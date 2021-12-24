@@ -8,3 +8,7 @@
 *.iml
 *.ipr
 *.iws
+
+tmp/
+
+.DS_Store
