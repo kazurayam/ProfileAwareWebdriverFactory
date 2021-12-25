@@ -43,7 +43,7 @@ class ChromeDriverFactoryTest {
 
 		DesiredCapabilities dc = cdFactory.getEmployedDesiredCapabilities()
 		assertNotNull(dc)
-		println("DesiredCapabilities: ${dc.toString()}")
+		//println("DesiredCapabilities: ${dc.toString()}")
 		//assertThat(cdFactory.getChromeProfile().getName(), is('kazurayam'))
 
 		driver.navigate().to('http://demoaut.katalon.com/')

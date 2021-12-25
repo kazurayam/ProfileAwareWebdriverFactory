@@ -17,7 +17,7 @@ class ChromeProfileUtilsTest {
 	@Test
 	void test_findUserDataDirectory() {
 		// when:
-		Path userDataDirectory= ChromeProfileUtils.findUserDataDirectory()
+		Path userDataDirectory= ChromeProfileUtils.getDefaultUserDataDirectory()
 		// then:
 		assertNotNull(userDataDirectory)
 		assertTrue(Files.exists(userDataDirectory))
