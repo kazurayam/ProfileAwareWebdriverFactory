@@ -1,8 +1,8 @@
 package com.kazurayam.webdriverfactory
 
 import com.kazurayam.webdriverfactory.chrome.ChromeDriverFactory
-import com.kazurayam.webdriverfactory.chrome.ChromeOptionsModifier
 import com.kazurayam.webdriverfactory.chrome.ChromeOptionsModifiers
+
 // import com.kazurayam.webdriverfactory.firefox.FirefoxDriverFactory
 // import com.kazurayam.webdriverfactory.firefox.FirefoxOptionsModifier
 // import com.kazurayam.webdriverfactory.firefox.FirefoxOptionsModifierHeadless
@@ -33,6 +33,10 @@ class WebDriverFactory {
 	}
 
 	static WebDriver newWebDriver(DriverTypeName driverTypeName, String userProfile) {
+		return newWebDriver(driverTypeName, new UserProfile(userProfile))
+	}
+
+	static WebDriver newWebDriver(DriverTypeName driverTypeName, UserProfile userProfile) {
 		switch (driverTypeName) {
 			case DriverTypeName.CHROME_DRIVER :
 				return ChromeDriverFactory.newInstance().newChromeDriverWithUserProfile(userProfile)

@@ -17,16 +17,6 @@ import org.junit.runners.JUnit4
 class ChromeDriverUtilsTest {
 
 	@Test
-	void test_getChromeProfileDirectory() {
-		// when:
-		Path profileDirectory = UserProfileUtils.getChromeProfileDirectory('Katalon')
-        UserProfile katalonProfile = new UserProfile(profileDirectory)
-		// then:
-		assertNotNull(katalonProfile)
-		assertNotNull(katalonProfile.getName())
-		//assertEquals(katalonProfile.getDirectoryName(), 'Profile 22')    // dependents on the runtime environment
-		assertEquals(katalonProfile.getProfilePath(), profileDirectory)
-	}
-	
+	void test_foo() {}
 
 }

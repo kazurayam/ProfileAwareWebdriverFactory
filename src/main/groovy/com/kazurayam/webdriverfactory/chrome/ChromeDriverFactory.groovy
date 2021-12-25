@@ -1,5 +1,6 @@
 package com.kazurayam.webdriverfactory.chrome
 
+import com.kazurayam.webdriverfactory.UserProfile
 import org.openqa.selenium.WebDriver
 import org.openqa.selenium.remote.DesiredCapabilities
 
@@ -19,9 +20,9 @@ abstract class ChromeDriverFactory {
 
 	abstract WebDriver newChromeDriver()
 
-	abstract WebDriver newChromeDriverWithUserProfile(String userName)
+	abstract WebDriver newChromeDriverWithUserProfile(UserProfile userProfile)
 
-	abstract WebDriver newChromeDriverWithUserProfileDirectoryName(String directoryName)
+	abstract WebDriver newChromeDriverWithProfileDirectoryName(String profileDirectoryName)
 
 	abstract DesiredCapabilities getEmployedDesiredCapabilities()
 }

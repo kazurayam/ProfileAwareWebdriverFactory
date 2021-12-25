@@ -1,8 +1,8 @@
 package com.kazurayam.webdriverfactory.chrome
 
+import com.kazurayam.webdriverfactory.UserProfile
 import org.junit.BeforeClass
 
-import static org.hamcrest.CoreMatchers.*
 import static org.junit.Assert.*
 
 import org.junit.Before
@@ -39,7 +39,7 @@ class ChromeDriverFactoryTest {
 	void test_newChromeDriver() {
 		ChromeDriverFactory cdFactory = ChromeDriverFactory.newInstance()
 		WebDriver driver = cdFactory.newChromeDriver()
-		assertThat(driver, is(notNullValue()))
+		assertNotNull(driver)
 
 		DesiredCapabilities dc = cdFactory.getEmployedDesiredCapabilities()
 		assertNotNull(dc)
@@ -55,10 +55,10 @@ class ChromeDriverFactoryTest {
 	 * 
 	 */
 	@Test
-	void test_newChromeDriverWithProfile() {
+	void test_newChromeDriverWithUserProfileName() {
 		ChromeDriverFactory cdFactory = ChromeDriverFactory.newInstance()
-		WebDriver driver = cdFactory.newChromeDriverWithUserProfile('Katalon')
-		assertThat(driver, is(notNullValue()))
+		WebDriver driver = cdFactory.newChromeDriverWithUserProfile(new UserProfile('Katalon'))
+		assertNotNull(driver)
 
 		DesiredCapabilities dc = cdFactory.getEmployedDesiredCapabilities()
 		assertNotNull(dc)
@@ -74,9 +74,9 @@ class ChromeDriverFactoryTest {
 	 * 
 	 */
 	@Test
-	void test_newChromeDriverWithProfileDirectory() {
+	void test_newChromeDriverWithProfileDirectoryName() {
 		ChromeDriverFactory cdFactory = ChromeDriverFactory.newInstance()
-		WebDriver driver = cdFactory.newChromeDriverWithUserProfileDirectoryName('Default')
+		WebDriver driver = cdFactory.newChromeDriverWithProfileDirectoryName('Default')
 		assertNotNull(driver)
 
 		DesiredCapabilities dc = cdFactory.getEmployedDesiredCapabilities()
@@ -105,7 +105,7 @@ class ChromeDriverFactoryTest {
 		//
 		String url = 'http://localhost/'
 		// 1st session
-		WebDriver driver = cdFactory.newChromeDriverWithUserProfile('Katalon')
+		WebDriver driver = cdFactory.newChromeDriverWithUserProfile(new UserProfile('Katalon'))
 		driver.navigate().to(url)
 		Set<Cookie> cookies = driver.manage().getCookies()
 		println "1st session: " + cookies
@@ -113,7 +113,7 @@ class ChromeDriverFactoryTest {
 		driver.quit()
 
 		// 2nd session
-		driver = cdFactory.newChromeDriverWithUserProfile('Katalon')
+		driver = cdFactory.newChromeDriverWithUserProfile(new UserProfile('Katalon'))
 		driver.navigate().to(url)
 		cookies = driver.manage().getCookies()
 		println "2nd session: " + cookies
