@@ -34,32 +34,28 @@ class WebDriverFactoryTest {
 	}
 
 	@Test
-	void test_newWebDriver_ChromeDriver() {
+	void test_newWebDriver_Chrome() {
 		driver = WebDriverFactory.newWebDriver(DriverTypeName.CHROME_DRIVER)
 		assertNotNull(driver)
 	}
 
 	@Test
-	void test_newWebDriver_ChromeDriver_Headless() {
+	void test_newWebDriver_Headless() {
 		driver = WebDriverFactory.newWebDriver(DriverTypeName.HEADLESS_DRIVER)
 		assertNotNull(driver)
 	}
 
 	@Test
-	void test_newWebDriver_ChromeDriver_withProfile() {
-		driver = WebDriverFactory.newWebDriver(DriverTypeName.CHROME_DRIVER, 'Katalon')
+	void test_newWebDriver_Chrome_UserProfile() {
+		driver = WebDriverFactory.newWebDriver(
+				DriverTypeName.CHROME_DRIVER, new UserProfile('Katalon'))
 		assertNotNull(driver)
 	}
 
 	@Test
-	void test_newWebDriver_ChromeDriver_withProfile_byDriverTypeName() {
-		driver = WebDriverFactory.newWebDriver(DriverTypeName.CHROME_DRIVER, 'Katalon')
-		assertNotNull(driver)
-	}
-
-	@Test
-	void test_newWebDriver_ChromeDriver_Headless_withProfile() {
-		driver = WebDriverFactory.newWebDriver(DriverTypeName.HEADLESS_DRIVER, 'Katalon')
+	void test_newWebDriver_Headless_UserProfile() {
+		driver = WebDriverFactory.newWebDriver(
+				DriverTypeName.HEADLESS_DRIVER, new UserProfile('Katalon'))
 		assertNotNull(driver)
 	}
 }

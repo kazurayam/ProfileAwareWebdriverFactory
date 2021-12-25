@@ -20,9 +20,14 @@ abstract class ChromeDriverFactory {
 
 	abstract WebDriver newChromeDriver()
 
-	abstract WebDriver newChromeDriverWithUserProfile(UserProfile userProfile)
+	abstract WebDriver newChromeDriver(UserProfile userProfile)
 
-	abstract WebDriver newChromeDriverWithProfileDirectoryName(ProfileDirectoryName profileDirectoryName)
+	abstract WebDriver newChromeDriver(UserProfile userProfile, UserDataAccess instruction)
 
 	abstract DesiredCapabilities getEmployedDesiredCapabilities()
+
+	enum UserDataAccess {
+		LOCK_USER_DATA,
+		CLONE_TO_TEMP
+	}
 }

@@ -39,12 +39,12 @@ class WebDriverFactory {
 	static WebDriver newWebDriver(DriverTypeName driverTypeName, UserProfile userProfile) {
 		switch (driverTypeName) {
 			case DriverTypeName.CHROME_DRIVER :
-				return ChromeDriverFactory.newInstance().newChromeDriverWithUserProfile(userProfile)
+				return ChromeDriverFactory.newInstance().newChromeDriver(userProfile)
 				break
 			case DriverTypeName.HEADLESS_DRIVER :	// Chrome Headless Browser
 				ChromeDriverFactory cdf = ChromeDriverFactory.newInstance()
 				cdf.addChromeOptionsModifier(ChromeOptionsModifiers.headless())
-				return cdf.newChromeDriverWithUserProfile(userProfile)
+				return cdf.newChromeDriver(userProfile)
 				break
 			//case DriverTypeName.FIREFOX_DRIVER :
 			//	return FirefoxDriverFactory.newInstance().newFirefoxDriverWithProfile(profileName)

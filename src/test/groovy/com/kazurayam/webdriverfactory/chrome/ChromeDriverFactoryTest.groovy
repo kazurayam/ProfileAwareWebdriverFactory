@@ -57,7 +57,7 @@ class ChromeDriverFactoryTest {
 	@Test
 	void test_newChromeDriverWithUserProfileName() {
 		ChromeDriverFactory cdFactory = ChromeDriverFactory.newInstance()
-		WebDriver driver = cdFactory.newChromeDriverWithUserProfile(new UserProfile('Katalon'))
+		WebDriver driver = cdFactory.newChromeDriver(new UserProfile('Katalon'))
 		assertNotNull(driver)
 
 		DesiredCapabilities dc = cdFactory.getEmployedDesiredCapabilities()
@@ -65,27 +65,6 @@ class ChromeDriverFactoryTest {
 		println("DesiredCapabilities: ${dc.toString()}")
 
 		println("ChromeDriver has been instantiated with profile Katalon")
-		driver.navigate().to('http://demoaut.katalon.com/')
-		driver.quit()
-	}
-
-	/**
-	 * Instantiate a ChromeDriver to open Chrome browser specifying a profile directory "Default"
-	 * 
-	 */
-	@Test
-	void test_newChromeDriverWithProfileDirectoryName() {
-		ChromeDriverFactory cdFactory = ChromeDriverFactory.newInstance()
-		WebDriver driver =
-				cdFactory.newChromeDriverWithProfileDirectoryName(
-				new ProfileDirectoryName('Default'))
-		assertNotNull(driver)
-
-		DesiredCapabilities dc = cdFactory.getEmployedDesiredCapabilities()
-		assertNotNull(dc)
-		println("DesiredCapabilities: ${dc.toString()}")
-
-		println("ChromeDriver has been instantiated with profile directory Default")
 		driver.navigate().to('http://demoaut.katalon.com/')
 		driver.quit()
 	}
@@ -107,7 +86,7 @@ class ChromeDriverFactoryTest {
 		//
 		String url = 'http://localhost/'
 		// 1st session
-		WebDriver driver = cdFactory.newChromeDriverWithUserProfile(new UserProfile('Katalon'))
+		WebDriver driver = cdFactory.newChromeDriver(new UserProfile('Katalon'))
 		driver.navigate().to(url)
 		Set<Cookie> cookies = driver.manage().getCookies()
 		println "1st session: " + cookies
@@ -115,7 +94,7 @@ class ChromeDriverFactoryTest {
 		driver.quit()
 
 		// 2nd session
-		driver = cdFactory.newChromeDriverWithUserProfile(new UserProfile('Katalon'))
+		driver = cdFactory.newChromeDriver(new UserProfile('Katalon'))
 		driver.navigate().to(url)
 		cookies = driver.manage().getCookies()
 		println "2nd session: " + cookies
