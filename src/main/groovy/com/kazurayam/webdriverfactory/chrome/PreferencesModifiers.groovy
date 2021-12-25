@@ -45,6 +45,9 @@ class PreferencesModifiers {
         return pm
     }
 
+    /**
+     *
+     */
     private static class Base implements PreferencesModifier {
         private Closure closure
         Base(Closure closure) {
@@ -53,7 +56,9 @@ class PreferencesModifiers {
         @Override
         Map<String, Object> modify(Map<String, Object> preferences) {
             Objects.requireNonNull(preferences)
-            return closure.call(preferences)
+            return (Map)closure.call(preferences)
         }
     }
+
+    private PreferencesModifiers() {}
 }

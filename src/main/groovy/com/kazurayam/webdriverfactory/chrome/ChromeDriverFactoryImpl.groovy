@@ -2,6 +2,7 @@ package com.kazurayam.webdriverfactory.chrome
 
 import com.kazurayam.webdriverfactory.WebDriverFactoryException
 import com.kazurayam.webdriverfactory.desiredcapabilities.DesiredCapabilitiesModifier
+import com.kazurayam.webdriverfactory.desiredcapabilities.DesiredCapabilitiesModifiers
 import com.kazurayam.webdriverfactory.desiredcapabilities.DesiredCapabilitiesBuilderImpl
 import org.apache.commons.io.FileUtils
 
@@ -70,7 +71,17 @@ class ChromeDriverFactoryImpl extends ChromeDriverFactory {
 		this.addPreferencesModifier(PreferencesModifiers.downloadIntoUserHomeDownloadsDirectory())
 		this.addPreferencesModifier(PreferencesModifiers.disableViewersOfFlashAndPdf())
 
-		this.addChromeOptionsModifier(new ChromeOptionsModifierDefault())
+		//this.addChromeOptionsModifier(new ChromeOptionsModifierDefault())
+		this.addChromeOptionsModifier(ChromeOptionsModifiers.windowSize1024_768())
+		this.addChromeOptionsModifier(ChromeOptionsModifiers.noSandbox())
+		//this.addChromeOptionsModifier(ChromeOptionsModifiers.singleProcess())
+		this.addChromeOptionsModifier(ChromeOptionsModifiers.disableInfobars())
+		//this.addChromeOptionsModifier(ChromeOptionsModifiers.disableExtensions())
+		this.addChromeOptionsModifier(ChromeOptionsModifiers.disableGpu())
+		this.addChromeOptionsModifier(ChromeOptionsModifiers.disableDevShmUsage())
+
+		//
+		this.addDesiredCapabilitiesModifier(DesiredCapabilitiesModifiers.passThrough())
 	}
 
 

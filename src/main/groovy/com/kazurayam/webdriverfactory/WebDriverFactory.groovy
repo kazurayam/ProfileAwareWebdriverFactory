@@ -1,13 +1,13 @@
 package com.kazurayam.webdriverfactory
 
-import org.openqa.selenium.WebDriver
-
 import com.kazurayam.webdriverfactory.chrome.ChromeDriverFactory
 import com.kazurayam.webdriverfactory.chrome.ChromeOptionsModifier
-import com.kazurayam.webdriverfactory.chrome.ChromeOptionsModifierHeadless
+import com.kazurayam.webdriverfactory.chrome.ChromeOptionsModifiers
 // import com.kazurayam.webdriverfactory.firefox.FirefoxDriverFactory
 // import com.kazurayam.webdriverfactory.firefox.FirefoxOptionsModifier
 // import com.kazurayam.webdriverfactory.firefox.FirefoxOptionsModifierHeadless
+
+import org.openqa.selenium.WebDriver
 
 
 class WebDriverFactory {
@@ -19,7 +19,7 @@ class WebDriverFactory {
 				break
 			case DriverTypeName.HEADLESS_DRIVER :	// Chrome Headless Browser
 				ChromeDriverFactory cdf = ChromeDriverFactory.newInstance()
-				cdf.addChromeOptionsModifier(new ChromeOptionsModifierHeadless())
+				cdf.addChromeOptionsModifier(ChromeOptionsModifiers.headless())
 				return cdf.newChromeDriver()
 				break
 			// I haven't worked out enough for Firefox yet
@@ -39,8 +39,7 @@ class WebDriverFactory {
 				break
 			case DriverTypeName.HEADLESS_DRIVER :	// Chrome Headless Browser
 				ChromeDriverFactory cdf = ChromeDriverFactory.newInstance()
-				ChromeOptionsModifier com = new ChromeOptionsModifierHeadless()
-				cdf.addChromeOptionsModifier(com)
+				cdf.addChromeOptionsModifier(ChromeOptionsModifiers.headless())
 				return cdf.newChromeDriverWithUserProfile(userProfile)
 				break
 			//case DriverTypeName.FIREFOX_DRIVER :
