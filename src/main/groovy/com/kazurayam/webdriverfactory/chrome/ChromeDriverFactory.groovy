@@ -22,7 +22,7 @@ abstract class ChromeDriverFactory {
 
 	abstract WebDriver newChromeDriverWithUserProfile(UserProfile userProfile)
 
-	abstract WebDriver newChromeDriverWithProfileDirectoryName(String profileDirectoryName)
+	abstract WebDriver newChromeDriverWithProfileDirectoryName(ProfileDirectoryName profileDirectoryName)
 
 	abstract DesiredCapabilities getEmployedDesiredCapabilities()
 }

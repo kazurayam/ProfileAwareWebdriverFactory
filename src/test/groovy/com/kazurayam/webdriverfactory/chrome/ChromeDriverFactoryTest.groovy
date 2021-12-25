@@ -76,7 +76,9 @@ class ChromeDriverFactoryTest {
 	@Test
 	void test_newChromeDriverWithProfileDirectoryName() {
 		ChromeDriverFactory cdFactory = ChromeDriverFactory.newInstance()
-		WebDriver driver = cdFactory.newChromeDriverWithProfileDirectoryName('Default')
+		WebDriver driver =
+				cdFactory.newChromeDriverWithProfileDirectoryName(
+				new ProfileDirectoryName('Default'))
 		assertNotNull(driver)
 
 		DesiredCapabilities dc = cdFactory.getEmployedDesiredCapabilities()

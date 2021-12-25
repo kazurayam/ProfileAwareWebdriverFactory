@@ -9,7 +9,7 @@ import java.util.stream.Collectors
 
 import com.kazurayam.webdriverfactory.utils.OSIdentifier
 
-final class ChromeUserProfileUtils {
+final class ChromeProfileUtils {
 
 	static Path findUserDataDirectory() {
 		if (OSIdentifier.isWindows()) {
@@ -75,16 +75,17 @@ final class ChromeUserProfileUtils {
 		return findChromeUserProfile(userProfileName) != null
 	}
 
-	static ChromeUserProfile findChromeUserProfileByProfileDirectoryName(String profileDirectoryName) {
-		List<ChromeUserProfile> userProfiles = getChromeUserProfileList()
-		for (ChromeUserProfile userProfile : userProfiles ) {
-			if (userProfile.getProfileDirectoryName() == profileDirectoryName) {
-				return userProfile
+	static ChromeUserProfile findChromeUserProfileByProfileDirectoryName(
+			ProfileDirectoryName profileDirectoryName) {
+		List<ChromeUserProfile> chromeUserProfiles = getChromeUserProfileList()
+		for (ChromeUserProfile chromeUserProfile : chromeUserProfiles ) {
+			if (chromeUserProfile.getProfileDirectoryName() == profileDirectoryName) {
+				return chromeUserProfile
 			}
 		}
 	}
 
-	static UserProfile findUserProfileByProfileDirectoryName(String profileDirectoryName) {
+	static UserProfile findUserProfileByProfileDirectoryName(ProfileDirectoryName profileDirectoryName) {
 		return findChromeUserProfileByProfileDirectoryName(profileDirectoryName).getUserProfileName()
 	}
 
@@ -105,6 +106,6 @@ final class ChromeUserProfileUtils {
 		return sb.toString()
 	}
 
-	private ChromeUserProfileUtils() {}
+	private ChromeProfileUtils() {}
 
 }

@@ -20,7 +20,7 @@ class ChromeUserProfileTest {
 	@Test
 	void test_ChromeProfile() {
 		// when:
-		Path userDataDirectory = ChromeUserProfileUtils.findUserDataDirectory()
+		Path userDataDirectory = ChromeProfileUtils.findUserDataDirectory()
         ChromeUserProfile defaultProfile =
 				new ChromeUserProfile(userDataDirectory, 'Default')
 		// then:
@@ -32,10 +32,10 @@ class ChromeUserProfileTest {
 
 	@Test
 	void test_getUserProfileDirectory() {
-		Path userDataDirectory = ChromeUserProfileUtils.findUserDataDirectory()
+		Path userDataDirectory = ChromeProfileUtils.findUserDataDirectory()
 		ChromeUserProfile defaultProfile =
 				new ChromeUserProfile(userDataDirectory, 'Default')
-		Path userProfileDirectory = defaultProfile.getUserProfileDirectory()
+		Path userProfileDirectory = defaultProfile.getChromeUserProfileDirectory()
 		assertNotNull(userProfileDirectory)
 		assertEquals('Default',
 				userProfileDirectory.getFileName().toString())
@@ -43,7 +43,7 @@ class ChromeUserProfileTest {
 
 	@Test
 	void test_toString() {
-		Path userDataDirectory = ChromeUserProfileUtils.findUserDataDirectory()
+		Path userDataDirectory = ChromeProfileUtils.findUserDataDirectory()
 		ChromeUserProfile defaultProfile =
 				new ChromeUserProfile(userDataDirectory, 'Default')
 		println defaultProfile.toString()

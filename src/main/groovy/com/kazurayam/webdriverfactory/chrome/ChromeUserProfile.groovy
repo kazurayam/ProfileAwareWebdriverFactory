@@ -56,12 +56,12 @@ class ChromeUserProfile implements Comparable<ChromeUserProfile> {
 		return this.userDataDirectory
 	}
 
-	String getProfileDirectoryName() {
-		return this.profileDirectoryName
+	ProfileDirectoryName getProfileDirectoryName() {
+		return new ProfileDirectoryName(this.profileDirectoryName)
 	}
 
-	Path getUserProfileDirectory() {
-		return this.getUserDataDirectory().resolve(this.getProfileDirectoryName())
+	Path getChromeUserProfileDirectory() {
+		return this.getUserDataDirectory().resolve(this.getProfileDirectoryName().getName())
 	}
 
 	UserProfile getUserProfileName() {

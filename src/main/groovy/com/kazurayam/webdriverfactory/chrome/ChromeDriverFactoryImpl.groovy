@@ -145,19 +145,23 @@ class ChromeDriverFactoryImpl extends ChromeDriverFactory {
 		//
 		this.prepare()
 		//
-		ChromeUserProfile chromeUserProfile = ChromeUserProfileUtils.findChromeUserProfile(userProfile)
-		Path profileDirectory = chromeUserProfile.getUserProfileDirectory()
+		ChromeUserProfile chromeUserProfile = ChromeProfileUtils.findChromeUserProfile(userProfile)
+		Path profileDirectory = chromeUserProfile.getChromeUserProfileDirectory()
 		if (profileDirectory != null) {
 			if (Files.exists(profileDirectory) && profileDirectory.toFile().canWrite()) {
 				// copy the Profile directory contents from the Chrome's internal "User Data" directory to temporary directory
 				// this is done in order to workaround "User Data is used" contention problem.
-				Path userDataDirectory = ChromeUserProfileUtils.findUserDataDirectory()
+				Path userDataDirectory = ChromeProfileUtils.findUserDataDirectory()
 				Path tempUDataDirectory = Files.createTempDirectory("User Data")
-				Path tempProfileDirectory = tempUDataDirectory.resolve(userProfile.toString())
+				String chromeProfileDirectoryName = chromeUserProfile.getProfileDirectoryName()
+				Path tempProfileDirectory = tempUDataDirectory.resolve(chromeProfileDirectoryName)
 				FileUtils.copyDirectory(profileDirectory.toFile(), tempProfileDirectory.toFile())
 
 				// create the basic ChromeOptionsModifier with copied profile dir
-				ChromeOptionsModifier com = new ChromeOptionsModifierUserProfile(tempUDataDirectory, tempProfileDirectory)
+				ChromeOptionsModifier com =
+						ChromeOptionsModifiers.withUserProfile(
+								tempUDataDirectory,
+								chromeProfileDirectoryName)
 				this.addChromeOptionsModifier(com)
 
 				//
@@ -184,7 +188,7 @@ class ChromeDriverFactoryImpl extends ChromeDriverFactory {
 		} else {
 			throw new WebDriverFactoryException(
 					"Profile directory for userName \"${userProfile}\" is not found." +
-					"\n" + ChromeUserProfileUtils.allChromeUserProfilesAsString())
+					"\n" + ChromeProfileUtils.allChromeUserProfilesAsString())
 		}
 	}
 
@@ -206,15 +210,15 @@ class ChromeDriverFactoryImpl extends ChromeDriverFactory {
 	 * </PRE>
 	 */
 	@Override
-	WebDriver newChromeDriverWithProfileDirectoryName(String profileDirectoryName) throws IOException {
+	WebDriver newChromeDriverWithProfileDirectoryName(ProfileDirectoryName profileDirectoryName) throws IOException {
 		Objects.requireNonNull(profileDirectoryName, "directoryName must not be null")
-		Path userDataDirectory = ChromeUserProfileUtils.findUserDataDirectory()
+		Path userDataDirectory = ChromeProfileUtils.findUserDataDirectory()
 		if (userDataDirectory != null) {
 			if (Files.exists(userDataDirectory)) {
-				Path profileDirectory = userDataDirectory.resolve(profileDirectoryName)
+				Path profileDirectory = userDataDirectory.resolve(profileDirectoryName.getName())
 				if (Files.exists(profileDirectory)) {
 					ChromeUserProfile chromeUserProfile =
-							ChromeUserProfileUtils.findChromeUserProfileByProfileDirectoryName(profileDirectoryName)
+							ChromeProfileUtils.findChromeUserProfileByProfileDirectoryName(profileDirectoryName)
 					return newChromeDriverWithUserProfile(chromeUserProfile.getUserProfileName())
 				} else {
 					throw new IOException("${profileDirectory} is not found")

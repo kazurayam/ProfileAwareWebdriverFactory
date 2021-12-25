@@ -12,12 +12,12 @@ import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
 
 @RunWith(JUnit4.class)
-class ChromeUserProfileUtilsTest {
+class ChromeProfileUtilsTest {
 
 	@Test
 	void test_findUserDataDirectory() {
 		// when:
-		Path userDataDirectory= ChromeUserProfileUtils.findUserDataDirectory()
+		Path userDataDirectory= ChromeProfileUtils.findUserDataDirectory()
 		// then:
 		assertNotNull(userDataDirectory)
 		assertTrue(Files.exists(userDataDirectory))
@@ -25,13 +25,13 @@ class ChromeUserProfileUtilsTest {
 
 	@Test
 	void test_getUserProfiles() {
-		List<ChromeUserProfile> userProfiles = ChromeUserProfileUtils.getChromeUserProfileList()
+		List<ChromeUserProfile> userProfiles = ChromeProfileUtils.getChromeUserProfileList()
 		assertTrue(userProfiles.size() > 0)
 	}
 
 	@Test
 	void test_listAllUserProfiles() {
-		String text = ChromeUserProfileUtils.allChromeUserProfilesAsString()
+		String text = ChromeProfileUtils.allChromeUserProfilesAsString()
 		//println text
 		assertTrue( text.length() > 0)
 	}
@@ -41,14 +41,16 @@ class ChromeUserProfileUtilsTest {
 	 */
 	@Test
 	void test_getUserProfile() {
-		ChromeUserProfile userProfile = ChromeUserProfileUtils.findChromeUserProfile(new UserProfile('Katalon'))
+		ChromeUserProfile userProfile = ChromeProfileUtils.findChromeUserProfile(new UserProfile('Katalon'))
 		assertNotNull(userProfile)
 		assertEquals(userProfile.getUserProfileName(), new UserProfile('Katalon'))
 	}
 
 	@Test
 	void test_getChromeProfileNameByDirectoryName() {
-		String profileName = ChromeUserProfileUtils.findUserProfileByProfileDirectoryName('Default')
+		String profileName =
+				ChromeProfileUtils.findUserProfileByProfileDirectoryName(
+						new ProfileDirectoryName('Default'))
 		assertNotNull(profileName)
 		println("DirectoryName \'Default\' is associated with the Profile \'${profileName}\'")
 	}
