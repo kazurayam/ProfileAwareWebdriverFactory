@@ -2,7 +2,15 @@ package com.kazurayam.webdriverfactory.chrome
 
 import org.openqa.selenium.chrome.ChromeOptions
 
-interface ChromeOptionsBuilder {
+abstract class ChromeOptionsBuilder {
 
-	ChromeOptions build(Map<String, Object> chromePreferences)
+	static ChromeOptionsBuilder newInstance() {
+		return new ChromeOptionsBuilderImpl()
+	}
+
+	static ChromeOptionsBuilder newInstance(Map<String, Object> chromePreferences) {
+		return new ChromeOptionsBuilderImpl(chromePreferences)
+	}
+
+	abstract ChromeOptions build()
 }

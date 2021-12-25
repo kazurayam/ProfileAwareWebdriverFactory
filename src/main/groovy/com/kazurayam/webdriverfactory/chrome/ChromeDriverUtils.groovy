@@ -24,7 +24,10 @@ class ChromeDriverUtils {
 	 * returns the path of the binary of Chrome browser
 	 *
 	 * https://github.com/SeleniumHQ/selenium/wiki/ChromeDriver#requirements
+	 *
+	 * No more used. we will to delegate to the binogracia/webdrivermanager
 	 */
+	@Deprecated
 	static Path getChromeBinaryPath() {
 		if (OSIdentifier.isWindows()) {
 			// "C:\Program Files (x86)\Google\Chrome\Application\chrome.exe"
@@ -36,28 +39,6 @@ class ChromeDriverUtils {
 		} else {
 			throw new IllegalStateException(
 			"Windows, Mac, Linux are supported. Other platforms are not supported")
-		}
-	}
-
-	/**
-	 * as described https://chromium.googlesource.com/chromium/src/+/HEAD/docs/user_data_dir.md
-	 *
-	 * @returns the path of 'UserData' directory in which Google Chrome's Profile directories are located
-	 */
-	static Path getChromeUserDataDirectory() {
-		return ChromeProfileFinder.getChromeUserDataDirectory()
-	}
-
-	/**
-	 * @returns the path of directory in which Chrome Profile of 'name' is located
-	 */
-	static Path getChromeProfileDirectory(String name) {
-		Objects.requireNonNull(name, "name must not be null")
-		ChromeProfile cProfile = ChromeProfileFinder.getChromeProfile(name)
-		if (cProfile != null) {
-			return cProfile.getProfilePath()
-		} else {
-			return null
 		}
 	}
 }

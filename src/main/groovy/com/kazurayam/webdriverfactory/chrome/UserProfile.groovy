@@ -11,7 +11,7 @@ import groovy.json.JsonSlurper
  * 
  * @author kazurayam
  */
-class ChromeProfile implements Comparable<ChromeProfile> {
+class UserProfile implements Comparable<UserProfile> {
 
 	static final String PREFERENCES_FILE_NAME = 'Preferences'
 
@@ -20,7 +20,7 @@ class ChromeProfile implements Comparable<ChromeProfile> {
 	private String name_ = null
 	private String directoryName_ = null
 
-	ChromeProfile(Path profilePath) {
+	UserProfile(Path profilePath) {
 		Path preferences = profilePath.resolve(PREFERENCES_FILE_NAME)
 		if (!Files.exists(preferences)) {
 			throw new IOException("${preferences.toString()} is not found")
@@ -54,7 +54,7 @@ class ChromeProfile implements Comparable<ChromeProfile> {
 	}
 
 	@Override
-	int compareTo(ChromeProfile other) {
+	int compareTo(UserProfile other) {
 		return this.getName().compareTo(other.getName())
 	}
 }

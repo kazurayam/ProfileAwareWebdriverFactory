@@ -7,7 +7,7 @@ import java.nio.file.Paths
 
 import com.kazurayam.webdriverfactory.utils.OSIdentifier
 
-public class FirefoxDriverUtils {
+class FirefoxDriverUtils {
 
 	/**
 	 * 

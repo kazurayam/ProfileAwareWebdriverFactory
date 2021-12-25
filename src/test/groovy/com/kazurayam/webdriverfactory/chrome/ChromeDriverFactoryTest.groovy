@@ -57,7 +57,7 @@ class ChromeDriverFactoryTest {
 	@Test
 	void test_newChromeDriverWithProfile() {
 		ChromeDriverFactory cdFactory = ChromeDriverFactory.newInstance()
-		WebDriver driver = cdFactory.newChromeDriverWithProfile('Katalon')
+		WebDriver driver = cdFactory.newChromeDriverWithUserProfile('Katalon')
 		assertThat(driver, is(notNullValue()))
 
 		DesiredCapabilities dc = cdFactory.getEmployedDesiredCapabilities()
@@ -76,8 +76,8 @@ class ChromeDriverFactoryTest {
 	@Test
 	void test_newChromeDriverWithProfileDirectory() {
 		ChromeDriverFactory cdFactory = ChromeDriverFactory.newInstance()
-		WebDriver driver = cdFactory.newChromeDriverWithProfileDirectory('Default')
-		assertThat(driver, is(notNullValue()))
+		WebDriver driver = cdFactory.newChromeDriverWithUserProfileDirectoryName('Default')
+		assertNotNull(driver)
 
 		DesiredCapabilities dc = cdFactory.getEmployedDesiredCapabilities()
 		assertNotNull(dc)
@@ -105,7 +105,7 @@ class ChromeDriverFactoryTest {
 		//
 		String url = 'http://localhost/'
 		// 1st session
-		WebDriver driver = cdFactory.newChromeDriverWithProfile('Katalon')
+		WebDriver driver = cdFactory.newChromeDriverWithUserProfile('Katalon')
 		driver.navigate().to(url)
 		Set<Cookie> cookies = driver.manage().getCookies()
 		println "1st session: " + cookies
@@ -113,7 +113,7 @@ class ChromeDriverFactoryTest {
 		driver.quit()
 
 		// 2nd session
-		driver = cdFactory.newChromeDriverWithProfile('Katalon')
+		driver = cdFactory.newChromeDriverWithUserProfile('Katalon')
 		driver.navigate().to(url)
 		cookies = driver.manage().getCookies()
 		println "2nd session: " + cookies

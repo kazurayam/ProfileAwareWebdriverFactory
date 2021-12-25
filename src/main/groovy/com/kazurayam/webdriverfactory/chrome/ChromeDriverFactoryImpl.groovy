@@ -16,7 +16,6 @@ import org.openqa.selenium.remote.DesiredCapabilities
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
-
 import groovy.json.JsonOutput
 
 class ChromeDriverFactoryImpl extends ChromeDriverFactory {
@@ -30,22 +29,22 @@ class ChromeDriverFactoryImpl extends ChromeDriverFactory {
 		}
 	}
 
-	private final List<ChromePreferencesModifier> chromePreferencesModifiers_
+	private final List<PreferencesModifier> preferencesModifiers_
 	private final List<ChromeOptionsModifier> chromeOptionsModifiers_
 	private final List<DesiredCapabilitiesModifier> desiredCapabilitiesModifiers_
 
 	private DesiredCapabilities desiredCapabilities_
 
 	ChromeDriverFactoryImpl() {
-		chromePreferencesModifiers_   = new ArrayList<>()
+		preferencesModifiers_         = new ArrayList<>()
 		chromeOptionsModifiers_       = new ArrayList<>()
 		desiredCapabilitiesModifiers_ = new ArrayList<>()
 		desiredCapabilities_ = null
 	}
 
 	@Override
-	void addChromePreferencesModifier(ChromePreferencesModifier chromePreferencesModifier) {
-		chromePreferencesModifiers_.add(chromePreferencesModifier)
+	void addPreferencesModifier(PreferencesModifier preferencesModifier) {
+		preferencesModifiers_.add(preferencesModifier)
 	}
 
 	@Override
@@ -66,7 +65,11 @@ class ChromeDriverFactoryImpl extends ChromeDriverFactory {
 	private void prepare() {
 		ChromeDriverUtils.enableChromeDriverLog(Paths.get(".").resolve('tmp'))
 
-		this.addChromePreferencesModifier(new ChromePreferencesModifierDefault())
+		//this.addPreferencesModifier(new PreferencesModifierDefault())
+		this.addPreferencesModifier(PreferencesModifiers.downloadWithoutPrompt())
+		this.addPreferencesModifier(PreferencesModifiers.downloadIntoUserHomeDownloadsDirectory())
+		this.addPreferencesModifier(PreferencesModifiers.disableViewersOfFlashAndPdf())
+
 		this.addChromeOptionsModifier(new ChromeOptionsModifierDefault())
 	}
 
@@ -81,15 +84,15 @@ class ChromeDriverFactoryImpl extends ChromeDriverFactory {
 	private WebDriver execute() {
 
 		// create a Chrome Preferences object as the seed
-		Map<String, Object> chromePreferences = new ChromePreferencesBuilderImpl().build()
+		Map<String, Object> preferences = new HashMap<>()
 
 		// modify the instance of Chrome Preferences
-		for (ChromePreferencesModifier cpm in chromePreferencesModifiers_) {
-			chromePreferences = cpm.modify(chromePreferences)
+		for (PreferencesModifier cpm in preferencesModifiers_) {
+			preferences = cpm.modify(preferences)
 		}
 
 		// create Chrome Options taking over the Chrome Preferences
-		ChromeOptions chromeOptions = new ChromeOptionsBuilderImpl().build(chromePreferences)
+		ChromeOptions chromeOptions = ChromeOptionsBuilder.newInstance(preferences).build()
 		// modify the Chrome Options
 		for (ChromeOptionsModifier com in chromeOptionsModifiers_) {
 			chromeOptions = com.modify(chromeOptions)
@@ -124,24 +127,24 @@ class ChromeDriverFactoryImpl extends ChromeDriverFactory {
 	 * https://chromium.googlesource.com/chromium/src/+/HEAD/docs/user_data_dir.md#Current-Location
 	 */
 	@Override
-	WebDriver newChromeDriverWithProfile(String profileName) {
+	WebDriver newChromeDriverWithUserProfile(String profileName) {
 		Objects.requireNonNull(profileName, "profileName must not be null")
 		//
 		this.prepare()
 		//
-		Path profileDirectory = ChromeDriverUtils.getChromeProfileDirectory(profileName)
+		Path profileDirectory = UserProfileUtils.getChromeProfileDirectory(profileName)
 		if (profileDirectory != null) {
 			if (Files.exists(profileDirectory) && profileDirectory.toFile().canWrite()) {
 
 				// copy the Profile directory contents from the Chrome's internal "User Data" directory to temporary directory
 				// this is done in order to workaround "User Data is used" contention problem.
-				Path userDataDirectory = ChromeDriverUtils.getChromeUserDataDirectory()
+				Path userDataDirectory = UserProfileUtils.getUserDataDirectory()
 				Path tempUDataDirectory = Files.createTempDirectory("User Data")
 				Path tempProfileDirectory = tempUDataDirectory.resolve(profileName)
 				FileUtils.copyDirectory(profileDirectory.toFile(), tempProfileDirectory.toFile())
 
 				// create the basic ChromeOptionsModifier with copied profile dir
-				ChromeOptionsModifier com = new ChromeOptionsModifierWithProfile(tempUDataDirectory, tempProfileDirectory)
+				ChromeOptionsModifier com = new ChromeOptionsModifierUserProfile(tempUDataDirectory, tempProfileDirectory)
 				this.addChromeOptionsModifier(com)
 
 				//
@@ -169,7 +172,7 @@ class ChromeDriverFactoryImpl extends ChromeDriverFactory {
 		} else {
 			throw new WebDriverFactoryException(
 					"Profile directory for userName \"${profileName}\" is not found." +
-					"\n" + ChromeProfileFinder.listChromeProfiles())
+					"\n" + UserProfileUtils.listUserProfiles())
 		}
 	}
 
@@ -191,18 +194,21 @@ class ChromeDriverFactoryImpl extends ChromeDriverFactory {
 	 * </PRE>
 	 */
 	@Override
-	WebDriver newChromeDriverWithProfileDirectory(String directoryName) throws IOException {
-		Objects.requireNonNull(directoryName, "directoryName must not be null")
-		Path userDataDir = ChromeDriverUtils.getChromeUserDataDirectory()
-		if (userDataDir != null) {
-			if (Files.exists(userDataDir)) {
-				Path profileDirectory = userDataDir.resolve(directoryName)
+	WebDriver newChromeDriverWithUserProfileDirectoryName(String profileDirectoryName) throws IOException {
+		Objects.requireNonNull(profileDirectoryName, "directoryName must not be null")
+		Path userDataDirectory = UserProfileUtils.getUserDataDirectory()
+		if (userDataDirectory != null) {
+			if (Files.exists(userDataDirectory)) {
+				Path profileDirectory = userDataDirectory.resolve(profileDirectoryName)
 				if (Files.exists(profileDirectory)) {
-					ChromeProfile chromeProfile = ChromeProfileFinder.getChromeProfileByDirectoryName(profileDirectory)
-					return newChromeDriverWithProfile(chromeProfile.getName())
+					UserProfile userProfile =
+							UserProfileUtils.getUserProfileByDirectoryName(profileDirectoryName)
+					return newChromeDriverWithUserProfile(userProfile.getName())
+				} else {
+					throw new IOException("${profileDirectory} is not found")
 				}
 			} else {
-				throw new IOException("${userDataDir} is not found")
+				throw new IOException("${userDataDirectory} is not found")
 			}
 		} else {
 			throw new IOException("unable to identify the User Data Directory of Chrome browser")

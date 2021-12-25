@@ -1,16 +1,18 @@
 package com.kazurayam.webdriverfactory.chrome
 
+import com.kazurayam.webdriverfactory.chrome.ChromeOptionsModifier
+
 import java.nio.file.Files
 import java.nio.file.Path
 
 import org.openqa.selenium.chrome.ChromeOptions
 
-class ChromeOptionsModifierWithProfile implements ChromeOptionsModifier {
+class ChromeOptionsModifierUserProfile implements ChromeOptionsModifier {
 
 	private Path userDataDirectory_
 	private Path profileDirectory_
 
-	ChromeOptionsModifierWithProfile(Path userDataDirectory, Path profileDirectory) {
+	ChromeOptionsModifierUserProfile(Path userDataDirectory, Path profileDirectory) {
 		Objects.requireNonNull(userDataDirectory, "userDataDirectory must not be null")
 		if (!Files.exists(userDataDirectory)) {
 			throw new IllegalArgumentException("${userDataDirectory} does not exist")

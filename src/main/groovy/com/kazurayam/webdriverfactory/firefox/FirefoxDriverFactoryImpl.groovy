@@ -14,6 +14,7 @@ import com.kazurayam.webdriverfactory.desiredcapabilities.DesiredCapabilitiesMod
 import com.kazurayam.webdriverfactory.desiredcapabilities.DesiredCapabilitiesBuilderImpl
 
 import groovy.json.JsonOutput
+
 class FirefoxDriverFactoryImpl extends FirefoxDriverFactory {
 
 	static Logger logger_ = LoggerFactory.getLogger(FirefoxDriverFactoryImpl.class)
@@ -25,7 +26,7 @@ class FirefoxDriverFactoryImpl extends FirefoxDriverFactory {
 		}
 	}
 
-	private final List<FirefoxPreferencesModifier> firefoxPreferencesModifiers_
+	private final List<PreferencesModifier> firefoxPreferencesModifiers_
 	private final List<FirefoxOptionsModifier> firefoxOptionsModifiers_
 	private final List<DesiredCapabilitiesModifier> desiredCapabilitiesModifiers_
 
@@ -39,7 +40,7 @@ class FirefoxDriverFactoryImpl extends FirefoxDriverFactory {
 	}
 
 	@Override
-	void addFirefoxPreferencesModifier(FirefoxPreferencesModifier firefoxPreferencesModifier) {
+	void addFirefoxPreferencesModifier(PreferencesModifier firefoxPreferencesModifier) {
 		firefoxPreferencesModifiers_.add(firefoxPreferencesModifier)
 	}
 
@@ -60,7 +61,7 @@ class FirefoxDriverFactoryImpl extends FirefoxDriverFactory {
 	private void prepare() {
 		FirefoxDriverUtils.enableFirefoxDriverLog(Paths.get(".").resolve('tmp'))
 
-		this.addFirefoxPreferencesModifier(new FirefoxPreferencesModifierDefault())
+		this.addFirefoxPreferencesModifier(new PreferencesModifierDefault())
 		this.addFirefoxOptionsModifier(new FirefoxOptionsModifierDefault())
 	}
 
@@ -75,7 +76,7 @@ class FirefoxDriverFactoryImpl extends FirefoxDriverFactory {
 		Map<String, Object> firefoxPreferences = new HashMap<>()
 
 		// modify the Chrome Preferences
-		for (FirefoxPreferencesModifier modifier in firefoxPreferencesModifiers_) {
+		for (PreferencesModifier modifier in firefoxPreferencesModifiers_) {
 			firefoxPreferences = modifier.modify(firefoxPreferences)
 		}
 

@@ -3,28 +3,28 @@ package com.kazurayam.webdriverfactory.firefox
 import java.nio.file.Path
 import java.nio.file.Paths
 
-public class FirefoxPreferencesModifierDefault implements FirefoxPreferencesModifier {
+class PreferencesModifierDefault implements PreferencesModifier {
 
 	@Override
-	Map<String, Object> modify(Map<String, Object> firefoxPreferences) {
-		Objects.requireNonNull(firefoxPreferences)
+	Map<String, Object> modify(Map<String, Object> preferences) {
+		Objects.requireNonNull(preferences)
 
 		// set location to store files after downloading
-		firefoxPreferences.put("browser.download.useDownloadDir", true)
-		firefoxPreferences.put("browser.download.folderList", 2)
+		preferences.put("browser.download.useDownloadDir", true)
+		preferences.put("browser.download.folderList", 2)
 		Path downloads = Paths.get(System.getProperty('user.home'), 'Downloads')
-		firefoxPreferences.put("browser.download.dir", downloads.toString())
+		preferences.put("browser.download.dir", downloads.toString())
 
 		// set preference not to show file download confirmation dialog
 		def mimeTypes = getAllMimeTypesAsString()
 		//println "mimeTypes=${mimeTypes}"
-		firefoxPreferences.put("browser.helperApps.neverAsk.saveToDisk", mimeTypes)
-		firefoxPreferences.put("browser.helperApps.neverAsk.openFile", mimeTypes)
+		preferences.put("browser.helperApps.neverAsk.saveToDisk", mimeTypes)
+		preferences.put("browser.helperApps.neverAsk.openFile", mimeTypes)
 
 		// profile.setPreference("browser.download.manager.showWhenStarting", false) // you can not modify this particular profile any more
-		firefoxPreferences.put("pdfjs.disable", true)
+		preferences.put("pdfjs.disable", true)
 
-		return firefoxPreferences
+		return preferences
 	}
 
 	private static String getAllMimeTypesAsString() {

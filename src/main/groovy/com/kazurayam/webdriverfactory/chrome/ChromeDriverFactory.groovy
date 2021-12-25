@@ -11,7 +11,7 @@ abstract class ChromeDriverFactory {
 		return new ChromeDriverFactoryImpl()
 	}
 
-	abstract void addChromePreferencesModifier(ChromePreferencesModifier chromePreferencesModifier)
+	abstract void addPreferencesModifier(PreferencesModifier chromePreferencesModifier)
 
 	abstract void addChromeOptionsModifier(ChromeOptionsModifier chromeOptionsModifier)
 
@@ -19,9 +19,9 @@ abstract class ChromeDriverFactory {
 
 	abstract WebDriver newChromeDriver()
 
-	abstract WebDriver newChromeDriverWithProfile(String userName)
+	abstract WebDriver newChromeDriverWithUserProfile(String userName)
 
-	abstract WebDriver newChromeDriverWithProfileDirectory(String directoryName)
+	abstract WebDriver newChromeDriverWithUserProfileDirectoryName(String directoryName)
 
 	abstract DesiredCapabilities getEmployedDesiredCapabilities()
 }
