@@ -26,6 +26,8 @@ abstract class ChromeDriverFactory {
 
 	abstract DesiredCapabilities getEmployedDesiredCapabilities()
 
+	abstract String getEmployedDesiredCapabilitiesAsJSON()
+
 	enum UserDataAccess {
 		LOCK_USER_DATA,
 		CLONE_TO_TEMP

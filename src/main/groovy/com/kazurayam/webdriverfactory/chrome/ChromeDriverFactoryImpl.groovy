@@ -25,14 +25,6 @@ class ChromeDriverFactoryImpl extends ChromeDriverFactory {
 
 	static Logger logger_ = LoggerFactory.getLogger(ChromeDriverFactoryImpl.class)
 
-	static {
-		// dynamically override the toString() method of the Selenium's built-in class
-		// so that it print in JSON pretty format
-		DesiredCapabilities.metaClass.toString = {
-			return JsonOutput.prettyPrint(JsonOutput.toJson(delegate.asMap()))
-		}
-	}
-
 	private final List<PreferencesModifier> preferencesModifiers_
 	private final List<ChromeOptionsModifier> chromeOptionsModifiers_
 	private final List<DesiredCapabilitiesModifier> desiredCapabilitiesModifiers_
@@ -70,6 +62,15 @@ class ChromeDriverFactoryImpl extends ChromeDriverFactory {
 		return this.desiredCapabilities_
 	}
 
+	@Override
+	String getEmployedDesiredCapabilitiesAsJSON() {
+		// dynamically override the toJSON() method of the Selenium's built-in class
+		// so that it print in JSON pretty format
+		DesiredCapabilities.metaClass.toJSON = {
+			return JsonOutput.prettyPrint(JsonOutput.toJson(delegate.asMap()))
+		}
+		return this.getEmployedDesiredCapabilities().toJSON()
+	}
 
 
 

@@ -43,8 +43,7 @@ class ChromeDriverFactoryTest {
 
 		DesiredCapabilities dc = cdFactory.getEmployedDesiredCapabilities()
 		assertNotNull(dc)
-		//println("DesiredCapabilities: ${dc.toString()}")
-		//assertThat(cdFactory.getChromeProfile().getName(), is('kazurayam'))
+		println("DesiredCapabilities: ${cdFactory.getEmployedDesiredCapabilitiesAsJSON()}")
 
 		driver.navigate().to('http://demoaut.katalon.com/')
 		driver.quit()
@@ -62,7 +61,7 @@ class ChromeDriverFactoryTest {
 
 		DesiredCapabilities dc = cdFactory.getEmployedDesiredCapabilities()
 		assertNotNull(dc)
-		println("DesiredCapabilities: ${dc.toString()}")
+		println("DesiredCapabilities: ${cdFactory.getEmployedDesiredCapabilitiesAsJSON()}")
 
 		println("ChromeDriver has been instantiated with profile Katalon")
 		driver.navigate().to('http://demoaut.katalon.com/')
@@ -86,7 +85,7 @@ class ChromeDriverFactoryTest {
 
 		DesiredCapabilities dc = cdFactory.getEmployedDesiredCapabilities()
 		assertNotNull(dc)
-		println("DesiredCapabilities: ${dc.toString()}")
+		println("DesiredCapabilities: ${cdFactoy.getEmployedDesiedCapabilitiesAsJSON()}")
 
 		driver.navigate().to('http://demoaut.katalon.com/')
 		driver.quit()
@@ -125,5 +124,20 @@ class ChromeDriverFactoryTest {
 		driver.quit()
 		//
 		assert phpsessid1st == phpsessid2nd;
+	}
+
+	@Test
+	void test_addPreferences_and_newChromeDriver() {
+		ChromeDriverFactory cdFactory = ChromeDriverFactory.newInstance()
+
+		WebDriver driver = cdFactory.newChromeDriver()
+		assertNotNull(driver)
+		DesiredCapabilities dc = cdFactory.getEmployedDesiredCapabilities()
+		assertNotNull(dc)
+		println("DesiredCapabilities: ${cdFactory.getEmployedDesiredCapabilitiesAsJSON()}")
+
+		driver.navigate().to('http://demoaut.katalon.com/')
+		driver.quit()
+
 	}
 }
