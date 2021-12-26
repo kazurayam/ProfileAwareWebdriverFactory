@@ -1,1 +1,1 @@
-see https://ProfileAwareWebdriverFactory.kazurayam.github.com/index.md
+see https://webdriverfactory.kazurayam.github.com/index.md
