@@ -25,6 +25,13 @@ class ChromeOptionsModifiersTest {
     }
 
     @Test
+    void test_incognito() {
+        ChromeOptionsModifier com = ChromeOptionsModifiers.incognito()
+        ChromeOptions modified = com.modify(options)
+        verifyContainsArgument(modified, '--incognito')
+    }
+
+    @Test
     void test_windowSize1024_768() {
         ChromeOptionsModifier com = ChromeOptionsModifiers.windowSize1024_768()
         ChromeOptions modified = com.modify(options)

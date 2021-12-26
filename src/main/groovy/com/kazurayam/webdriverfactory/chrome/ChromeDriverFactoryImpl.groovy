@@ -32,10 +32,27 @@ class ChromeDriverFactoryImpl extends ChromeDriverFactory {
 	private DesiredCapabilities desiredCapabilities_
 
 	ChromeDriverFactoryImpl() {
-		preferencesModifiers_         = new ArrayList<>()
-		chromeOptionsModifiers_       = new ArrayList<>()
+		preferencesModifiers_ = new ArrayList<>()
+		chromeOptionsModifiers_ = new ArrayList<>()
 		desiredCapabilitiesModifiers_ = new ArrayList<>()
 		desiredCapabilities_ = null
+		this.prepareDefaultSettings()
+	}
+
+	private void prepareDefaultSettings() {
+		this.addPreferencesModifier(PreferencesModifiers.downloadWithoutPrompt())
+		this.addPreferencesModifier(PreferencesModifiers.downloadIntoUserHomeDownloadsDirectory())
+		this.addPreferencesModifier(PreferencesModifiers.disableViewersOfFlashAndPdf())
+		//
+		this.addChromeOptionsModifier(ChromeOptionsModifiers.windowSize1024_768())
+		this.addChromeOptionsModifier(ChromeOptionsModifiers.noSandbox())
+		//this.addChromeOptionsModifier(ChromeOptionsModifiers.singleProcess())
+		this.addChromeOptionsModifier(ChromeOptionsModifiers.disableInfobars())
+		//this.addChromeOptionsModifier(ChromeOptionsModifiers.disableExtensions())
+		this.addChromeOptionsModifier(ChromeOptionsModifiers.disableGpu())
+		this.addChromeOptionsModifier(ChromeOptionsModifiers.disableDevShmUsage())
+		//
+		this.addDesiredCapabilitiesModifier(DesiredCapabilitiesModifiers.passThrough())
 	}
 
 	@Override
@@ -73,12 +90,9 @@ class ChromeDriverFactoryImpl extends ChromeDriverFactory {
 	}
 
 
-
-
-
 	@Override
 	WebDriver newChromeDriver() {
-		this.prepare()
+		this.prepareDefaultSettings()
 		WebDriver driver = this.execute()
 		return driver
 	}
@@ -160,7 +174,6 @@ class ChromeDriverFactoryImpl extends ChromeDriverFactory {
 		// launch the Chrome driver
 		WebDriver driver = null
 		try {
-			this.prepare()
 			driver = this.execute()
 			return driver
 		} catch (InvalidArgumentException iae) {
@@ -178,30 +191,6 @@ class ChromeDriverFactoryImpl extends ChromeDriverFactory {
 		}
 	}
 
-	/**
-	 * 1. enable logging by Chrome Driver into the tmp directory under the Katalon Studio Project directory
-	 * 2. ensure the path of Chrome Driver executable
-	 */
-	private void prepare() {
-		ChromeDriverUtils.enableChromeDriverLog(Paths.get(".").resolve('tmp'))
-
-		//this.addPreferencesModifier(new PreferencesModifierDefault())
-		this.addPreferencesModifier(PreferencesModifiers.downloadWithoutPrompt())
-		this.addPreferencesModifier(PreferencesModifiers.downloadIntoUserHomeDownloadsDirectory())
-		this.addPreferencesModifier(PreferencesModifiers.disableViewersOfFlashAndPdf())
-
-		//this.addChromeOptionsModifier(new ChromeOptionsModifierDefault())
-		this.addChromeOptionsModifier(ChromeOptionsModifiers.windowSize1024_768())
-		this.addChromeOptionsModifier(ChromeOptionsModifiers.noSandbox())
-		//this.addChromeOptionsModifier(ChromeOptionsModifiers.singleProcess())
-		this.addChromeOptionsModifier(ChromeOptionsModifiers.disableInfobars())
-		//this.addChromeOptionsModifier(ChromeOptionsModifiers.disableExtensions())
-		this.addChromeOptionsModifier(ChromeOptionsModifiers.disableGpu())
-		this.addChromeOptionsModifier(ChromeOptionsModifiers.disableDevShmUsage())
-
-		//
-		this.addDesiredCapabilitiesModifier(DesiredCapabilitiesModifiers.passThrough())
-	}
 
 
 	/**
@@ -242,6 +231,12 @@ class ChromeDriverFactoryImpl extends ChromeDriverFactory {
 		return driver
 	}
 
-
-
+	@Override
+	void enableChromeDriverLog(Path outputDirectory) {
+		Objects.requireNonNull(outputDirectory)
+		if (!Files.exists(outputDirectory)) {
+			Files.createDirectories(outputDirectory)
+		}
+		ChromeDriverUtils.enableChromeDriverLog ( outputDirectory)
+	}
 }

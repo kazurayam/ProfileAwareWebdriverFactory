@@ -15,6 +15,7 @@ import org.openqa.selenium.WebDriver
 import org.openqa.selenium.remote.DesiredCapabilities
 
 import io.github.bonigarcia.wdm.WebDriverManager
+import groovy.json.*
 
 /**
  * @author kazurayam
@@ -43,7 +44,8 @@ class ChromeDriverFactoryTest {
 
 		DesiredCapabilities dc = cdFactory.getEmployedDesiredCapabilities()
 		assertNotNull(dc)
-		println("DesiredCapabilities: ${cdFactory.getEmployedDesiredCapabilitiesAsJSON()}")
+		String dcJson = cdFactory.getEmployedDesiredCapabilitiesAsJSON()
+		println("DesiredCapabilities is\n${dcJson}")
 
 		driver.navigate().to('http://demoaut.katalon.com/')
 		driver.quit()
@@ -61,7 +63,8 @@ class ChromeDriverFactoryTest {
 
 		DesiredCapabilities dc = cdFactory.getEmployedDesiredCapabilities()
 		assertNotNull(dc)
-		println("DesiredCapabilities: ${cdFactory.getEmployedDesiredCapabilitiesAsJSON()}")
+		String dcJson = cdFactory.getEmployedDesiredCapabilitiesAsJSON()
+		println("DesiredCapabilities is\n${dcJson}")
 
 		println("ChromeDriver has been instantiated with profile Katalon")
 		driver.navigate().to('http://demoaut.katalon.com/')
@@ -75,6 +78,9 @@ class ChromeDriverFactoryTest {
 	 * > invalid argument: user data directory is already in use, please specify a unique value for --user-data-dir argument, or don't use --user-data-dir
 	 * when you have at least 1 Chrome browser already opened.
 	 */
+	@Ignore
+	// This test case is ignored because it tends to fail easily:
+	// when you have Chrome opened when you execute this test, it will certainly fail
 	@Test
 	void test_newChromeDriver_withUserProfile_LOCK() {
 		ChromeDriverFactory cdFactory = ChromeDriverFactory.newInstance()
@@ -85,7 +91,8 @@ class ChromeDriverFactoryTest {
 
 		DesiredCapabilities dc = cdFactory.getEmployedDesiredCapabilities()
 		assertNotNull(dc)
-		println("DesiredCapabilities: ${cdFactoy.getEmployedDesiedCapabilitiesAsJSON()}")
+		String dcJson = cdFactory.getEmployedDesiredCapabilitiesAsJSON()
+		println("DesiredCapabilities is\n${dcJson}")
 
 		driver.navigate().to('http://demoaut.katalon.com/')
 		driver.quit()
@@ -127,17 +134,31 @@ class ChromeDriverFactoryTest {
 	}
 
 	@Test
-	void test_addPreferences_and_newChromeDriver() {
+	void test_addChromeOptionsModifier_and_newChromeDriver() {
 		ChromeDriverFactory cdFactory = ChromeDriverFactory.newInstance()
-
+		//
+		cdFactory.addChromeOptionsModifier(ChromeOptionsModifiers.incognito())
+		//
 		WebDriver driver = cdFactory.newChromeDriver()
 		assertNotNull(driver)
 		DesiredCapabilities dc = cdFactory.getEmployedDesiredCapabilities()
 		assertNotNull(dc)
-		println("DesiredCapabilities: ${cdFactory.getEmployedDesiredCapabilitiesAsJSON()}")
-
+		String dcJson = cdFactory.getEmployedDesiredCapabilitiesAsJSON()
+		println("DesiredCapabilities is\n${dcJson}")
 		driver.navigate().to('http://demoaut.katalon.com/')
 		driver.quit()
-
+		//
+		def jo = new JsonSlurper().parseText(dcJson)
+		/*
+		DesiredCapabilities is
+		{
+			"acceptSslCerts": true,
+			"browserName": "chrome",
+			"goog:chromeOptions": {
+				"args": [
+						"--incognito",
+						...
+		 */
+		assertTrue(jo["goog:chromeOptions"]["args"].contains("--incognito"))
 	}
 }

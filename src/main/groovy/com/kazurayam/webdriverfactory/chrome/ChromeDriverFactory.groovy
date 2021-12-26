@@ -6,6 +6,8 @@ import org.openqa.selenium.remote.DesiredCapabilities
 
 import com.kazurayam.webdriverfactory.desiredcapabilities.DesiredCapabilitiesModifier
 
+import java.nio.file.Path
+
 abstract class ChromeDriverFactory {
 
 	static ChromeDriverFactory newInstance() {
@@ -27,6 +29,8 @@ abstract class ChromeDriverFactory {
 	abstract DesiredCapabilities getEmployedDesiredCapabilities()
 
 	abstract String getEmployedDesiredCapabilitiesAsJSON()
+
+	abstract void enableChromeDriverLog(Path outputDirectory)
 
 	enum UserDataAccess {
 		LOCK_USER_DATA,

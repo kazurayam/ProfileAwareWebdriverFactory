@@ -15,6 +15,14 @@ class ChromeOptionsModifiers {
         return com
     }
 
+    static ChromeOptionsModifier incognito() {
+        ChromeOptionsModifier com = new Base({ ChromeOptions chromeOptions ->
+            chromeOptions.addArguments("--incognito")
+            return chromeOptions
+        })
+        return com
+    }
+
     /**
      * set window-size=1027,768
      * @return
