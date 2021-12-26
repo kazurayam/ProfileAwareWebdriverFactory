@@ -14,6 +14,10 @@ abstract class ChromeDriverFactory {
 		return new ChromeDriverFactoryImpl()
 	}
 
+	static ChromeDriverFactory newInstance(boolean requireDefaultSettings) {
+		return new ChromeDriverFactoryImpl(requireDefaultSettings)
+	}
+
 	abstract void addPreferencesModifier(PreferencesModifier chromePreferencesModifier)
 
 	abstract void addChromeOptionsModifier(ChromeOptionsModifier chromeOptionsModifier)

@@ -10,7 +10,6 @@ import org.openqa.selenium.InvalidArgumentException
 
 import java.nio.file.Files
 import java.nio.file.Path
-import java.nio.file.Paths
 
 import org.openqa.selenium.WebDriver
 import org.openqa.selenium.chrome.ChromeDriver
@@ -25,18 +24,24 @@ class ChromeDriverFactoryImpl extends ChromeDriverFactory {
 
 	static Logger logger_ = LoggerFactory.getLogger(ChromeDriverFactoryImpl.class)
 
-	private final List<PreferencesModifier> preferencesModifiers_
-	private final List<ChromeOptionsModifier> chromeOptionsModifiers_
-	private final List<DesiredCapabilitiesModifier> desiredCapabilitiesModifiers_
+	private final List<PreferencesModifier> preferencesModifiers
+	private final List<ChromeOptionsModifier> chromeOptionsModifiers
+	private final List<DesiredCapabilitiesModifier> desiredCapabilitiesModifiers
 
-	private DesiredCapabilities desiredCapabilities_
+	private DesiredCapabilities desiredCapabilities
 
 	ChromeDriverFactoryImpl() {
-		preferencesModifiers_ = new ArrayList<>()
-		chromeOptionsModifiers_ = new ArrayList<>()
-		desiredCapabilitiesModifiers_ = new ArrayList<>()
-		desiredCapabilities_ = null
-		this.prepareDefaultSettings()
+		this(true)
+	}
+
+	ChromeDriverFactoryImpl(boolean requireDefaultSettings) {
+		preferencesModifiers = new ArrayList<>()
+		chromeOptionsModifiers = new ArrayList<>()
+		desiredCapabilitiesModifiers = new ArrayList<>()
+		desiredCapabilities = null
+		if (requireDefaultSettings) {
+			this.prepareDefaultSettings()
+		}
 	}
 
 	private void prepareDefaultSettings() {
@@ -57,17 +62,17 @@ class ChromeDriverFactoryImpl extends ChromeDriverFactory {
 
 	@Override
 	void addPreferencesModifier(PreferencesModifier preferencesModifier) {
-		preferencesModifiers_.add(preferencesModifier)
+		preferencesModifiers.add(preferencesModifier)
 	}
 
 	@Override
 	void addChromeOptionsModifier(ChromeOptionsModifier chromeOptionsModifier) {
-		chromeOptionsModifiers_.add(chromeOptionsModifier)
+		chromeOptionsModifiers.add(chromeOptionsModifier)
 	}
 
 	@Override
 	void addDesiredCapabilitiesModifier(DesiredCapabilitiesModifier desiredCapabilitiesModifier) {
-		desiredCapabilitiesModifiers_.add(desiredCapabilitiesModifier)
+		desiredCapabilitiesModifiers.add(desiredCapabilitiesModifier)
 	}
 
 	/**
@@ -76,7 +81,7 @@ class ChromeDriverFactoryImpl extends ChromeDriverFactory {
 	 */
 	@Override
 	DesiredCapabilities getEmployedDesiredCapabilities() {
-		return this.desiredCapabilities_
+		return this.desiredCapabilities
 	}
 
 	@Override
@@ -92,7 +97,6 @@ class ChromeDriverFactoryImpl extends ChromeDriverFactory {
 
 	@Override
 	WebDriver newChromeDriver() {
-		this.prepareDefaultSettings()
 		WebDriver driver = this.execute()
 		return driver
 	}
@@ -206,26 +210,26 @@ class ChromeDriverFactoryImpl extends ChromeDriverFactory {
 		Map<String, Object> preferences = new HashMap<>()
 
 		// modify the instance of Chrome Preferences
-		for (PreferencesModifier cpm in preferencesModifiers_) {
+		for (PreferencesModifier cpm in preferencesModifiers) {
 			preferences = cpm.modify(preferences)
 		}
 
 		// create Chrome Options taking over the Chrome Preferences
 		ChromeOptions chromeOptions = ChromeOptionsBuilder.newInstance(preferences).build()
 		// modify the Chrome Options
-		for (ChromeOptionsModifier com in chromeOptionsModifiers_) {
+		for (ChromeOptionsModifier com in chromeOptionsModifiers) {
 			chromeOptions = com.modify(chromeOptions)
 		}
 
 		// create Desired Capabilities taking over settings in the Chrome Options
-		desiredCapabilities_ = new DesiredCapabilitiesBuilderImpl().build(chromeOptions)
+		desiredCapabilities = new DesiredCapabilitiesBuilderImpl().build(chromeOptions)
 		// modify the Desired Capabilities
-		for (DesiredCapabilitiesModifier dcm in desiredCapabilitiesModifiers_) {
-			desiredCapabilities_ = dcm.modify(desiredCapabilities_)
+		for (DesiredCapabilitiesModifier dcm in desiredCapabilitiesModifiers) {
+			desiredCapabilities = dcm.modify(desiredCapabilities)
 		}
 
 		// now launch the browser
-		WebDriver driver = new ChromeDriver(desiredCapabilities_)
+		WebDriver driver = new ChromeDriver(desiredCapabilities)
 
 		// well done
 		return driver

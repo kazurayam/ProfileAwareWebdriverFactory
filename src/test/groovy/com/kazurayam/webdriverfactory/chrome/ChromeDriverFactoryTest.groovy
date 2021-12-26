@@ -31,22 +31,52 @@ class ChromeDriverFactoryTest {
 	@Before
 	void setup() {}
 
+	@Test
+	void test_newChromeDriver_no_default_settings() {
+		ChromeDriverFactory cdFactory = ChromeDriverFactory.newInstance(false)
+		//
+		WebDriver driver = cdFactory.newChromeDriver()
+		assertNotNull(driver)
+		DesiredCapabilities dc = cdFactory.getEmployedDesiredCapabilities()
+		assertNotNull(dc)
+		String dcJson = cdFactory.getEmployedDesiredCapabilitiesAsJSON()
+		println("DesiredCapabilities is\n${dcJson}")
+		//
+		driver.navigate().to('http://demoaut.katalon.com/')
+		driver.quit()
+		//
+		def jo = new JsonSlurper().parseText(dcJson)
+		/* in case "with default setting" you will see
+		DesiredCapabilities is
+		{
+			"acceptSslCerts": true,
+			"browserName": "chrome",
+			"goog:chromeOptions": {
+				"args": [
+						"window-size=1024,768",
+						...
+		 */
+		assertFalse("window-size option should not be there when no default setting",
+				jo["goog:chromeOptions"]["args"].contains("window-size=1024,768")
+		)
+	}
+
 	/**
 	 * Basic case.
 	 * Instantiate a ChromeDriver to open a Chrome browser with the default profile.
 	 * 
 	 */
 	@Test
-	void test_newChromeDriver_withoutUserProfile() {
+	void test_newChromeDriver_noUserProfileSpeciified() {
 		ChromeDriverFactory cdFactory = ChromeDriverFactory.newInstance()
+
 		WebDriver driver = cdFactory.newChromeDriver()
 		assertNotNull(driver)
-
 		DesiredCapabilities dc = cdFactory.getEmployedDesiredCapabilities()
 		assertNotNull(dc)
 		String dcJson = cdFactory.getEmployedDesiredCapabilitiesAsJSON()
 		println("DesiredCapabilities is\n${dcJson}")
-
+		//
 		driver.navigate().to('http://demoaut.katalon.com/')
 		driver.quit()
 	}
@@ -134,7 +164,7 @@ class ChromeDriverFactoryTest {
 	}
 
 	@Test
-	void test_addChromeOptionsModifier_and_newChromeDriver() {
+	void test_addChromeOptionsModifier_incognito() {
 		ChromeDriverFactory cdFactory = ChromeDriverFactory.newInstance()
 		//
 		cdFactory.addChromeOptionsModifier(ChromeOptionsModifiers.incognito())
