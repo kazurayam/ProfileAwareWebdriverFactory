@@ -36,7 +36,7 @@ class ChromeDriverFactoryTest {
 	 * 
 	 */
 	@Test
-	void test_newChromeDriver() {
+	void test_newChromeDriver_withoutUserProfile() {
 		ChromeDriverFactory cdFactory = ChromeDriverFactory.newInstance()
 		WebDriver driver = cdFactory.newChromeDriver()
 		assertNotNull(driver)
@@ -52,10 +52,10 @@ class ChromeDriverFactoryTest {
 
 	/**
 	 * Instantiate a ChromeDriver to open a Chrome browser specifying a user profile "Katalon"
-	 * 
+	 * while cloning the User Data directory to a temporary folder
 	 */
 	@Test
-	void test_newChromeDriverWithUserProfileName() {
+	void test_newChromeDriver_withUserProfile_CLONE() {
 		ChromeDriverFactory cdFactory = ChromeDriverFactory.newInstance()
 		WebDriver driver = cdFactory.newChromeDriver(new UserProfile('Katalon'))
 		assertNotNull(driver)
@@ -65,6 +65,29 @@ class ChromeDriverFactoryTest {
 		println("DesiredCapabilities: ${dc.toString()}")
 
 		println("ChromeDriver has been instantiated with profile Katalon")
+		driver.navigate().to('http://demoaut.katalon.com/')
+		driver.quit()
+	}
+
+	/**
+	 * Instantiate a ChromeDriver to open a Chrome browser specifying a user profile "Katalon"
+	 * while cloning the User Data directory to a temporary folder
+	 * You are likely to see an error:
+	 * > invalid argument: user data directory is already in use, please specify a unique value for --user-data-dir argument, or don't use --user-data-dir
+	 * when you have at least 1 Chrome browser already opened.
+	 */
+	@Test
+	void test_newChromeDriver_withUserProfile_LOCK() {
+		ChromeDriverFactory cdFactory = ChromeDriverFactory.newInstance()
+		WebDriver driver = cdFactory.newChromeDriver(
+				new UserProfile('Katalon'),
+				ChromeDriverFactory.UserDataAccess.LOCK_USER_DATA)
+		assertNotNull(driver)
+
+		DesiredCapabilities dc = cdFactory.getEmployedDesiredCapabilities()
+		assertNotNull(dc)
+		println("DesiredCapabilities: ${dc.toString()}")
+
 		driver.navigate().to('http://demoaut.katalon.com/')
 		driver.quit()
 	}
