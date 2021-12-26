@@ -1,1 +1,1 @@
-see https://webdriverfactory.kazurayam.github.com/index.md
+see https://kazurayam.github.io/webdriverfactory/
