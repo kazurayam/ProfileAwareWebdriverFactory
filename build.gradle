@@ -7,7 +7,7 @@ plugins {
     id 'signing'
 }
 
-group 'org.kazurayam'
+group 'com.kazurayam'
 version '0.1.0-SNAPSHOT'
 
 ext.isReleaseVersion = ! version.endsWith("SNAPSHOT")
