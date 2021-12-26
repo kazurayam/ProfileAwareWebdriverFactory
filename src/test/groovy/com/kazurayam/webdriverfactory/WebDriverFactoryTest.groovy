@@ -43,6 +43,15 @@ class WebDriverFactoryTest {
 	}
 
 	@Test
+	void test_getEmployedDesiredCapabilities() {
+		WebDriverFactory wdf = new WebDriverFactory.Builder(DriverTypeName.CHROME_DRIVER).build()
+		driver = wdf.newWebDriver()
+		String json = wdf.getEmployedDesiredCapabilities()
+		assertNotNull(json)
+		println json
+	}
+
+	@Test
 	void test_newWebDriver_Headless() {
 		WebDriverFactory wdf = new WebDriverFactory.Builder(DriverTypeName.HEADLESS_DRIVER).build()
 		driver = wdf.newWebDriver()
