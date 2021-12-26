@@ -1,6 +1,6 @@
 package com.kazurayam.webdriverfactory.firefox
 
-interface PreferencesModifier {
+interface FirefoxPreferencesModifier {
 
 	Map<String, Object> modify(Map<String, Object> preferences)
 }

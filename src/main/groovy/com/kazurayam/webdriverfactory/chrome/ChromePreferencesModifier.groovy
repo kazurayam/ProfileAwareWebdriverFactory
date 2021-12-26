@@ -1,6 +1,6 @@
 package com.kazurayam.webdriverfactory.chrome
 
-interface PreferencesModifier {
+interface ChromePreferencesModifier {
 
 	Map<String, Object> modify(Map<String, Object> preferences)
 }

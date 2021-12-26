@@ -11,7 +11,7 @@ abstract class FirefoxDriverFactory {
 		return new FirefoxDriverFactoryImpl()
 	}
 
-	abstract void addFirefoxPreferencesModifier(PreferencesModifier firefoxPreferecesModifier)
+	abstract void addFirefoxPreferencesModifier(FirefoxPreferencesModifier firefoxPreferecesModifier)
 
 	abstract void addFirefoxOptionsModifier(FirefoxOptionsModifier firefoxOptionsModifier)
 

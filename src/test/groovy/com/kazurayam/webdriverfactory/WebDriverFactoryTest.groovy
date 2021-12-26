@@ -1,5 +1,6 @@
 package com.kazurayam.webdriverfactory
 
+import org.junit.Before
 import org.junit.BeforeClass
 
 import static org.junit.Assert.*
@@ -15,47 +16,54 @@ import io.github.bonigarcia.wdm.WebDriverManager
 @RunWith(JUnit4.class)
 class WebDriverFactoryTest {
 
-	WebDriver driver
+	private WebDriver driver
 
 	@BeforeClass
 	static void beforeClass() {
 		WebDriverManager.chromedriver().setup()
+	}
 
-		//String ght = TestUtils.getGitHubPersonalAccessToken()
-		//WebDriverManager.firefoxdriver().gitHubToken(ght).setup()
+	@Before
+	void setup() {
+		driver = null
 	}
 
 	@After
 	void quitWebDriver() {
 		if (driver != null) {
 			driver.quit()
-			driver = null
 		}
 	}
 
 	@Test
 	void test_newWebDriver_Chrome() {
-		driver = WebDriverFactory.newWebDriver(DriverTypeName.CHROME_DRIVER)
+		WebDriverFactory wdf = new WebDriverFactory.Builder(DriverTypeName.CHROME_DRIVER).build()
+		driver = wdf.newWebDriver()
 		assertNotNull(driver)
 	}
 
 	@Test
 	void test_newWebDriver_Headless() {
-		driver = WebDriverFactory.newWebDriver(DriverTypeName.HEADLESS_DRIVER)
+		WebDriverFactory wdf = new WebDriverFactory.Builder(DriverTypeName.HEADLESS_DRIVER).build()
+		driver = wdf.newWebDriver()
 		assertNotNull(driver)
 	}
 
 	@Test
 	void test_newWebDriver_Chrome_UserProfile() {
-		driver = WebDriverFactory.newWebDriver(
-				DriverTypeName.CHROME_DRIVER, new UserProfile('Katalon'))
+		WebDriverFactory wdf = new WebDriverFactory.Builder(DriverTypeName.CHROME_DRIVER)
+				.userProfile('Katalon')
+				.build()
+		driver = wdf.newWebDriver()
 		assertNotNull(driver)
 	}
 
 	@Test
 	void test_newWebDriver_Headless_UserProfile() {
-		driver = WebDriverFactory.newWebDriver(
-				DriverTypeName.HEADLESS_DRIVER, new UserProfile('Katalon'))
+		WebDriverFactory wdf = new WebDriverFactory.Builder(DriverTypeName.HEADLESS_DRIVER)
+				.userProfile('Katalon')
+				.build()
+		driver = wdf.newWebDriver()
 		assertNotNull(driver)
 	}
 }

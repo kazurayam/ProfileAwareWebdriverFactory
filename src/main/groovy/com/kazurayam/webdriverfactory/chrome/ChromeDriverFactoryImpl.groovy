@@ -24,7 +24,7 @@ class ChromeDriverFactoryImpl extends ChromeDriverFactory {
 
 	static Logger logger_ = LoggerFactory.getLogger(ChromeDriverFactoryImpl.class)
 
-	private final List<PreferencesModifier> preferencesModifiers
+	private final List<ChromePreferencesModifier> chromePreferencesModifiers
 	private final List<ChromeOptionsModifier> chromeOptionsModifiers
 	private final List<DesiredCapabilitiesModifier> desiredCapabilitiesModifiers
 
@@ -35,19 +35,19 @@ class ChromeDriverFactoryImpl extends ChromeDriverFactory {
 	}
 
 	ChromeDriverFactoryImpl(boolean requireDefaultSettings) {
-		preferencesModifiers = new ArrayList<>()
+		chromePreferencesModifiers = new ArrayList<>()
 		chromeOptionsModifiers = new ArrayList<>()
 		desiredCapabilitiesModifiers = new ArrayList<>()
-		desiredCapabilities = null
+		desiredCapabilities = new DesiredCapabilities()
 		if (requireDefaultSettings) {
 			this.prepareDefaultSettings()
 		}
 	}
 
 	private void prepareDefaultSettings() {
-		this.addPreferencesModifier(PreferencesModifiers.downloadWithoutPrompt())
-		this.addPreferencesModifier(PreferencesModifiers.downloadIntoUserHomeDownloadsDirectory())
-		this.addPreferencesModifier(PreferencesModifiers.disableViewersOfFlashAndPdf())
+		this.addChromePreferencesModifier(ChromePreferencesModifiers.downloadWithoutPrompt())
+		this.addChromePreferencesModifier(ChromePreferencesModifiers.downloadIntoUserHomeDownloadsDirectory())
+		this.addChromePreferencesModifier(ChromePreferencesModifiers.disableViewersOfFlashAndPdf())
 		//
 		this.addChromeOptionsModifier(ChromeOptionsModifiers.windowSize1024_768())
 		this.addChromeOptionsModifier(ChromeOptionsModifiers.noSandbox())
@@ -61,8 +61,13 @@ class ChromeDriverFactoryImpl extends ChromeDriverFactory {
 	}
 
 	@Override
-	void addPreferencesModifier(PreferencesModifier preferencesModifier) {
-		preferencesModifiers.add(preferencesModifier)
+	void addChromePreferencesModifier(ChromePreferencesModifier preferencesModifier) {
+		chromePreferencesModifiers.add(preferencesModifier)
+	}
+
+	@Override
+	void addAllChromePreferencesModifiers(List<ChromePreferencesModifier> list) {
+		chromePreferencesModifiers.addAll(list)
 	}
 
 	@Override
@@ -71,9 +76,20 @@ class ChromeDriverFactoryImpl extends ChromeDriverFactory {
 	}
 
 	@Override
+	void addAllChromeOptionsModifiers(List<ChromeOptionsModifier> list) {
+		chromeOptionsModifiers.addAll(list)
+	}
+
+	@Override
 	void addDesiredCapabilitiesModifier(DesiredCapabilitiesModifier desiredCapabilitiesModifier) {
 		desiredCapabilitiesModifiers.add(desiredCapabilitiesModifier)
 	}
+
+	@Override
+	void addAllDesiredCapabilitiesModifiers(List<DesiredCapabilitiesModifier> list) {
+		desiredCapabilitiesModifiers.addAll(list)
+	}
+
 
 	/**
 	 * returns the DesiredCapability object employed when the factory instantiated ChromeDriver by calling execute().
@@ -109,7 +125,7 @@ class ChromeDriverFactoryImpl extends ChromeDriverFactory {
 	 */
 	@Override
 	WebDriver newChromeDriver(UserProfile userProfile) {
-		return newChromeDriver(userProfile, UserDataAccess.CLONE_TO_TEMP)
+		return newChromeDriver(userProfile, UserDataAccess.TO_GO)
 	}
 
 	/**
@@ -152,7 +168,7 @@ class ChromeDriverFactoryImpl extends ChromeDriverFactory {
 		Path userDataDirectory = ChromeProfileUtils.getDefaultUserDataDirectory()
 		ProfileDirectoryName profileDirectoryName = chromeUserProfile.getProfileDirectoryName()
 
-		if (instruction == UserDataAccess.CLONE_TO_TEMP) {
+		if (instruction == UserDataAccess.TO_GO) {
 			// create a temporary directory with name "User Data", into which
 			// copy the Profile directory contents from the Chrome's internal "User Data",
 			// this is done in order to workaround "User Data is used" contention problem.
@@ -210,7 +226,7 @@ class ChromeDriverFactoryImpl extends ChromeDriverFactory {
 		Map<String, Object> preferences = new HashMap<>()
 
 		// modify the instance of Chrome Preferences
-		for (PreferencesModifier cpm in preferencesModifiers) {
+		for (ChromePreferencesModifier cpm in chromePreferencesModifiers) {
 			preferences = cpm.modify(preferences)
 		}
 

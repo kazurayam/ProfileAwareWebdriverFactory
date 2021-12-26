@@ -18,11 +18,23 @@ abstract class ChromeDriverFactory {
 		return new ChromeDriverFactoryImpl(requireDefaultSettings)
 	}
 
-	abstract void addPreferencesModifier(PreferencesModifier chromePreferencesModifier)
+	abstract void addChromePreferencesModifier(
+			ChromePreferencesModifier chromePreferencesModifier)
 
-	abstract void addChromeOptionsModifier(ChromeOptionsModifier chromeOptionsModifier)
+	abstract void addAllChromePreferencesModifiers(
+			List<ChromePreferencesModifier> chromePreferencesModifierList)
 
-	abstract void addDesiredCapabilitiesModifier(DesiredCapabilitiesModifier desiredCapabilitiesModifier)
+	abstract void addChromeOptionsModifier(
+			ChromeOptionsModifier chromeOptionsModifier)
+
+	abstract void addAllChromeOptionsModifiers(
+			List<ChromeOptionsModifier> chromeOptionsModifierList)
+
+	abstract void addDesiredCapabilitiesModifier(
+			DesiredCapabilitiesModifier desiredCapabilitiesModifier)
+
+	abstract void addAllDesiredCapabilitiesModifiers(
+			List<DesiredCapabilitiesModifier> desiredCapabilitiesModifierList)
 
 	abstract WebDriver newChromeDriver()
 
@@ -37,7 +49,7 @@ abstract class ChromeDriverFactory {
 	abstract void enableChromeDriverLog(Path outputDirectory)
 
 	enum UserDataAccess {
-		LOCK_USER_DATA,
-		CLONE_TO_TEMP
+		FOR_HERE,
+		TO_GO
 	}
 }

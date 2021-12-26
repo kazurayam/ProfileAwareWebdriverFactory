@@ -2,6 +2,8 @@ package com.kazurayam.webdriverfactory
 
 class UserProfile implements Comparable<UserProfile> {
 
+    public static UserProfile NULL = new UserProfile(null)
+
     private String name
 
     UserProfile(String name) {

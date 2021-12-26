@@ -26,7 +26,7 @@ class FirefoxDriverFactoryImpl extends FirefoxDriverFactory {
 		}
 	}
 
-	private final List<PreferencesModifier> firefoxPreferencesModifiers_
+	private final List<FirefoxPreferencesModifier> firefoxPreferencesModifiers_
 	private final List<FirefoxOptionsModifier> firefoxOptionsModifiers_
 	private final List<DesiredCapabilitiesModifier> desiredCapabilitiesModifiers_
 
@@ -40,7 +40,7 @@ class FirefoxDriverFactoryImpl extends FirefoxDriverFactory {
 	}
 
 	@Override
-	void addFirefoxPreferencesModifier(PreferencesModifier firefoxPreferencesModifier) {
+	void addFirefoxPreferencesModifier(FirefoxPreferencesModifier firefoxPreferencesModifier) {
 		firefoxPreferencesModifiers_.add(firefoxPreferencesModifier)
 	}
 
@@ -61,7 +61,7 @@ class FirefoxDriverFactoryImpl extends FirefoxDriverFactory {
 	private void prepare() {
 		FirefoxDriverUtils.enableFirefoxDriverLog(Paths.get(".").resolve('tmp'))
 
-		this.addFirefoxPreferencesModifier(new PreferencesModifierDefault())
+		this.addFirefoxPreferencesModifier(new FirefoxPreferencesModifierDefault())
 		this.addFirefoxOptionsModifier(new FirefoxOptionsModifierDefault())
 	}
 
@@ -76,7 +76,7 @@ class FirefoxDriverFactoryImpl extends FirefoxDriverFactory {
 		Map<String, Object> firefoxPreferences = new HashMap<>()
 
 		// modify the Chrome Preferences
-		for (PreferencesModifier modifier in firefoxPreferencesModifiers_) {
+		for (FirefoxPreferencesModifier modifier in firefoxPreferencesModifiers_) {
 			firefoxPreferences = modifier.modify(firefoxPreferences)
 		}
 

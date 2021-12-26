@@ -8,7 +8,7 @@ import static org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
 
-class PreferencesModifiersTest {
+class ChromePreferencesModifiersTest {
 
     private Map<String, Object> preferences
 
@@ -19,7 +19,7 @@ class PreferencesModifiersTest {
 
     @Test
     void test_downloadWithoutPrompt() {
-        PreferencesModifier pm = PreferencesModifiers.downloadWithoutPrompt()
+        ChromePreferencesModifier pm = ChromePreferencesModifiers.downloadWithoutPrompt()
         Map<String, Object> modified = pm.modify(preferences)
         assertEquals(0, modified.get('profile.default_content_settings.popups'))
         assertEquals(false, modified.get('download.prompt_for_download'))
@@ -27,7 +27,7 @@ class PreferencesModifiersTest {
 
     @Test
     void test_downloadIntoUserHomeDownloadsDirectory() {
-        PreferencesModifier pm = PreferencesModifiers.downloadIntoUserHomeDownloadsDirectory()
+        ChromePreferencesModifier pm = ChromePreferencesModifiers.downloadIntoUserHomeDownloadsDirectory()
         Map<String, Object> modified = pm.modify(preferences)
         assertNotNull(modified.get('download.default_directory'))
         String value = (String)modified.get('download.default_directory')
@@ -37,7 +37,7 @@ class PreferencesModifiersTest {
     @Test
     void test_downloadIntoDirectory() {
         Path dir = Paths.get(System.getProperty('user.dir'), 'tmp')
-        PreferencesModifier pm = PreferencesModifiers.downloadIntoDirectory(dir)
+        ChromePreferencesModifier pm = ChromePreferencesModifiers.downloadIntoDirectory(dir)
         Map<String, Object> modified = pm.modify(preferences)
         assertNotNull(modified.get('download.default_directory'))
         String value = (String)modified.get('download.default_directory')
@@ -46,7 +46,7 @@ class PreferencesModifiersTest {
 
     @Test
     void test_disableViewersOfFlashAndPdf() {
-        PreferencesModifier pm = PreferencesModifiers.disableViewersOfFlashAndPdf()
+        ChromePreferencesModifier pm = ChromePreferencesModifiers.disableViewersOfFlashAndPdf()
         Map<String, Object> modified = pm.modify(preferences)
         assertNotNull(modified.get('plugins.plugins_disabled'))
         String value = (String)modified.get('plugins.plugins_disabled')

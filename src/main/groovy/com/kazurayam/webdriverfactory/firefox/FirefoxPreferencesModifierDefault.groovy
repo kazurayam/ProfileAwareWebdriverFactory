@@ -3,7 +3,7 @@ package com.kazurayam.webdriverfactory.firefox
 import java.nio.file.Path
 import java.nio.file.Paths
 
-class PreferencesModifierDefault implements PreferencesModifier {
+class FirefoxPreferencesModifierDefault implements FirefoxPreferencesModifier {
 
 	@Override
 	Map<String, Object> modify(Map<String, Object> preferences) {
