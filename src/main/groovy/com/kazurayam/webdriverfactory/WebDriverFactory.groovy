@@ -70,6 +70,9 @@ class WebDriverFactory {
 		private List<ChromeOptionsModifier> chromeOptionsModifierList = new ArrayList<>()
 		private List<DesiredCapabilitiesModifier> desiredCapabilitiesModifierList = new ArrayList<>()
 		private Boolean requireDefaultSettings = true
+		Builder() {
+			this(DriverTypeName.CHROME_DRIVER)
+		}
 		Builder(DriverTypeName driverTypeName) {
 			this.driverTypeName = driverTypeName
 		}
