@@ -86,7 +86,7 @@ class ChromeDriverFactoryTest {
 	 * while cloning the User Data directory to a temporary folder
 	 */
 	@Test
-	void test_newChromeDriver_withUserProfile_CLONE() {
+	void test_newChromeDriver_withUserProfile_TOGO() {
 		ChromeDriverFactory cdFactory = ChromeDriverFactory.newInstance()
 		WebDriver driver = cdFactory.newChromeDriver(new UserProfile('Katalon'))
 		assertNotNull(driver)
@@ -112,11 +112,11 @@ class ChromeDriverFactoryTest {
 	// This test case is ignored because it tends to fail easily:
 	// when you have Chrome opened when you execute this test, it will certainly fail
 	@Test
-	void test_newChromeDriver_withUserProfile_LOCK() {
+	void test_newChromeDriver_withUserProfile_FORHERE() {
 		ChromeDriverFactory cdFactory = ChromeDriverFactory.newInstance()
 		WebDriver driver = cdFactory.newChromeDriver(
 				new UserProfile('Katalon'),
-				ChromeDriverFactory.UserDataAccess.LOCK_USER_DATA)
+				ChromeDriverFactory.UserDataAccess.FOR_HERE)
 		assertNotNull(driver)
 
 		DesiredCapabilities dc = cdFactory.getEmployedDesiredCapabilities()
