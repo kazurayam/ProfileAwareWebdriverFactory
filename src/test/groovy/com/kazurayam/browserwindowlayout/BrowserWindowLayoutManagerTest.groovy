@@ -33,7 +33,7 @@ class BrowserWindowLayoutManagerTest {
 
     @Test
     void test_tiling() {
-        String url = "http://demoaut.katalon.com/"
+        String url = "http://example.com/"
         driver.navigate().to(url)
         List<WindowLocation> locations = [
                 new WindowLocation(2, 0),

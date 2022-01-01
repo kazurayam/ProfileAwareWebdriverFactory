@@ -1,3 +1,7 @@
 = webdriverfactory
 
-TO BE AUTHORED YET
+A Java/Groovy library that wraps `org.openqa.selenium.webdriver.chrome.ChromeDriver`.
+It enables you to launch Chrome browser specifying a *User Profile* so that cookies are
+taken over from a HTTP session to the next session.
+
+*STILL TO BE AUTHORED*

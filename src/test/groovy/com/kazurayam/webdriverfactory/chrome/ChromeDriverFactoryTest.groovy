@@ -42,7 +42,7 @@ class ChromeDriverFactoryTest {
 		String dcJson = cdFactory.getEmployedDesiredCapabilitiesAsJSON()
 		println("DesiredCapabilities is\n${dcJson}")
 		//
-		driver.navigate().to('http://demoaut.katalon.com/')
+		driver.navigate().to('http://example.com/')
 		driver.quit()
 		//
 		def jo = new JsonSlurper().parseText(dcJson)
@@ -67,7 +67,7 @@ class ChromeDriverFactoryTest {
 	 * 
 	 */
 	@Test
-	void test_newChromeDriver_noUserProfileSpeciified() {
+	void test_newChromeDriver_noUserProfileSpecified() {
 		ChromeDriverFactory cdFactory = ChromeDriverFactory.newInstance()
 
 		WebDriver driver = cdFactory.newChromeDriver()
@@ -77,18 +77,18 @@ class ChromeDriverFactoryTest {
 		String dcJson = cdFactory.getEmployedDesiredCapabilitiesAsJSON()
 		println("DesiredCapabilities is\n${dcJson}")
 		//
-		driver.navigate().to('http://demoaut.katalon.com/')
+		driver.navigate().to('http://example.com/')
 		driver.quit()
 	}
 
 	/**
-	 * Instantiate a ChromeDriver to open a Chrome browser specifying a user profile "Katalon"
+	 * Instantiate a ChromeDriver to open a Chrome browser specifying a user profile "Picaso"
 	 * while cloning the User Data directory to a temporary folder
 	 */
 	@Test
 	void test_newChromeDriver_withUserProfile_TOGO() {
 		ChromeDriverFactory cdFactory = ChromeDriverFactory.newInstance()
-		WebDriver driver = cdFactory.newChromeDriver(new UserProfile('Katalon'))
+		WebDriver driver = cdFactory.newChromeDriver(new UserProfile('Picaso'))
 		assertNotNull(driver)
 
 		DesiredCapabilities dc = cdFactory.getEmployedDesiredCapabilities()
@@ -96,13 +96,13 @@ class ChromeDriverFactoryTest {
 		String dcJson = cdFactory.getEmployedDesiredCapabilitiesAsJSON()
 		println("DesiredCapabilities is\n${dcJson}")
 
-		println("ChromeDriver has been instantiated with profile Katalon")
-		driver.navigate().to('http://demoaut.katalon.com/')
+		println("ChromeDriver has been instantiated with profile Picaso")
+		driver.navigate().to('http://example.com/')
 		driver.quit()
 	}
 
 	/**
-	 * Instantiate a ChromeDriver to open a Chrome browser specifying a user profile "Katalon"
+	 * Instantiate a ChromeDriver to open a Chrome browser specifying a user profile "Picaso"
 	 * while cloning the User Data directory to a temporary folder
 	 * You are likely to see an error:
 	 * > invalid argument: user data directory is already in use, please specify a unique value for --user-data-dir argument, or don't use --user-data-dir
@@ -115,7 +115,7 @@ class ChromeDriverFactoryTest {
 	void test_newChromeDriver_withUserProfile_FORHERE() {
 		ChromeDriverFactory cdFactory = ChromeDriverFactory.newInstance()
 		WebDriver driver = cdFactory.newChromeDriver(
-				new UserProfile('Katalon'),
+				new UserProfile('Picaso'),
 				ChromeDriverFactory.UserDataAccess.FOR_HERE)
 		assertNotNull(driver)
 
@@ -124,14 +124,14 @@ class ChromeDriverFactoryTest {
 		String dcJson = cdFactory.getEmployedDesiredCapabilitiesAsJSON()
 		println("DesiredCapabilities is\n${dcJson}")
 
-		driver.navigate().to('http://demoaut.katalon.com/')
+		driver.navigate().to('http://example.com/')
 		driver.quit()
 	}
 
 	/**
-	 * open a session using a user profile Katalon and navigate too http://localhost, then close the session.
+	 * open a session using a user profile Picaso and navigate too http://127.0.0.1, then close the session.
 	 * the session will create a cookie "timestamp".
-	 * open a second session using Katalon Profile again.
+	 * open a second session using Picaso Profile again.
 	 * I expect the second session will use the same value of timestamp cookie. So I test it.
 	 * 
 	 */
@@ -145,7 +145,7 @@ class ChromeDriverFactoryTest {
 		//
 		String url = 'http://localhost/'
 		// 1st session
-		WebDriver driver = cdFactory.newChromeDriver(new UserProfile('Katalon'))
+		WebDriver driver = cdFactory.newChromeDriver(new UserProfile('Picaso'))
 		driver.navigate().to(url)
 		Set<Cookie> cookies = driver.manage().getCookies()
 		println "1st session: " + cookies
@@ -153,7 +153,7 @@ class ChromeDriverFactoryTest {
 		driver.quit()
 
 		// 2nd session
-		driver = cdFactory.newChromeDriver(new UserProfile('Katalon'))
+		driver = cdFactory.newChromeDriver(new UserProfile('Picaso'))
 		driver.navigate().to(url)
 		cookies = driver.manage().getCookies()
 		println "2nd session: " + cookies
@@ -175,7 +175,7 @@ class ChromeDriverFactoryTest {
 		assertNotNull(dc)
 		String dcJson = cdFactory.getEmployedDesiredCapabilitiesAsJSON()
 		println("DesiredCapabilities is\n${dcJson}")
-		driver.navigate().to('http://demoaut.katalon.com/')
+		driver.navigate().to('http://example.com/')
 		driver.quit()
 		//
 		def jo = new JsonSlurper().parseText(dcJson)

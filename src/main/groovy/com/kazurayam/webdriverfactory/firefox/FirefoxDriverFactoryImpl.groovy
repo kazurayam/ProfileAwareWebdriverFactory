@@ -55,7 +55,7 @@ class FirefoxDriverFactoryImpl extends FirefoxDriverFactory {
 	}
 
 	/**
-	 * 1. enable logging by FirefoxDriver into the tmp directory under the Katalon Studio Project directory
+	 * 1. enable logging by FirefoxDriver into the tmp directory under the current working directory
 	 * 2. ensure the path of FirefoxDriver executable
 	 */
 	private void prepare() {

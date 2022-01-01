@@ -1,8 +1,6 @@
 package com.kazurayam.webdriverfactory
 /**
  *
- * https://docs.katalon.com/javadoc/com/kms/katalon/core/driver/DriverType.html
- *
  * @author kazurayam
  */
 enum DriverTypeName {

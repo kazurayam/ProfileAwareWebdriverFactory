@@ -118,10 +118,7 @@ class ChromeDriverFactoryImpl extends ChromeDriverFactory {
 	}
 
 	/**
-	 * Based on the post https://forum.katalon.com/t/open-browser-with-custom-profile/19268 by Thanh To
 	 *
-	 * Chrome's User Data directory is OS dependent. The User Data Directory is described in the document
-	 * https://chromium.googlesource.com/chromium/src/+/HEAD/docs/user_data_dir.md#Current-Location
 	 */
 	@Override
 	WebDriver newChromeDriver(UserProfile userProfile) {

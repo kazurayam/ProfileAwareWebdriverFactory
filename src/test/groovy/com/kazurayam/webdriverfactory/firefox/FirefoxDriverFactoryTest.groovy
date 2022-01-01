@@ -30,21 +30,21 @@ class FirefoxDriverFactoryTest {
 	}
 
 	/**
-	 * Instantiate a FirefoxDriver to open a Firefox browser specifying a user profile "Katalon"
+	 * Instantiate a FirefoxDriver to open a Firefox browser specifying a user profile "Picaso"
 	 *
 	 */
 	@Test
 	void test_newFirefoxDriverWithProfile() {
 		FirefoxDriverFactory factory = FirefoxDriverFactory.newInstance()
-		WebDriver driver = factory.newFirefoxDriverWithProfile('Katalon')
+		WebDriver driver = factory.newFirefoxDriverWithProfile('Picaso')
 		assertThat(driver, is(notNullValue()))
 
 		DesiredCapabilities dc = factory.getEmployedDesiredCapabilities()
 		assertNotNull(dc)
 		println("DesiredCapabilities: ${dc.toString()}")
 
-		println("ChromeDriver has been instantiated with profile Katalon")
-		driver.navigate().to('http://demoaut.katalon.com/')
+		println("ChromeDriver has been instantiated with profile Picaso")
+		driver.navigate().to('http://example.com/')
 		driver.quit()
 	}
 }
