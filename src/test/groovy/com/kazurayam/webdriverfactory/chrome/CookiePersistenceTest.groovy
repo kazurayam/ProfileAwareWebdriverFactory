@@ -5,6 +5,7 @@ import com.kazurayam.webdriverfactory.utils.CookieClassHelper
 import org.junit.After
 import org.junit.Before
 import org.junit.BeforeClass
+import org.junit.Ignore
 import org.junit.Test
 import org.openqa.selenium.Cookie
 import org.openqa.selenium.WebDriver
@@ -20,6 +21,7 @@ import java.util.concurrent.TimeUnit
  *
  * You can start it by `$ ./startup-server.sh`
  */
+@Ignore
 class CookiePersistenceTest {
 
     String url = "http://127.0.0.1:8090"

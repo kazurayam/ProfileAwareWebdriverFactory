@@ -8,6 +8,8 @@ import com.kazurayam.webdriverfactory.utils.OSIdentifier
 
 class ChromeDriverUtils {
 
+	static final String LOG_FILE_NAME = 'chromedriver.log'
+
 	/**
 	 * let ChromeDriver to make verbose log into the logsDir
 	 *
@@ -15,7 +17,7 @@ class ChromeDriverUtils {
 	 */
 	static void enableChromeDriverLog(Path logsDir) {
 		Files.createDirectories(logsDir)
-		Path chromeDriverLog = logsDir.resolve('chromedriver.log')
+		Path chromeDriverLog = logsDir.resolve(LOG_FILE_NAME)
 		System.setProperty('webdriver.chrome.logfile', chromeDriverLog.toString())
 		System.setProperty("webdriver.chrome.verboseLogging", "true")
 	}

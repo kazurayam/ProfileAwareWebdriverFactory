@@ -2,6 +2,7 @@ package com.kazurayam.webdriverfactory.chrome
 
 import com.kazurayam.webdriverfactory.UserProfile
 import org.openqa.selenium.WebDriver
+import org.openqa.selenium.chrome.ChromeDriver
 import org.openqa.selenium.remote.DesiredCapabilities
 
 import com.kazurayam.webdriverfactory.desiredcapabilities.DesiredCapabilitiesModifier
@@ -36,11 +37,15 @@ abstract class ChromeDriverFactory {
 	abstract void addAllDesiredCapabilitiesModifiers(
 			List<DesiredCapabilitiesModifier> desiredCapabilitiesModifierList)
 
-	abstract WebDriver newChromeDriver()
+	abstract ChromeDriver newChromeDriver()
 
-	abstract WebDriver newChromeDriver(UserProfile userProfile)
+	abstract ChromeDriver newChromeDriver(UserProfile userProfile)
 
-	abstract WebDriver newChromeDriver(UserProfile userProfile, UserDataAccess instruction)
+	abstract ChromeDriver newChromeDriver(UserProfile userProfile, UserDataAccess instruction)
+
+	abstract ChromeDriver newChromeDriver(ProfileDirectoryName profileDirectoryName)
+
+	abstract ChromeDriver newChromeDriver(ProfileDirectoryName profileDirectoryName, UserDataAccess instruction)
 
 	abstract DesiredCapabilities getEmployedDesiredCapabilities()
 
