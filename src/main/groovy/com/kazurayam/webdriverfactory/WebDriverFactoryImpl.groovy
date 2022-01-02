@@ -9,7 +9,7 @@ import com.kazurayam.webdriverfactory.desiredcapabilities.DesiredCapabilitiesMod
 import org.openqa.selenium.WebDriver
 
 
-class WebDriverFactoryImpl extends WebDriverFactory {
+class WebDriverFactoryImpl implements WebDriverFactory {
 
 	private DriverTypeName driverTypeName
 	private UserProfile userProfile
@@ -21,7 +21,7 @@ class WebDriverFactoryImpl extends WebDriverFactory {
 
 	private String employedDesiredCapabilities
 
-	private WebDriverFactoryImpl(Builder builder) {
+	private WebDriverFactoryImpl(WebDriverFactory.Builder builder) {
 		this.driverTypeName = builder.driverTypeName
 		this.userProfile = builder.userProfile
 		this.userDataAccess = builder.userDataAccess
