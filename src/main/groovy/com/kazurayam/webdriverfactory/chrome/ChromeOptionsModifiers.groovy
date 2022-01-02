@@ -93,14 +93,14 @@ class ChromeOptionsModifiers {
         return com
     }
 
-    static ChromeOptionsModifier withUserProfile(Path userDataDirectory, String profileDirectoryName) {
-        Objects.requireNonNull(userDataDirectory)
+    static ChromeOptionsModifier withUserProfile(Path userDataDir, String profileDirectoryName) {
+        Objects.requireNonNull(userDataDir)
         Objects.requireNonNull(profileDirectoryName)
-        if (!Files.exists(userDataDirectory)) {
-            throw new IllegalStateException("${userDataDirectory} is not found")
+        if (!Files.exists(userDataDir)) {
+            throw new IllegalStateException("${userDataDir} is not found")
         }
         ChromeOptionsModifier com = new Base({ ChromeOptions chromeOptions ->
-            chromeOptions.addArguments("user-data-dir=${userDataDirectory.toString()}")
+            chromeOptions.addArguments("user-data-dir=${userDataDir.toString()}")
             chromeOptions.addArguments("profile-directory=${profileDirectoryName}")
             return chromeOptions
         })

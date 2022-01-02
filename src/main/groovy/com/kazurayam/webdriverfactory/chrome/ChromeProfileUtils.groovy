@@ -14,7 +14,7 @@ final class ChromeProfileUtils {
 	/**
 	 *
 	 */
-	static Path getDefaultUserDataDirectory() {
+	static Path getDefaultUserDataDir() {
 		if (OSIdentifier.isWindows()) {
 			// It is important that this chromeProfilesPath ends with User Data and not with the profile folder
 			// %HOME%\AppData\Local\Google\Chrome\User Data
@@ -38,19 +38,19 @@ final class ChromeProfileUtils {
 	 *
 	 */
 	static List<ChromeUserProfile> getChromeUserProfileList() {
-		return getChromeUserProfileList(getDefaultUserDataDirectory())
+		return getChromeUserProfileList(getDefaultUserDataDir())
 	}
-	static List<ChromeUserProfile> getChromeUserProfileList(Path userDataDirectory) {
-		Objects.requireNonNull(userDataDirectory)
-		if (! Files.exists(userDataDirectory)) {
-			throw new IllegalArgumentException("${userDataDirectory} is not present")
+	static List<ChromeUserProfile> getChromeUserProfileList(Path userDataDir) {
+		Objects.requireNonNull(userDataDir)
+		if (! Files.exists(userDataDir)) {
+			throw new IllegalArgumentException("${userDataDir} is not present")
 		}
 		List<ChromeUserProfile> userProfiles = new ArrayList<ChromeUserProfile>()
-		List<Path> dirs = Files.list(userDataDirectory).collect(Collectors.toList());
+		List<Path> dirs = Files.list(userDataDir).collect(Collectors.toList());
 		for (Path dir : dirs) {
 			if (Files.exists(dir.resolve('Preferences'))) {
 				ChromeUserProfile cp = new ChromeUserProfile(
-						userDataDirectory, dir.getFileName().toString())
+						userDataDir, dir.getFileName().toString())
 				userProfiles.add(cp)
 			}
 		}
@@ -63,11 +63,11 @@ final class ChromeProfileUtils {
 	 * @return ChromeUserProfile object of the userProfile specified
 	 */
 	static ChromeUserProfile findChromeUserProfile(UserProfile userProfile) {
-		return findChromeUserProfile(getDefaultUserDataDirectory(), userProfile)
+		return findChromeUserProfile(getDefaultUserDataDir(), userProfile)
 	}
-	static ChromeUserProfile findChromeUserProfile(Path userDataDirectory, UserProfile userProfile) {
+	static ChromeUserProfile findChromeUserProfile(Path userDataDir, UserProfile userProfile) {
 		Objects.requireNonNull(userProfile)
-		List<ChromeUserProfile> userProfiles = getChromeUserProfileList(userDataDirectory)
+		List<ChromeUserProfile> userProfiles = getChromeUserProfileList(userDataDir)
 		for (ChromeUserProfile cUP in userProfiles) {
 			//System.out.println("[ChromeProfileFinder#getUserProfile] userProfile.getName()==${userProfile.getName()}, userProfile.getDirectoryName()=${userProfile.getDirectoryName()}")
 			if (cUP.getUserProfileName() == userProfile) {
@@ -82,10 +82,10 @@ final class ChromeProfileUtils {
 	 *
 	 */
 	static boolean hasChromeUserProfile(UserProfile userProfile) {
-		return hasChromeUserProfile(getDefaultUserDataDirectory(), userProfile)
+		return hasChromeUserProfile(getDefaultUserDataDir(), userProfile)
 	}
-	static boolean hasChromeUserProfile(Path userDataDirectory, UserProfile userProfile) {
-		return findChromeUserProfile(userProfile) != null
+	static boolean hasChromeUserProfile(Path userDataDir, UserProfile userProfile) {
+		return findChromeUserProfile(userDataDir, userProfile) != null
 	}
 
 	/**
@@ -94,13 +94,13 @@ final class ChromeProfileUtils {
 	static ChromeUserProfile findChromeUserProfileByProfileDirectoryName(
 			ProfileDirectoryName profileDirectoryName) {
 		return findChromeUserProfileByProfileDirectoryName(
-				getDefaultUserDataDirectory(),
+				getDefaultUserDataDir(),
 				profileDirectoryName)
 	}
 	static ChromeUserProfile findChromeUserProfileByProfileDirectoryName(
-			Path userDataDirectory,
+			Path userDataDir,
 			ProfileDirectoryName profileDirectoryName) {
-		List<ChromeUserProfile> chromeUserProfiles = getChromeUserProfileList(userDataDirectory)
+		List<ChromeUserProfile> chromeUserProfiles = getChromeUserProfileList(userDataDir)
 		for (ChromeUserProfile chromeUserProfile : chromeUserProfiles ) {
 			if (chromeUserProfile.getProfileDirectoryName() == profileDirectoryName) {
 				return chromeUserProfile
@@ -113,13 +113,13 @@ final class ChromeProfileUtils {
 	 */
 	static UserProfile findUserProfileByProfileDirectoryName(ProfileDirectoryName profileDirectoryName) {
 		return findUserProfileByProfileDirectoryName(
-				getDefaultUserDataDirectory(),
+				getDefaultUserDataDir(),
 				profileDirectoryName)
 	}
 	static UserProfile findUserProfileByProfileDirectoryName(
-			Path userDataDirectory, ProfileDirectoryName profileDirectoryName) {
+			Path userDataDir, ProfileDirectoryName profileDirectoryName) {
 		return findChromeUserProfileByProfileDirectoryName(
-				userDataDirectory, profileDirectoryName).getUserProfileName()
+				userDataDir, profileDirectoryName).getUserProfileName()
 	}
 
 	/**

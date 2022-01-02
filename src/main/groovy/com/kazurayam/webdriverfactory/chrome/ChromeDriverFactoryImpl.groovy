@@ -163,30 +163,30 @@ class ChromeDriverFactoryImpl extends ChromeDriverFactory {
 					"Profile directory \"${originalProfileDirectory.toString()}\" does not exist")
 		}
 
-		Path userDataDirectory = ChromeProfileUtils.getDefaultUserDataDirectory()
+		Path userDataDir = ChromeProfileUtils.getDefaultUserDataDir()
 		ProfileDirectoryName profileDirectoryName = chromeUserProfile.getProfileDirectoryName()
 
-		return launchChrome(originalProfileDirectory, userDataDirectory, profileDirectoryName, instruction)
+		return launchChrome(originalProfileDirectory, userDataDir, profileDirectoryName, instruction)
 	}
 
 	/**
 	 *
 	 * @param originalProfileDirectory
-	 * @param userDataDirectory
+	 * @param userDataDir
 	 * @param profileDirectoryName
 	 * @param instruction
 	 * @return
 	 */
 	private ChromeDriver launchChrome(Path originalProfileDirectory,
-								   Path userDataDirectory,
+								   Path userDataDir,
 								   ProfileDirectoryName profileDirectoryName,
 								   UserDataAccess instruction) {
 		if (instruction == UserDataAccess.TO_GO) {
 			// create a temporary directory with name "User Data", into which
 			// copy the Profile directory contents from the Chrome's internal "User Data",
 			// this is done in order to workaround "User Data is used" contention problem.
-			userDataDirectory = Files.createTempDirectory("User Data")
-			Path destinationDirectory = userDataDirectory.resolve(profileDirectoryName.getName())
+			userDataDir = Files.createTempDirectory("User Data")
+			Path destinationDirectory = userDataDir.resolve(profileDirectoryName.getName())
 			FileUtils.copyDirectory(
 					originalProfileDirectory.toFile(),
 					destinationDirectory.toFile())
@@ -198,7 +198,7 @@ class ChromeDriverFactoryImpl extends ChromeDriverFactory {
 		// use the specified UserProfile with which Chrome browser is launched
 		ChromeOptionsModifier com =
 				ChromeOptionsModifiers.withUserProfile(
-						userDataDirectory,
+						userDataDir,
 						profileDirectoryName.getName())
 		this.addChromeOptionsModifier(com)
 
@@ -248,8 +248,8 @@ class ChromeDriverFactoryImpl extends ChromeDriverFactory {
 			throw new WebDriverFactoryException(
 					"Profile directory \"${originalProfileDirectory.toString()}\" does not exist")
 		}
-		Path userDataDirectory = ChromeProfileUtils.getDefaultUserDataDirectory()
-		return launchChrome(originalProfileDirectory, userDataDirectory, profileDirectoryName, instruction)
+		Path userDataDir = ChromeProfileUtils.getDefaultUserDataDir()
+		return launchChrome(originalProfileDirectory, userDataDir, profileDirectoryName, instruction)
 	}
 
 

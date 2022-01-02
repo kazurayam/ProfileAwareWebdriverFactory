@@ -20,21 +20,21 @@ class ChromeUserProfileTest {
 	@Test
 	void test_ChromeProfile() {
 		// when:
-		Path userDataDirectory = ChromeProfileUtils.getDefaultUserDataDirectory()
+		Path userDataDir = ChromeProfileUtils.getDefaultUserDataDir()
         ChromeUserProfile defaultProfile =
-				new ChromeUserProfile(userDataDirectory, 'Default')
+				new ChromeUserProfile(userDataDir, 'Default')
 		// then:
 		assertNotNull(defaultProfile)
 		assertNotNull(defaultProfile.getUserProfileName())
 		assertTrue(defaultProfile.getUserProfileName().toString().startsWith('K'))  // kazurayam's name
-		assertEquals(userDataDirectory, defaultProfile.getUserDataDirectory())
+		assertEquals(userDataDir, defaultProfile.getUserDataDir())
 	}
 
 	@Test
 	void test_getUserProfileDirectory() {
-		Path userDataDirectory = ChromeProfileUtils.getDefaultUserDataDirectory()
+		Path userDataDir = ChromeProfileUtils.getDefaultUserDataDir()
 		ChromeUserProfile defaultProfile =
-				new ChromeUserProfile(userDataDirectory, 'Default')
+				new ChromeUserProfile(userDataDir, 'Default')
 		Path userProfileDirectory = defaultProfile.getChromeUserProfileDirectory()
 		assertNotNull(userProfileDirectory)
 		assertEquals('Default',
@@ -43,9 +43,9 @@ class ChromeUserProfileTest {
 
 	@Test
 	void test_toString() {
-		Path userDataDirectory = ChromeProfileUtils.getDefaultUserDataDirectory()
+		Path userDataDir = ChromeProfileUtils.getDefaultUserDataDir()
 		ChromeUserProfile defaultProfile =
-				new ChromeUserProfile(userDataDirectory, 'Default')
+				new ChromeUserProfile(userDataDir, 'Default')
 		println defaultProfile.toString()
 		JsonSlurper slurper = new JsonSlurper()
 		def obj = slurper.parseText(defaultProfile.toString())

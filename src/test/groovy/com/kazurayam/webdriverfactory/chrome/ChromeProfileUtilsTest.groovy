@@ -15,12 +15,12 @@ import org.junit.runners.JUnit4
 class ChromeProfileUtilsTest {
 
 	@Test
-	void test_findUserDataDirectory() {
+	void test_findUserDataDir() {
 		// when:
-		Path userDataDirectory= ChromeProfileUtils.getDefaultUserDataDirectory()
+		Path userDataDir= ChromeProfileUtils.getDefaultUserDataDir()
 		// then:
-		assertNotNull(userDataDirectory)
-		assertTrue(Files.exists(userDataDirectory))
+		assertNotNull(userDataDir)
+		assertTrue(Files.exists(userDataDir))
 	}
 
 	@Test

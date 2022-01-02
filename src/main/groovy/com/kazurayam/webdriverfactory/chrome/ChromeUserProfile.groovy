@@ -17,27 +17,27 @@ class ChromeUserProfile implements Comparable<ChromeUserProfile> {
 
 	static final String PREFERENCES_FILE_NAME = 'Preferences'
 
-	private final Path userDataDirectory
+	private final Path userDataDir
 	private final String profileDirectoryName
 
 	private UserProfile userProfileName
 	private String preferences
 
 	/**
-	 * @param userDataDirectory "~/Library/Application Support/Google/Chrome/"
+	 * @param userDataDir "~/Library/Application Support/Google/Chrome/"
 	 * @param profileName "Default", "Profile 1", "Profile 2", "Profile 3", ...
 	 */
-    ChromeUserProfile(Path userDataDirectory, String profileDirectoryName) {
-		Objects.requireNonNull(userDataDirectory)
+    ChromeUserProfile(Path userDataDir, String profileDirectoryName) {
+		Objects.requireNonNull(userDataDir)
 		Objects.requireNonNull(profileDirectoryName)
-		if (! Files.exists(userDataDirectory)) {
-			throw new IllegalArgumentException("${userDataDirectory} is not found")
+		if (! Files.exists(userDataDir)) {
+			throw new IllegalArgumentException("${userDataDir} is not found")
 		}
-		Path profilePath = userDataDirectory.resolve(profileDirectoryName)
+		Path profilePath = userDataDir.resolve(profileDirectoryName)
 		if (! Files.exists(profilePath)) {
 			throw new IllegalArgumentException("${p} is not found")
 		}
-		this.userDataDirectory = userDataDirectory
+		this.userDataDir = userDataDir
 		this.profileDirectoryName = profileDirectoryName
 
 		Path preferencesPath = profilePath.resolve(PREFERENCES_FILE_NAME)
@@ -52,8 +52,8 @@ class ChromeUserProfile implements Comparable<ChromeUserProfile> {
 		assert this.userProfileName != null
 	}
 
-	Path getUserDataDirectory() {
-		return this.userDataDirectory
+	Path getUserDataDir() {
+		return this.userDataDir
 	}
 
 	ProfileDirectoryName getProfileDirectoryName() {
@@ -61,7 +61,7 @@ class ChromeUserProfile implements Comparable<ChromeUserProfile> {
 	}
 
 	Path getChromeUserProfileDirectory() {
-		return this.getUserDataDirectory().resolve(this.getProfileDirectoryName().getName())
+		return this.getUserDataDir().resolve(this.getProfileDirectoryName().getName())
 	}
 
 	UserProfile getUserProfileName() {
@@ -89,14 +89,14 @@ class ChromeUserProfile implements Comparable<ChromeUserProfile> {
 			return false
 		}
 		ChromeUserProfile other = (ChromeUserProfile)obj
-		return this.getUserDataDirectory() == other.getUserDataDirectory() &&
+		return this.getUserDataDir() == other.getUserDataDir() &&
 				this.getProfileDirectoryName() == other.getProfileDirectoryName()
 	}
 
 	@Override
 	int hashCode() {
 		int hash = 7
-		hash = 31 * hash + (int) this.getUserDataDirectory().hashCode()
+		hash = 31 * hash + (int) this.getUserDataDir().hashCode()
 		hash = 31 * hash + (int) this.getProfileDirectoryName().hashCode()
 		return hash
 	}
@@ -116,7 +116,7 @@ class ChromeUserProfile implements Comparable<ChromeUserProfile> {
 		sb.append(",")
 		//
 		sb.append("\"userDataDirector\":\"")
-		sb.append(this.getUserDataDirectory().toString())
+		sb.append(this.getUserDataDir().toString())
 		sb.append("\"")
 		sb.append("}")
 		return JsonOutput.prettyPrint(sb.toString())
