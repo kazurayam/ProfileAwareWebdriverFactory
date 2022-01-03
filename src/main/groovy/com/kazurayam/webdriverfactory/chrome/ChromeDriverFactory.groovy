@@ -11,12 +11,24 @@ import java.nio.file.Path
 
 abstract class ChromeDriverFactory {
 
-	static ChromeDriverFactory newInstance() {
+	static ChromeDriverFactory newChromeDriverFactory() {
 		return new ChromeDriverFactoryImpl()
 	}
 
-	static ChromeDriverFactory newInstance(boolean requireDefaultSettings) {
+	static ChromeDriverFactory newChromeDriverFactory(boolean requireDefaultSettings) {
 		return new ChromeDriverFactoryImpl(requireDefaultSettings)
+	}
+
+	static ChromeDriverFactory newHeadlessChromeDriverFactory() {
+		ChromeDriverFactoryImpl cdfi = new ChromeDriverFactoryImpl()
+		cdfi.addChromeOptionsModifier(ChromeOptionsModifiers.headless())
+		return cdfi
+	}
+
+	static ChromeDriverFactory newHeadlessChromeDriverFactory(boolean requireDefaultSettings) {
+		ChromeDriverFactoryImpl cdfi = new ChromeDriverFactoryImpl(requireDefaultSettings)
+		cdfi.addChromeOptionsModifier(ChromeOptionsModifiers.headless())
+		return cdfi
 	}
 
 	abstract void addChromePreferencesModifier(
@@ -57,4 +69,13 @@ abstract class ChromeDriverFactory {
 		FOR_HERE,
 		TO_GO
 	}
+
+	/**
+	 *
+	 */
+	static void setPathToChromeDriverExecutable(String chromeDriverPath) {
+		Objects.requireNonNull(chromeDriverPath)
+		System.setProperty("webdriver.chrome.driver", chromeDriverPath)
+	}
+
 }

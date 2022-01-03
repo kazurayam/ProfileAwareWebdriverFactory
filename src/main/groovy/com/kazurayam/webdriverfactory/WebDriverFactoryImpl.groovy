@@ -35,7 +35,7 @@ class WebDriverFactoryImpl implements WebDriverFactory {
 	WebDriver newWebDriver() {
 		if (driverTypeName == DriverTypeName.CHROME_DRIVER ||
 				driverTypeName == DriverTypeName.HEADLESS_DRIVER) {
-			ChromeDriverFactory cdf = ChromeDriverFactory.newInstance(this.requireDefaultSettings)
+			ChromeDriverFactory cdf = ChromeDriverFactory.newChromeDriverFactory(this.requireDefaultSettings)
 			if (driverTypeName == DriverTypeName.HEADLESS_DRIVER) {
 				cdf.addChromeOptionsModifier(ChromeOptionsModifiers.headless())  // make it headless
 			}

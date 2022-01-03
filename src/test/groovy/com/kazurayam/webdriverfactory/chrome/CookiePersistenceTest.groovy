@@ -41,7 +41,7 @@ class CookiePersistenceTest {
      */
     @Test
     void test_FORHERE_takes_over_persisted_cookie() {
-        ChromeDriverFactory cdFactory = ChromeDriverFactory.newInstance()
+        ChromeDriverFactory cdFactory = ChromeDriverFactory.newChromeDriverFactory()
         // 1st session
         driver = cdFactory.newChromeDriver(new UserProfile(profileName),
                 ChromeDriverFactory.UserDataAccess.FOR_HERE)
@@ -82,7 +82,7 @@ class CookiePersistenceTest {
      */
     @Test
     void test_TOGO_doesnt_take_over_persisted_cookie() {
-        ChromeDriverFactory cdFactory = ChromeDriverFactory.newInstance()
+        ChromeDriverFactory cdFactory = ChromeDriverFactory.newChromeDriverFactory()
         // 1st session
         driver = cdFactory.newChromeDriver(new UserProfile(profileName),
                 ChromeDriverFactory.UserDataAccess.TO_GO)   // notice it; we use TO_GO!

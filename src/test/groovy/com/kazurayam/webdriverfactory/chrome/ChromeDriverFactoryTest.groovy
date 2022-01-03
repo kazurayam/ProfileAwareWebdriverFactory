@@ -41,7 +41,7 @@ class ChromeDriverFactoryTest {
 
 	@Test
 	void test_newChromeDriver_no_default_settings() {
-		ChromeDriverFactory cdFactory = ChromeDriverFactory.newInstance(false)
+		ChromeDriverFactory cdFactory = ChromeDriverFactory.newChromeDriverFactory(false)
 		//
 		ChromeDriver driver = cdFactory.newChromeDriver()
 		assertNotNull(driver)
@@ -76,7 +76,7 @@ class ChromeDriverFactoryTest {
 	 */
 	@Test
 	void test_newChromeDriver_noUserProfileSpecified() {
-		ChromeDriverFactory cdFactory = ChromeDriverFactory.newInstance()
+		ChromeDriverFactory cdFactory = ChromeDriverFactory.newChromeDriverFactory()
 
 		ChromeDriver driver = cdFactory.newChromeDriver()
 		assertNotNull(driver)
@@ -91,7 +91,7 @@ class ChromeDriverFactoryTest {
 
 	@Test
 	void test_enableChromeDriverLog() {
-		ChromeDriverFactory cdFactory = ChromeDriverFactory.newInstance()
+		ChromeDriverFactory cdFactory = ChromeDriverFactory.newChromeDriverFactory()
 		cdFactory.enableChromeDriverLog(outputFolder)
 		ChromeDriver driver = cdFactory.newChromeDriver()
 		assertNotNull(driver)
@@ -106,7 +106,7 @@ class ChromeDriverFactoryTest {
 	 */
 	@Test
 	void test_newChromeDriver_byUserProfile_TOGO() {
-		ChromeDriverFactory cdFactory = ChromeDriverFactory.newInstance()
+		ChromeDriverFactory cdFactory = ChromeDriverFactory.newChromeDriverFactory()
 		ChromeDriver driver = cdFactory.newChromeDriver(new UserProfile('Picaso'))
 		assertNotNull(driver)
 
@@ -122,7 +122,7 @@ class ChromeDriverFactoryTest {
 
 	@Test
 	void test_newChromeDriver_byProfileDirectoryName_TO_GO() {
-		ChromeDriverFactory cdFactory = ChromeDriverFactory.newInstance()
+		ChromeDriverFactory cdFactory = ChromeDriverFactory.newChromeDriverFactory()
 		ChromeDriver driver = cdFactory.newChromeDriver(new ProfileDirectoryName('Default'))
 		assertNotNull(driver)
 
@@ -142,7 +142,7 @@ class ChromeDriverFactoryTest {
 	@Ignore
 	@Test
 	void test_newChromeDriver_byProfileDirectoryName_FOR_HERE() {
-		ChromeDriverFactory cdFactory = ChromeDriverFactory.newInstance()
+		ChromeDriverFactory cdFactory = ChromeDriverFactory.newChromeDriverFactory()
 		ChromeDriver driver = cdFactory.newChromeDriver(new ProfileDirectoryName('Default'),
 				ChromeDriverFactory.UserDataAccess.FOR_HERE)
 		assertNotNull(driver)
@@ -170,7 +170,7 @@ class ChromeDriverFactoryTest {
 	// when you have Chrome opened when you execute this test, it will certainly fail
 	@Test
 	void test_newChromeDriver_withUserProfile_FOR_HERE() {
-		ChromeDriverFactory cdFactory = ChromeDriverFactory.newInstance()
+		ChromeDriverFactory cdFactory = ChromeDriverFactory.newChromeDriverFactory()
 		ChromeDriver driver = cdFactory.newChromeDriver(
 				new UserProfile('Picaso'),
 				ChromeDriverFactory.UserDataAccess.FOR_HERE)
@@ -196,7 +196,7 @@ class ChromeDriverFactoryTest {
 	@Test
 	public void test_if_cookie_is_retained_in_profile_accross_2_sessions() {
 		// we want Headless
-		ChromeDriverFactory cdFactory = ChromeDriverFactory.newInstance()
+		ChromeDriverFactory cdFactory = ChromeDriverFactory.newChromeDriverFactory()
 		//ChromeOptionsModifier com = new ChromeOptionsModifierHeadless()
 		//cdFactory.addChromeOptionsModifier(com)
 		//
@@ -222,7 +222,7 @@ class ChromeDriverFactoryTest {
 
 	@Test
 	void test_addChromeOptionsModifier_incognito() {
-		ChromeDriverFactory cdFactory = ChromeDriverFactory.newInstance()
+		ChromeDriverFactory cdFactory = ChromeDriverFactory.newChromeDriverFactory()
 		//
 		cdFactory.addChromeOptionsModifier(ChromeOptionsModifiers.incognito())
 		//
