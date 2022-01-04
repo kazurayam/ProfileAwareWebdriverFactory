@@ -5,11 +5,12 @@ import com.kazurayam.webdriverfactory.WebDriverFactoryException
 import com.kazurayam.webdriverfactory.desiredcapabilities.DesiredCapabilitiesModifier
 import com.kazurayam.webdriverfactory.desiredcapabilities.DesiredCapabilitiesModifiers
 import com.kazurayam.webdriverfactory.desiredcapabilities.DesiredCapabilitiesBuilderImpl
-import org.apache.commons.io.FileUtils
+import com.kazurayam.webdriverfactory.utils.PathUtils
 import org.openqa.selenium.InvalidArgumentException
 
 import java.nio.file.Files
 import java.nio.file.Path
+import java.util.stream.Collectors
 
 import org.openqa.selenium.WebDriver
 import org.openqa.selenium.chrome.ChromeDriver
@@ -273,12 +274,13 @@ class ChromeDriverFactoryImpl extends ChromeDriverFactory {
 			// create a temporary directory with name "User Data", into which
 			// copy the Profile directory contents from the Chrome's internal "User Data",
 			// this is done in order to workaround "User Data is used" contention problem.
-			userDataDir = Files.createTempDirectory("User Data")
+			userDataDir = Files.createTempDirectory("__user-data-dir__")
 			Path destinationDirectory = userDataDir.resolve(profileDirectoryName.getName())
-			FileUtils.copyDirectory(
-					originalProfileDirectory.toFile(),
-					destinationDirectory.toFile())
-			logger_.info("copied ${originalProfileDirectory} into ${destinationDirectory} ")
+			PathUtils.copyDirectoryRecursively(
+					originalProfileDirectory,
+					destinationDirectory)
+			int numCopied = PathUtils.listDirectoryRecursively(destinationDirectory).size()
+			logger_.info("copied ${numCopied} files from ${originalProfileDirectory} into ${destinationDirectory} ")
 		} else {
 			logger_.debug("will use ${originalProfileDirectory} ")
 		}
@@ -310,6 +312,5 @@ class ChromeDriverFactoryImpl extends ChromeDriverFactory {
 			throw new WebDriverFactoryException(sb.toString())
 		}
 	}
-
 
 }

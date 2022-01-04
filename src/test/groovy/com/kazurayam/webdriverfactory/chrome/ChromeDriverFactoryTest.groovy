@@ -1,9 +1,15 @@
 package com.kazurayam.webdriverfactory.chrome
 
+import com.kazurayam.timekeeper.Measurement
+import com.kazurayam.timekeeper.Record
+import com.kazurayam.timekeeper.Table
+import com.kazurayam.timekeeper.Timekeeper
 import com.kazurayam.webdriverfactory.UserProfile
 import org.junit.After
 import org.junit.BeforeClass
 import org.openqa.selenium.chrome.ChromeDriver
+
+import java.time.LocalDateTime
 
 import static org.junit.Assert.*
 
@@ -92,7 +98,7 @@ class ChromeDriverFactoryTest {
 		DesiredCapabilities dc = cdFactory.getEmployedDesiredCapabilities()
 		assertNotNull(dc)
 		String dcJson = cdFactory.getEmployedDesiredCapabilitiesAsJSON()
-		println("DesiredCapabilities is\n${dcJson}")
+		//println("DesiredCapabilities is\n${dcJson}")
 		//
 		driver.navigate().to('http://example.com/')
 		driver.quit()
@@ -122,24 +128,24 @@ class ChromeDriverFactoryTest {
 		DesiredCapabilities dc = cdFactory.getEmployedDesiredCapabilities()
 		assertNotNull(dc)
 		String dcJson = cdFactory.getEmployedDesiredCapabilitiesAsJSON()
-		println("DesiredCapabilities is\n${dcJson}")
+		//println("DesiredCapabilities is\n${dcJson}")
 
-		println("ChromeDriver has been instantiated with profile Picasso")
+		//println("ChromeDriver has been instantiated with profile Picasso")
 		driver.navigate().to('http://example.com/')
 	}
 
 	@Test
 	void test_newChromeDriver_byProfileDirectoryName_TO_GO() {
 		ChromeDriverFactory cdFactory = ChromeDriverFactory.newChromeDriverFactory()
-		driver = cdFactory.newChromeDriver(new ProfileDirectoryName('Default'))
+		driver = cdFactory.newChromeDriver(new ProfileDirectoryName('Profile 1'))  // or 'Default'
 		assertNotNull(driver)
 
 		DesiredCapabilities dc = cdFactory.getEmployedDesiredCapabilities()
 		assertNotNull(dc)
 		String dcJson = cdFactory.getEmployedDesiredCapabilitiesAsJSON()
-		println("DesiredCapabilities is\n${dcJson}")
+		//println("DesiredCapabilities is\n${dcJson}")
 
-		println("ChromeDriver has been instantiated with profile directory Default")
+		//println("ChromeDriver has been instantiated with profile directory Default")
 		driver.navigate().to('http://example.com/')
 	}
 
@@ -150,16 +156,16 @@ class ChromeDriverFactoryTest {
 	@Test
 	void test_newChromeDriver_byProfileDirectoryName_FOR_HERE() {
 		ChromeDriverFactory cdFactory = ChromeDriverFactory.newChromeDriverFactory()
-		driver = cdFactory.newChromeDriver(new ProfileDirectoryName('Default'),
+		driver = cdFactory.newChromeDriver(new ProfileDirectoryName('Profile 1'),
 				ChromeDriverFactory.UserDataAccess.FOR_HERE)
 		assertNotNull(driver)
 
 		DesiredCapabilities dc = cdFactory.getEmployedDesiredCapabilities()
 		assertNotNull(dc)
 		String dcJson = cdFactory.getEmployedDesiredCapabilitiesAsJSON()
-		println("DesiredCapabilities is\n${dcJson}")
+		//println("DesiredCapabilities is\n${dcJson}")
 
-		println("ChromeDriver has been instantiated with profile directory Default")
+		//println("ChromeDriver has been instantiated with profile directory Default")
 		driver.navigate().to('http://example.com/')
 	}
 
@@ -185,7 +191,7 @@ class ChromeDriverFactoryTest {
 		DesiredCapabilities dc = cdFactory.getEmployedDesiredCapabilities()
 		assertNotNull(dc)
 		String dcJson = cdFactory.getEmployedDesiredCapabilitiesAsJSON()
-		println("DesiredCapabilities is\n${dcJson}")
+		//println("DesiredCapabilities is\n${dcJson}")
 
 		driver.navigate().to('http://example.com/')
 	}
@@ -235,7 +241,7 @@ class ChromeDriverFactoryTest {
 		DesiredCapabilities dc = cdFactory.getEmployedDesiredCapabilities()
 		assertNotNull(dc)
 		String dcJson = cdFactory.getEmployedDesiredCapabilitiesAsJSON()
-		println("DesiredCapabilities is\n${dcJson}")
+		//println("DesiredCapabilities is\n${dcJson}")
 		driver.navigate().to('http://example.com/')
 		//
 		def jo = new JsonSlurper().parseText(dcJson)
@@ -261,7 +267,7 @@ class ChromeDriverFactoryTest {
 	}
 
 	@Test
-	void test_ChromeDriver_metadata_stuffed() {
+	void test_ChromeDriver_metadata() {
 		ChromeDriverFactory cdFactory = ChromeDriverFactory.newChromeDriverFactory()
 		driver = cdFactory.newChromeDriver(new ProfileDirectoryName('Default'))
 		assertNotNull(driver)
@@ -274,6 +280,37 @@ class ChromeDriverFactoryTest {
 			assertTrue(Files.exists(up.getUserDataDir()))
 			// e.g, "/Users/kazurayam/Library/Application Support/Google/Chrome"
 		})
+	}
+
+	@Test
+	void test_speed() {
+		Timekeeper tk = new Timekeeper()
+		Measurement m1 = new Measurement.Builder(
+				"How long it took to open a Chrome browser",
+				["Case"]).build()
+		tk.add(new Table.Builder(m1).build())
+		// open Chrome as default
+		LocalDateTime before = LocalDateTime.now()
+		ChromeDriverFactory cdFactory = ChromeDriverFactory.newChromeDriverFactory()
+		driver = cdFactory.newChromeDriver()
+		LocalDateTime after = LocalDateTime.now()
+		m1.recordDuration(["Case": "no specialization"], before, after)
+		driver.quit()
+		// open Chrome with ProfileDirectoryName
+		before = LocalDateTime.now()
+		cdFactory = ChromeDriverFactory.newChromeDriverFactory()
+		driver = cdFactory.newChromeDriver(new ProfileDirectoryName('Profile 1'))
+		after = LocalDateTime.now()
+		m1.recordDuration(["Case": "with ProfileDirectoryName"], before, after)
+		// report
+		Path md = outputFolder.resolve("test_speed.md")
+		tk.report(md)
+		println "Timekeeper report: ${md}"
+		// fail if too slow to open Chrome window
+		Record r = m1.getLast()
+		float cap = 8.0
+		assertTrue("r.getDurationMillis=${r.getDurationMillis() / 1000} should be less than ${cap}",
+				r.getDurationMillis() / 1000 < cap)
 	}
 
 }
