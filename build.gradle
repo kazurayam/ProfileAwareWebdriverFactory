@@ -22,7 +22,6 @@ ext {
     groovyVersion = '2.4.21'
     //seleniumVersion = '3.141.59'
     seleniumVersion = '4.1.1'
-    commonsioVersion = '2.11.0'
     slf4jVersion = '1.7.25'
     webdrivermanagerVersion = '5.0.3'
     junitVersion = '4.12'
@@ -43,7 +42,6 @@ dependencies {
     generateDocs "org.codehaus.groovy:groovy-all:${groovyVersion}"
 
     implementation group: 'org.seleniumhq.selenium', name: 'selenium-java', version: "${seleniumVersion}"
-    implementation group: 'commons-io', name: 'commons-io', version: "${commonsioVersion}"
 
     implementation "org.slf4j:slf4j-api:${slf4jVersion}"
     implementation group: 'org.slf4j', name: 'slf4j-simple', version: "${slf4jVersion}"
