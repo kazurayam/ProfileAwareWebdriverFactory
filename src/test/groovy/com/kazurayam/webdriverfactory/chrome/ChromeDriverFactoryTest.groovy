@@ -1,6 +1,7 @@
 package com.kazurayam.webdriverfactory.chrome
 
 import com.kazurayam.webdriverfactory.UserProfile
+import org.junit.After
 import org.junit.BeforeClass
 import org.openqa.selenium.chrome.ChromeDriver
 
@@ -27,6 +28,7 @@ import java.nio.file.Paths
 class ChromeDriverFactoryTest {
 
 	static Path outputFolder
+	ChromeDriver driver
 
 	@BeforeClass
 	static void beforeClass() {
@@ -37,13 +39,22 @@ class ChromeDriverFactoryTest {
 	}
 
 	@Before
-	void setup() {}
+	void setup() {
+		driver = null
+	}
+
+	@After
+	void tearDown() {
+		if (driver != null) {
+			driver.quit()
+			driver = null
+		}
+	}
 
 	@Test
 	void test_newChromeDriver_no_default_settings() {
 		ChromeDriverFactory cdFactory = ChromeDriverFactory.newChromeDriverFactory(false)
-		//
-		ChromeDriver driver = cdFactory.newChromeDriver()
+		driver = cdFactory.newChromeDriver()
 		assertNotNull(driver)
 		DesiredCapabilities dc = cdFactory.getEmployedDesiredCapabilities()
 		assertNotNull(dc)
@@ -51,7 +62,6 @@ class ChromeDriverFactoryTest {
 		println("DesiredCapabilities is\n${dcJson}")
 		//
 		driver.navigate().to('http://example.com/')
-		driver.quit()
 		//
 		def jsonObject = new JsonSlurper().parseText(dcJson)
 		/* in case "with default setting" you will see
@@ -77,8 +87,7 @@ class ChromeDriverFactoryTest {
 	@Test
 	void test_newChromeDriver_noUserProfileSpecified() {
 		ChromeDriverFactory cdFactory = ChromeDriverFactory.newChromeDriverFactory()
-
-		ChromeDriver driver = cdFactory.newChromeDriver()
+		driver = cdFactory.newChromeDriver()
 		assertNotNull(driver)
 		DesiredCapabilities dc = cdFactory.getEmployedDesiredCapabilities()
 		assertNotNull(dc)
@@ -93,7 +102,7 @@ class ChromeDriverFactoryTest {
 	void test_enableChromeDriverLog() {
 		ChromeDriverFactory cdFactory = ChromeDriverFactory.newChromeDriverFactory()
 		cdFactory.enableChromeDriverLog(outputFolder)
-		ChromeDriver driver = cdFactory.newChromeDriver()
+		driver = cdFactory.newChromeDriver()
 		assertNotNull(driver)
 		Path logFile = outputFolder.resolve(ChromeDriverUtils.LOG_FILE_NAME)
 		assertTrue(Files.exists(logFile))
@@ -107,7 +116,7 @@ class ChromeDriverFactoryTest {
 	@Test
 	void test_newChromeDriver_byUserProfile_TOGO() {
 		ChromeDriverFactory cdFactory = ChromeDriverFactory.newChromeDriverFactory()
-		ChromeDriver driver = cdFactory.newChromeDriver(new UserProfile('Picaso'))
+		driver = cdFactory.newChromeDriver(new UserProfile('Picaso'))
 		assertNotNull(driver)
 
 		DesiredCapabilities dc = cdFactory.getEmployedDesiredCapabilities()
@@ -117,13 +126,12 @@ class ChromeDriverFactoryTest {
 
 		println("ChromeDriver has been instantiated with profile Picaso")
 		driver.navigate().to('http://example.com/')
-		driver.quit()
 	}
 
 	@Test
 	void test_newChromeDriver_byProfileDirectoryName_TO_GO() {
 		ChromeDriverFactory cdFactory = ChromeDriverFactory.newChromeDriverFactory()
-		ChromeDriver driver = cdFactory.newChromeDriver(new ProfileDirectoryName('Default'))
+		driver = cdFactory.newChromeDriver(new ProfileDirectoryName('Default'))
 		assertNotNull(driver)
 
 		DesiredCapabilities dc = cdFactory.getEmployedDesiredCapabilities()
@@ -133,7 +141,6 @@ class ChromeDriverFactoryTest {
 
 		println("ChromeDriver has been instantiated with profile directory Default")
 		driver.navigate().to('http://example.com/')
-		driver.quit()
 	}
 
 
@@ -143,7 +150,7 @@ class ChromeDriverFactoryTest {
 	@Test
 	void test_newChromeDriver_byProfileDirectoryName_FOR_HERE() {
 		ChromeDriverFactory cdFactory = ChromeDriverFactory.newChromeDriverFactory()
-		ChromeDriver driver = cdFactory.newChromeDriver(new ProfileDirectoryName('Default'),
+		driver = cdFactory.newChromeDriver(new ProfileDirectoryName('Default'),
 				ChromeDriverFactory.UserDataAccess.FOR_HERE)
 		assertNotNull(driver)
 
@@ -154,7 +161,6 @@ class ChromeDriverFactoryTest {
 
 		println("ChromeDriver has been instantiated with profile directory Default")
 		driver.navigate().to('http://example.com/')
-		driver.quit()
 	}
 
 
@@ -171,7 +177,7 @@ class ChromeDriverFactoryTest {
 	@Test
 	void test_newChromeDriver_withUserProfile_FOR_HERE() {
 		ChromeDriverFactory cdFactory = ChromeDriverFactory.newChromeDriverFactory()
-		ChromeDriver driver = cdFactory.newChromeDriver(
+		driver = cdFactory.newChromeDriver(
 				new UserProfile('Picaso'),
 				ChromeDriverFactory.UserDataAccess.FOR_HERE)
 		assertNotNull(driver)
@@ -182,7 +188,6 @@ class ChromeDriverFactoryTest {
 		println("DesiredCapabilities is\n${dcJson}")
 
 		driver.navigate().to('http://example.com/')
-		driver.quit()
 	}
 
 	/**
@@ -202,7 +207,7 @@ class ChromeDriverFactoryTest {
 		//
 		String url = 'http://localhost/'
 		// 1st session
-		ChromeDriver driver = cdFactory.newChromeDriver(new UserProfile('Picaso'))
+		driver = cdFactory.newChromeDriver(new UserProfile('Picaso'))
 		driver.navigate().to(url)
 		Set<Cookie> cookies = driver.manage().getCookies()
 		println "1st session: " + cookies
@@ -215,7 +220,6 @@ class ChromeDriverFactoryTest {
 		cookies = driver.manage().getCookies()
 		println "2nd session: " + cookies
 		String phpsessid2nd = driver.manage().getCookieNamed('timestamp')
-		driver.quit()
 		//
 		assert phpsessid1st == phpsessid2nd;
 	}
@@ -226,14 +230,13 @@ class ChromeDriverFactoryTest {
 		//
 		cdFactory.addChromeOptionsModifier(ChromeOptionsModifiers.incognito())
 		//
-		ChromeDriver driver = cdFactory.newChromeDriver()
+		driver = cdFactory.newChromeDriver()
 		assertNotNull(driver)
 		DesiredCapabilities dc = cdFactory.getEmployedDesiredCapabilities()
 		assertNotNull(dc)
 		String dcJson = cdFactory.getEmployedDesiredCapabilitiesAsJSON()
 		println("DesiredCapabilities is\n${dcJson}")
 		driver.navigate().to('http://example.com/')
-		driver.quit()
 		//
 		def jo = new JsonSlurper().parseText(dcJson)
 		/*
@@ -252,7 +255,7 @@ class ChromeDriverFactoryTest {
 	@Test
 	void test_ChromeDriver_metadata_empty() {
 		ChromeDriverFactory cdFactory = ChromeDriverFactory.newChromeDriverFactory()
-		ChromeDriver driver = cdFactory.newChromeDriver()
+		driver = cdFactory.newChromeDriver()
 		assertEquals(Optional.empty(), driver.userProfile)
 		assertEquals(Optional.empty(), driver.userDataAccess)
 	}
@@ -260,7 +263,7 @@ class ChromeDriverFactoryTest {
 	@Test
 	void test_ChromeDriver_metadata_stuffed() {
 		ChromeDriverFactory cdFactory = ChromeDriverFactory.newChromeDriverFactory()
-		ChromeDriver driver = cdFactory.newChromeDriver(new ProfileDirectoryName('Default'))
+		driver = cdFactory.newChromeDriver(new ProfileDirectoryName('Default'))
 		assertNotNull(driver)
 		assertTrue(driver.userProfile.isPresent())
 		assertTrue(driver.userDataAccess.isPresent())
