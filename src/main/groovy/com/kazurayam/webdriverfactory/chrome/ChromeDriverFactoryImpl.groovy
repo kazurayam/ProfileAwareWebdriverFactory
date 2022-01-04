@@ -168,7 +168,7 @@ class ChromeDriverFactoryImpl extends ChromeDriverFactory {
 		Path userDataDir = ChromeProfileUtils.getDefaultUserDataDir()
 		ProfileDirectoryName profileDirectoryName = chromeUserProfile.getProfileDirectoryName()
 
-		return launchChrome(userProfile, originalProfileDirectory, userDataDir, profileDirectoryName, instruction)
+		return launchChrome(chromeUserProfile, originalProfileDirectory, userDataDir, profileDirectoryName, instruction)
 	}
 
 	@Override
