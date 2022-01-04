@@ -53,6 +53,9 @@ dependencies {
     // https://mvnrepository.com/artifact/com.kazurayam/subprocessj
     testImplementation group: 'com.kazurayam', name: 'subprocessj', version: "${subprocessjVersion}"
 
+    // https://mvnrepository.com/artifact/com.kazurayam/timekeeper
+    implementation group: 'com.kazurayam', name: 'timekeeper', version: '0.3.3'
+
 }
 
 test {
