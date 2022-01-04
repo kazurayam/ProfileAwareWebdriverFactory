@@ -43,7 +43,7 @@ class ChromeProfileUtilsTest {
 	void test_getUserProfile() {
 		ChromeUserProfile userProfile = ChromeProfileUtils.findChromeUserProfile(new UserProfile('Picaso'))
 		assertNotNull(userProfile)
-		assertEquals(userProfile.getUserProfileName(), new UserProfile('Picaso'))
+		assertEquals(userProfile.getUserProfile(), new UserProfile('Picaso'))
 	}
 
 	@Test

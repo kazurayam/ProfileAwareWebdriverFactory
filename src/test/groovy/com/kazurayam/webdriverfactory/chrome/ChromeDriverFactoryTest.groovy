@@ -248,4 +248,29 @@ class ChromeDriverFactoryTest {
 		 */
 		assertTrue(jo["goog:chromeOptions"]["args"].contains("--incognito"))
 	}
+
+	@Test
+	void test_ChromeDriver_metadata_empty() {
+		ChromeDriverFactory cdFactory = ChromeDriverFactory.newChromeDriverFactory()
+		ChromeDriver driver = cdFactory.newChromeDriver()
+		assertEquals(Optional.empty(), driver.userProfile)
+		assertEquals(Optional.empty(), driver.userDataAccess)
+	}
+
+	@Test
+	void test_ChromeDriver_metadata_stuffed() {
+		ChromeDriverFactory cdFactory = ChromeDriverFactory.newChromeDriverFactory()
+		ChromeDriver driver = cdFactory.newChromeDriver(new ProfileDirectoryName('Default'))
+		assertNotNull(driver)
+		assertTrue(driver.userProfile.isPresent())
+		assertTrue(driver.userDataAccess.isPresent())
+		driver.userProfile.ifPresent({ ChromeUserProfile up ->
+			println up
+			assertEquals(new UserProfile("Kazuaki"), up.getUserProfile())
+			assertEquals(new ProfileDirectoryName("Default"), up.getProfileDirectoryName())
+			assertTrue(Files.exists(up.getUserDataDir()))
+			// e.g, "/Users/kazurayam/Library/Application Support/Google/Chrome"
+		})
+	}
+
 }

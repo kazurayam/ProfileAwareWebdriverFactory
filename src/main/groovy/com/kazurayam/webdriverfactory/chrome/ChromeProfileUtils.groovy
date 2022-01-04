@@ -50,7 +50,9 @@ final class ChromeProfileUtils {
 		for (Path dir : dirs) {
 			if (Files.exists(dir.resolve('Preferences'))) {
 				ChromeUserProfile cp = new ChromeUserProfile(
-						userDataDir, dir.getFileName().toString())
+						userDataDir,
+						new ProfileDirectoryName(dir.getFileName().toString())
+				)
 				userProfiles.add(cp)
 			}
 		}
@@ -70,7 +72,7 @@ final class ChromeProfileUtils {
 		List<ChromeUserProfile> userProfiles = getChromeUserProfileList(userDataDir)
 		for (ChromeUserProfile cUP in userProfiles) {
 			//System.out.println("[ChromeProfileFinder#getUserProfile] userProfile.getName()==${userProfile.getName()}, userProfile.getDirectoryName()=${userProfile.getDirectoryName()}")
-			if (cUP.getUserProfileName() == userProfile) {
+			if (cUP.getUserProfile() == userProfile) {
 				return cUP
 			}
 		}
@@ -119,7 +121,7 @@ final class ChromeProfileUtils {
 	static UserProfile findUserProfileByProfileDirectoryName(
 			Path userDataDir, ProfileDirectoryName profileDirectoryName) {
 		return findChromeUserProfileByProfileDirectoryName(
-				userDataDir, profileDirectoryName).getUserProfileName()
+				userDataDir, profileDirectoryName).getUserProfile()
 	}
 
 	/**
