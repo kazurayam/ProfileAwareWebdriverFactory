@@ -61,7 +61,7 @@ class WebDriverFactoryTest {
 	@Test
 	void test_newWebDriver_Chrome_UserProfile() {
 		WebDriverFactory wdf = new WebDriverFactory.Builder(DriverTypeName.CHROME_DRIVER)
-				.userProfile('Picaso')
+				.userProfile('Picasso')
 				.build()
 		driver = wdf.newWebDriver()
 		assertNotNull(driver)
@@ -70,7 +70,7 @@ class WebDriverFactoryTest {
 	@Test
 	void test_newWebDriver_Headless_UserProfile() {
 		WebDriverFactory wdf = new WebDriverFactory.Builder(DriverTypeName.HEADLESS_DRIVER)
-				.userProfile('Picaso')
+				.userProfile('Picasso')
 				.build()
 		driver = wdf.newWebDriver()
 		assertNotNull(driver)

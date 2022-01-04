@@ -37,13 +37,13 @@ class ChromeProfileUtilsTest {
 	}
 
 	/**
-	 * This test requires you to have a custom profile 'Picaso' defined in your Google Chrome browser
+	 * This test requires you to have a custom profile 'Picasso' defined in your Google Chrome browser
 	 */
 	@Test
 	void test_getUserProfile() {
-		ChromeUserProfile userProfile = ChromeProfileUtils.findChromeUserProfile(new UserProfile('Picaso'))
+		ChromeUserProfile userProfile = ChromeProfileUtils.findChromeUserProfile(new UserProfile('Picasso'))
 		assertNotNull(userProfile)
-		assertEquals(userProfile.getUserProfile(), new UserProfile('Picaso'))
+		assertEquals(userProfile.getUserProfile(), new UserProfile('Picasso'))
 	}
 
 	@Test

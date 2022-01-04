@@ -110,13 +110,13 @@ class ChromeDriverFactoryTest {
 	}
 
 	/**
-	 * Instantiate a ChromeDriver to open a Chrome browser specifying a user profile "Picaso"
+	 * Instantiate a ChromeDriver to open a Chrome browser specifying a user profile "Picasso"
 	 * while cloning the User Data directory to a temporary folder
 	 */
 	@Test
 	void test_newChromeDriver_byUserProfile_TOGO() {
 		ChromeDriverFactory cdFactory = ChromeDriverFactory.newChromeDriverFactory()
-		driver = cdFactory.newChromeDriver(new UserProfile('Picaso'))
+		driver = cdFactory.newChromeDriver(new UserProfile('Picasso'))
 		assertNotNull(driver)
 
 		DesiredCapabilities dc = cdFactory.getEmployedDesiredCapabilities()
@@ -124,7 +124,7 @@ class ChromeDriverFactoryTest {
 		String dcJson = cdFactory.getEmployedDesiredCapabilitiesAsJSON()
 		println("DesiredCapabilities is\n${dcJson}")
 
-		println("ChromeDriver has been instantiated with profile Picaso")
+		println("ChromeDriver has been instantiated with profile Picasso")
 		driver.navigate().to('http://example.com/')
 	}
 
@@ -165,7 +165,7 @@ class ChromeDriverFactoryTest {
 
 
 	/**
-	 * Instantiate a ChromeDriver to open a Chrome browser specifying a user profile "Picaso"
+	 * Instantiate a ChromeDriver to open a Chrome browser specifying a user profile "Picasso"
 	 * while cloning the User Data directory to a temporary folder
 	 * You are likely to see an error:
 	 * > invalid argument: user data directory is already in use, please specify a unique value for --user-data-dir argument, or don't use --user-data-dir
@@ -178,7 +178,7 @@ class ChromeDriverFactoryTest {
 	void test_newChromeDriver_withUserProfile_FOR_HERE() {
 		ChromeDriverFactory cdFactory = ChromeDriverFactory.newChromeDriverFactory()
 		driver = cdFactory.newChromeDriver(
-				new UserProfile('Picaso'),
+				new UserProfile('Picasso'),
 				ChromeDriverFactory.UserDataAccess.FOR_HERE)
 		assertNotNull(driver)
 
@@ -191,15 +191,15 @@ class ChromeDriverFactoryTest {
 	}
 
 	/**
-	 * open a session using a user profile Picaso and navigate too http://127.0.0.1, then close the session.
+	 * open a session using a user profile Picasso and navigate too http://127.0.0.1, then close the session.
 	 * the session will create a cookie "timestamp".
-	 * open a second session using Picaso Profile again.
+	 * open a second session using Picasso Profile again.
 	 * I expect the second session will use the same value of timestamp cookie. So I test it.
 	 * 
 	 */
 	@Ignore
 	@Test
-	public void test_if_cookie_is_retained_in_profile_accross_2_sessions() {
+	void test_if_cookie_is_retained_in_profile_accross_2_sessions() {
 		// we want Headless
 		ChromeDriverFactory cdFactory = ChromeDriverFactory.newChromeDriverFactory()
 		//ChromeOptionsModifier com = new ChromeOptionsModifierHeadless()
@@ -207,7 +207,7 @@ class ChromeDriverFactoryTest {
 		//
 		String url = 'http://localhost/'
 		// 1st session
-		driver = cdFactory.newChromeDriver(new UserProfile('Picaso'))
+		driver = cdFactory.newChromeDriver(new UserProfile('Picasso'))
 		driver.navigate().to(url)
 		Set<Cookie> cookies = driver.manage().getCookies()
 		println "1st session: " + cookies
@@ -215,13 +215,13 @@ class ChromeDriverFactoryTest {
 		driver.quit()
 
 		// 2nd session
-		driver = cdFactory.newChromeDriver(new UserProfile('Picaso'))
+		driver = cdFactory.newChromeDriver(new UserProfile('Picasso'))
 		driver.navigate().to(url)
 		cookies = driver.manage().getCookies()
 		println "2nd session: " + cookies
 		String phpsessid2nd = driver.manage().getCookieNamed('timestamp')
 		//
-		assert phpsessid1st == phpsessid2nd;
+		assert phpsessid1st == phpsessid2nd
 	}
 
 	@Test

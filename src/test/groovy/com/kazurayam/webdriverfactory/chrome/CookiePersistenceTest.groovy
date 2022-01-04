@@ -25,7 +25,7 @@ import java.util.concurrent.TimeUnit
 class CookiePersistenceTest {
 
     String url = "http://127.0.0.1:8090"
-    String profileName = "Picaso"
+    String profileName = "Picasso"
     String cookieName = "timestamp"
 
     WebDriver driver
