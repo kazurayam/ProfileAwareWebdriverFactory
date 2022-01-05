@@ -5,3 +5,9 @@ It enables you to launch Chrome browser specifying a *User Profile* so that cook
 taken over from a HTTP session to the next session.
 
 *STILL TO BE AUTHORED*
+
+
+https://forum.katalon.com/t/open-browser-with-custom-profile/19268[Open Browser with Custom Profile]
+
+
+
