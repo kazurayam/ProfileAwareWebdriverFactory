@@ -10,7 +10,6 @@ import org.openqa.selenium.InvalidArgumentException
 
 import java.nio.file.Files
 import java.nio.file.Path
-import java.util.stream.Collectors
 
 import org.openqa.selenium.WebDriver
 import org.openqa.selenium.chrome.ChromeDriver
@@ -21,6 +20,8 @@ import org.slf4j.LoggerFactory
 
 import groovy.json.JsonOutput
 
+import java.time.Duration
+
 class ChromeDriverFactoryImpl extends ChromeDriverFactory {
 
 	static Logger logger_ = LoggerFactory.getLogger(ChromeDriverFactoryImpl.class)
@@ -30,6 +31,7 @@ class ChromeDriverFactoryImpl extends ChromeDriverFactory {
 	private final List<DesiredCapabilitiesModifier> desiredCapabilitiesModifiers
 
 	private DesiredCapabilities desiredCapabilities
+	private Integer implicitWaitSeconds
 
 	ChromeDriverFactoryImpl() {
 		this(true)
@@ -43,6 +45,8 @@ class ChromeDriverFactoryImpl extends ChromeDriverFactory {
 		if (requireDefaultSettings) {
 			this.prepareDefaultSettings()
 		}
+		//implicitWaitSeconds = Integer.MIN_VALUE   // not set
+		implicitWaitSeconds = 30   // perform implicit wait for 30 seconds
 	}
 
 	private void prepareDefaultSettings() {
@@ -111,13 +115,32 @@ class ChromeDriverFactoryImpl extends ChromeDriverFactory {
 		return this.getEmployedDesiredCapabilities().toJSON()
 	}
 
+	@Override
+	void setImplicitWaitSeconds(Integer waitSeconds) {
+		Objects.requireNonNull(waitSeconds)
+		if (waitSeconds <= 0) {
+			throw new IllegalArgumentException("waitSeconds=${waitSeconds} must not be <=0")
+		}
+		if (waitSeconds > 999) {
+			throw new IllegalArgumentException("waitSeconds=${waitSeconds} must not be > 999")
+		}
+		this.implicitWaitSeconds = waitSeconds
+	}
 
 	@Override
 	ChromeDriver newChromeDriver() {
-		WebDriver driver = this.execute()
+		WebDriver driver = this.createInstance()
 		driver.metaClass.userProfile = Optional.empty()
 		driver.metaClass.userDataAccess = Optional.empty()
+		setImplicitWait(driver, this.implicitWaitSeconds)
 		return driver
+	}
+
+	protected void setImplicitWait(ChromeDriver driver, Integer seconds) {
+		if (seconds != Integer.MIN_VALUE) {
+			Duration dur = Duration.ofSeconds((long)seconds)
+			driver.manage().timeouts().implicitlyWait(dur);
+		}
 	}
 
 	/**
@@ -225,7 +248,7 @@ class ChromeDriverFactoryImpl extends ChromeDriverFactory {
 	 *     Chrome Preferences => Chrome Options => Desired Capabilities
 	 * while modifying each containers with specified Modifiers
 	 */
-	private WebDriver execute() {
+	private ChromeDriver createInstance() {
 
 		// create a Chrome Preferences object as the seed
 		Map<String, Object> preferences = new HashMap<>()
@@ -249,8 +272,8 @@ class ChromeDriverFactoryImpl extends ChromeDriverFactory {
 			desiredCapabilities = dcm.modify(desiredCapabilities)
 		}
 
-		// now launch the browser
-		WebDriver driver = new ChromeDriver(desiredCapabilities)
+		// now launch the Chrome browser
+		ChromeDriver driver = new ChromeDriver(desiredCapabilities)
 
 		// well done
 		return driver
@@ -295,9 +318,10 @@ class ChromeDriverFactoryImpl extends ChromeDriverFactory {
 		// launch the Chrome driver
 		ChromeDriver driver = null
 		try {
-			driver = this.execute()
+			driver = this.createInstance()
 			driver.metaClass.userProfile = Optional.of(userProfile)
 			driver.metaClass.userDataAccess = Optional.of(instruction)
+			setImplicitWait(driver, this.implicitWaitSeconds)
 			return driver
 		} catch (InvalidArgumentException iae) {
 			if (driver != null) {

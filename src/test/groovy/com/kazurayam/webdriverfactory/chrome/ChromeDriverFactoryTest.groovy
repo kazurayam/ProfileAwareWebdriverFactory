@@ -101,7 +101,6 @@ class ChromeDriverFactoryTest {
 		//println("DesiredCapabilities is\n${dcJson}")
 		//
 		driver.navigate().to('http://example.com/')
-		driver.quit()
 	}
 
 	@Test
@@ -296,6 +295,7 @@ class ChromeDriverFactoryTest {
 		LocalDateTime after = LocalDateTime.now()
 		m1.recordDuration(["Case": "no specialization"], before, after)
 		driver.quit()
+
 		// open Chrome with ProfileDirectoryName
 		before = LocalDateTime.now()
 		cdFactory = ChromeDriverFactory.newChromeDriverFactory()
@@ -311,6 +311,15 @@ class ChromeDriverFactoryTest {
 		float cap = 8.0
 		assertTrue("r.getDurationMillis=${r.getDurationMillis() / 1000} should be less than ${cap}",
 				r.getDurationMillis() / 1000 < cap)
+	}
+
+	@Test
+	void test_if_implicit_wait_works() {
+		ChromeDriverFactory cdFactory = ChromeDriverFactory.newChromeDriverFactory()
+		cdFactory.setImplicitWaitSeconds(10)
+		driver = cdFactory.newChromeDriver()
+		assertNotNull(driver)
+		driver.navigate().to("http://example.com")
 	}
 
 }
