@@ -21,6 +21,7 @@ import org.slf4j.LoggerFactory
 import groovy.json.JsonOutput
 
 import java.time.Duration
+import java.util.concurrent.TimeUnit
 
 class ChromeDriverFactoryImpl extends ChromeDriverFactory {
 
@@ -139,7 +140,8 @@ class ChromeDriverFactoryImpl extends ChromeDriverFactory {
 	protected void setImplicitWait(ChromeDriver driver, Integer seconds) {
 		if (seconds != Integer.MIN_VALUE) {
 			Duration dur = Duration.ofSeconds((long)seconds)
-			driver.manage().timeouts().implicitlyWait(dur);
+			long millis = dur.toMillis()
+			driver.manage().timeouts().implicitlyWait(millis, TimeUnit.MILLISECONDS);
 		}
 	}
 

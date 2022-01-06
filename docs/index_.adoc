@@ -1,8 +1,34 @@
 = webdriverfactory
 
 A Java/Groovy library that wraps `org.openqa.selenium.webdriver.chrome.ChromeDriver`.
-It enables you to launch Chrome browser specifying a *User Profile* so that cookies are
-taken over from a HTTP session to the next session.
+It enables you to launch Chrome browser while specifying a *Profile* so that cookies and cached page resources are carried over from previous HTTP session to the next.
+
+== Examples
+
+=== Launch Chrome browser without profile specified
+
+Basic case where we launch Chrome browser without profile specified. The example includes how to launch Headless brower. Also includes how to position and resize the browser window.
+
+[source, groovy]
+----
+include::../src/test/groovy/examples/LaunchChromeWithoutProfile.groovy[]
+----
+
+=== Launch Chrome browser with UserProfile specified
+
+[source, groovy]
+----
+include::../src/test/groovy/examples/LaunchChromeWithUserProfile.groovy[]
+----
+
+
+=== Launch Headless Chrome with ProfileDirectoryName specified
+
+[source, groovy]
+----
+include::../src/test/groovy/examples/LaunchChromeWithProfileDirectory.groovy[]
+----
+
 
 *STILL TO BE AUTHORED*
 
