@@ -7,10 +7,6 @@ It enables you to launch Chrome browser while specifying a "User Profile", for e
 
 You have an option where to find the profile directory:
 
-1.  `UserDataAccess.FOR_HERE` : ChromeDriverFactory tries to find the profile directory in the Chrome’s genuine "user-data-dir". On Mac, it is `/Users/myosusername/Library/Application Support/Google/Chrome/`. A process of Chrome browser demands to lock the genuine profile directory. While a Chrome process is already running, when you try to open another Chrome with FOR\_HERE option, the new comer process will fail.
-
-2.  `UserDataAccess.TO_GO` : ChromeDriverFactory allocates a new temporary directory and in there will create a profile directory. Then ChromeDriverFactory will copy the content of the genuine profile directory into the temporary directory. When you open Chrome with TO\_GO option the process will run. However, all of session data saved into this temporary profile directory will be discarded (cookies, cached page resources, etc) when you close the session.
-
 ## Examples
 
 ### Launch Chrome browser without profile specified
@@ -463,3 +459,19 @@ This emits
         "userDataDir": "/Users/kazurayam/Library/Application Support/Google/Chrome"
     }
     UserDataAccess: TO_GO
+
+## What is "user profile", "user-data-dir" and "profile directory" in Chrome
+
+What is "user profile" in Chrome browser? There are a few articles about it, for example
+
+-   <https://www.guidingtech.com/things-about-google-chrome-profiles/>
+
+## Problem to solve
+
+## Solution
+
+## Description
+
+1.  `UserDataAccess.FOR_HERE` : ChromeDriverFactory tries to find the profile directory in the Chrome’s genuine "user-data-dir". On Mac, it is `/Users/myosusername/Library/Application Support/Google/Chrome/`. A process of Chrome browser demands to lock the genuine profile directory. While a Chrome process is already running, when you try to open another Chrome with FOR\_HERE option, the new comer process will fail.
+
+2.  `UserDataAccess.TO_GO` : ChromeDriverFactory allocates a new temporary directory and in there will create a profile directory. Then ChromeDriverFactory will copy the content of the genuine profile directory into the temporary directory. When you open Chrome with TO\_GO option the process will run. However, all of session data saved into this temporary profile directory will be discarded (cookies, cached page resources, etc) when you close the session.
