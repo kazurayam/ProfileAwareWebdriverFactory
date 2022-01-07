@@ -5,11 +5,10 @@ import org.openqa.selenium.Point
 
 abstract class WindowLayoutMetrics {
 
-    public static final WindowLayoutMetrics DEFAULT =
-            new StackingWindowLayoutMetrics.Builder().disposition(new Dimension(0, 0)).build()
+    abstract int getSize()
 
-    abstract Point getWindowPosition(WindowLocation windowLocation)
+    abstract Point getWindowPosition(int windowIndex)
 
-    abstract Dimension getWindowDimension(WindowLocation windowLocation)
+    abstract Dimension getWindowDimension(int windowIndex)
 
 }

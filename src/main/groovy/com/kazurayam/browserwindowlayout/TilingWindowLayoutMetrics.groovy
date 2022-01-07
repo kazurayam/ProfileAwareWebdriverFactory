@@ -7,11 +7,18 @@ import java.awt.Toolkit
 
 class TilingWindowLayoutMetrics extends WindowLayoutMetrics {
 
-    public static final TilingWindowLayoutMetrics DEFAULT =
-            new TilingWindowLayoutMetrics.Builder().build()
+    private final int size
+    private final Dimension virtualScreenSize
+    private final Point basePoint
 
-    protected final Dimension virtualScreenSize
-    protected final Point basePoint
+    private TilingWindowLayoutMetrics(Builder builder) {
+        this.size = builder.size
+        virtualScreenSize = new Dimension(
+                builder.physicalScreenSize.width - builder.basePoint.x * 2,
+                builder.physicalScreenSize.height - builder.basePoint.y * 2
+        )
+        basePoint = builder.basePoint
+    }
 
     Dimension getVirtualScreenSize() {
         return virtualScreenSize
@@ -22,22 +29,33 @@ class TilingWindowLayoutMetrics extends WindowLayoutMetrics {
     }
 
     @Override
-    Dimension getWindowDimension(WindowLocation windowLocation) {
-        if (windowLocation.size == 1) {
+    int getSize() {
+        return this.size
+    }
+
+    @Override
+    Dimension getWindowDimension(int windowIndex) {
+        if (windowIndex < 0 || windowIndex >= this.size) {
+            throw new IllegalArgumentException("windowIndex=${windowIndex} must not be <0 and >=size")
+        }
+        if (size == 1) {
             return virtualScreenSize
         } else {
             // Tiles in 2 columns
-            int width = Math.floor(virtualScreenSize.width / 2)
-            int rows = Math.ceil(windowLocation.size / 2)
-            int height = Math.floor(virtualScreenSize.height / rows )
+            int width = (int)Math.floor(virtualScreenSize.width / 2)
+            int rows = (int)Math.ceil(this.size / 2)
+            int height = (int)Math.floor(virtualScreenSize.height / rows )
             return new Dimension(width, height)
         }
     }
 
     @Override
-    Point getWindowPosition(WindowLocation windowLocation) {
-        int x = basePoint.x + (windowLocation.index % 2) * this.getWindowDimension(windowLocation).width
-        int y = basePoint.y + Math.floor(windowLocation.index / 2) * this.getWindowDimension(windowLocation).height
+    Point getWindowPosition(int windowIndex) {
+        if (windowIndex < 0 || windowIndex >= this.size) {
+            throw new IllegalArgumentException("windowIndex=${windowIndex} must not be <0 and >=size")
+        }
+        int x = basePoint.x + (windowIndex % 2) * this.getWindowDimension(windowIndex).width
+        int y = basePoint.y + Math.floor(windowIndex / 2) * this.getWindowDimension(windowIndex).height
         return new Point(x, y)
     }
 
@@ -78,13 +96,19 @@ class TilingWindowLayoutMetrics extends WindowLayoutMetrics {
      */
     static class Builder {
         // Required parameters - none
+        private int size
 
         // Optional parameters - initialized to default values
         private java.awt.Dimension ss = Toolkit.getDefaultToolkit().getScreenSize()
         private Dimension physicalScreenSize = new Dimension((int)ss.width, (int)ss.height)
         private Point basePoint = new Point(10, 10)
 
-        Builder() {}
+        Builder(int size) {
+            if (size <= 0) {
+                throw new IllegalArgumentException("size=${size} must not be <=0")
+            }
+            this.size = size
+        }
 
         Builder physicalScreenSize(Dimension physicalScreenSize) {
             this.physicalScreenSize = physicalScreenSize
@@ -101,11 +125,4 @@ class TilingWindowLayoutMetrics extends WindowLayoutMetrics {
         }
     }
 
-    private TilingWindowLayoutMetrics(Builder builder) {
-        virtualScreenSize = new Dimension(
-                builder.physicalScreenSize.width - builder.basePoint.x * 2,
-                builder.physicalScreenSize.height - builder.basePoint.y * 2
-        )
-        basePoint = builder.basePoint
-    }
 }

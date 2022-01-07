@@ -17,8 +17,8 @@ class BrowserWindowLayoutManagerTest {
 
     @Before
     void setup() {
-        tilingLayout = new TilingWindowLayoutMetrics.Builder().build()
-        stackingLayout = new StackingWindowLayoutMetrics.Builder().build()
+        tilingLayout = new TilingWindowLayoutMetrics.Builder(4).build()
+        stackingLayout = new StackingWindowLayoutMetrics.Builder(3).build()
         WebDriverFactory factory = new WebDriverFactory.Builder().build()   // will use Chrome driver as default
         driver = factory.newWebDriver()
     }
@@ -35,37 +35,25 @@ class BrowserWindowLayoutManagerTest {
     void test_tiling() {
         String url = "http://example.com/"
         driver.navigate().to(url)
-        List<WindowLocation> locations = [
-                new WindowLocation(2, 0),
-                new WindowLocation(2, 1),
-                new WindowLocation(4, 0),
-                new WindowLocation(4, 1),
-                new WindowLocation(4, 2),
-                new WindowLocation(4, 3),
-        ]
-        locations.each { loc ->
+        for (int index in 0..<tilingLayout.getSize()) {
             BrowserWindowLayoutManager.layout(
                     driver,
-                    tilingLayout.getWindowPosition(loc),
-                    tilingLayout.getWindowDimension(loc))
+                    tilingLayout.getWindowPosition(index),
+                    tilingLayout.getWindowDimension(index)
+            )
         }
     }
 
     @Test
     void test_stacking() {
-        String url = "http://demoaut-mimic.kazurayam.com/"
+        String url = "http://example.com/"
         driver.navigate().to(url)
-        List<WindowLocation> locations = [
-                new WindowLocation(4, 0),
-                new WindowLocation(4, 1),
-                new WindowLocation(4, 2),
-                new WindowLocation(4, 3),
-        ]
-        locations.each { loc ->
+        for (int index in 0..<stackingLayout.getSize()) {
             BrowserWindowLayoutManager.layout(
                     driver,
-                    stackingLayout.getWindowPosition(loc),
-                    tilingLayout.getWindowDimension(loc))
+                    stackingLayout.getWindowPosition(index),
+                    stackingLayout.getWindowDimension(index)
+            )
         }
     }
 

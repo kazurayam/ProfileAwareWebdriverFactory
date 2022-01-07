@@ -5,26 +5,42 @@ import org.openqa.selenium.Point
 
 class StackingWindowLayoutMetrics extends WindowLayoutMetrics {
 
-    public static final StackingWindowLayoutMetrics DEFAULT =
-            new StackingWindowLayoutMetrics.Builder().build()
-
+    private final int size
     private final Dimension windowDimension
-    private final Dimension disposition
+    private final Point disposition
 
-    Dimension getDisposition() {
-        return disposition
+    private StackingWindowLayoutMetrics(Builder builder) {
+        size            = builder.size
+        windowDimension = builder.windowDimension
+        disposition     = builder.disposition
+    }
+
+    Dimension getWindowDimension() {
+        return this.windowDimension
+    }
+
+    Point getDisposition() {
+        return this.disposition
     }
 
     @Override
-    Point getWindowPosition(WindowLocation windowLocation) {
-        int x = disposition.width * windowLocation.index
-        int y = disposition.height * windowLocation.index
+    int getSize() {
+        return this.size
+    }
+
+    @Override
+    Point getWindowPosition(int windowIndex) {
+        if (windowIndex < 0 || windowIndex >= this.size) {
+            throw new IllegalArgumentException("windowIndex must be >=0 and <${this.size}")
+        }
+        int x = disposition.x * windowIndex
+        int y = disposition.y * windowIndex
         return new Point(x, y)
     }
 
     @Override
-    Dimension getWindowDimension(WindowLocation windowLocation) {
-        return windowDimension
+    Dimension getWindowDimension(int windowIndex) {
+        return this.windowDimension
     }
 
     @Override
@@ -52,9 +68,11 @@ class StackingWindowLayoutMetrics extends WindowLayoutMetrics {
     String toString() {
         StringBuilder sb = new StringBuilder()
         sb.append("{\"StackingWindowLayoutMetrics\":{")
-        sb.append("\"windowDimension\":[${windowDimension.width},${windowDimension.height}]")
+        sb.append("\"size\":${this.size}")
         sb.append(",")
-        sb.append("\"disposition\":[${disposition.width},${disposition.height}]")
+        sb.append("\"windowDimension\":{\"width\":${windowDimension.width},\"height\":${windowDimension.height}}")
+        sb.append(",")
+        sb.append("\"disposition\":{\"x\":${disposition.x},\"y\":${disposition.y}}")
         sb.append("}}")
         return sb.toString()
     }
@@ -64,12 +82,17 @@ class StackingWindowLayoutMetrics extends WindowLayoutMetrics {
      */
     static class Builder {
         // Required parameters
+        private int size
 
         // Optional parameters - initialized to default values
         private Dimension windowDimension = new Dimension(1280, 600)
-        private Dimension disposition = new Dimension(80, 80)
+        private Point disposition = new Point(80, 80)
 
-        Builder() {
+        Builder(int size) {
+            if (size <= 0) {
+                throw new IllegalArgumentException("size=${size} must not be <=0")
+            }
+            this.size = size
         }
 
         Builder windowDimension(Dimension windowDimension) {
@@ -77,7 +100,7 @@ class StackingWindowLayoutMetrics extends WindowLayoutMetrics {
             return this
         }
 
-        Builder disposition(Dimension disposition) {
+        Builder disposition(Point disposition) {
             this.disposition = disposition
             return this
         }
@@ -86,12 +109,5 @@ class StackingWindowLayoutMetrics extends WindowLayoutMetrics {
             return new StackingWindowLayoutMetrics(this)
         }
     }
-
-
-    private StackingWindowLayoutMetrics(Builder builder) {
-        windowDimension = builder.windowDimension
-        disposition     = builder.disposition
-    }
-
 
 }

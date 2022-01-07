@@ -2,7 +2,7 @@ package examples
 
 import com.kazurayam.browserwindowlayout.BrowserWindowLayoutManager
 import com.kazurayam.browserwindowlayout.TilingWindowLayoutMetrics
-import com.kazurayam.browserwindowlayout.WindowLocation
+
 import com.kazurayam.webdriverfactory.UserProfile
 import com.kazurayam.webdriverfactory.chrome.ChromeDriverFactory
 import io.github.bonigarcia.wdm.WebDriverManager
@@ -15,23 +15,19 @@ import org.openqa.selenium.chrome.ChromeDriver
 class LaunchMultipleChromeWindows {
 
     ChromeDriver browser
-    TilingWindowLayoutMetrics tilingLayout
 
     @Test
     void test_open2windows_in_tiling_layout() {
-        List<WindowLocation> locations = [
-                new WindowLocation(2, 0),
-                new WindowLocation(2, 1),
-        ]
+        TilingWindowLayoutMetrics tilingLayout = new TilingWindowLayoutMetrics.Builder(2).build()
         ChromeDriverFactory factory = ChromeDriverFactory.newChromeDriverFactory()
         ChromeDriver browser0 = factory.newChromeDriver(new UserProfile("Picasso"))
         BrowserWindowLayoutManager.layout(browser0,
-                tilingLayout.getWindowPosition(locations.get(0)),
-                tilingLayout.getWindowDimension(locations.get(0)))
+                tilingLayout.getWindowPosition(0),
+                tilingLayout.getWindowDimension(0))
         ChromeDriver browser1 = factory.newChromeDriver(new UserProfile("Gogh"))
         BrowserWindowLayoutManager.layout(browser1,
-                tilingLayout.getWindowPosition(locations.get(1)),
-                tilingLayout.getWindowDimension(locations.get(1)))
+                tilingLayout.getWindowPosition(1),
+                tilingLayout.getWindowDimension(1))
         browser0.navigate().to("https://www.pablopicasso.org/")
         browser1.navigate().to("https://www.vincentvangogh.org/")
         Thread.sleep(1000)
@@ -48,7 +44,6 @@ class LaunchMultipleChromeWindows {
     @Before
     void setUp() {
         browser = null
-        tilingLayout = new TilingWindowLayoutMetrics.Builder().build()
     }
 
     @After
