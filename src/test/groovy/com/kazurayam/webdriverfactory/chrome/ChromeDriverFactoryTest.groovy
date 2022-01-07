@@ -314,7 +314,7 @@ class ChromeDriverFactoryTest {
 	}
 
 	@Test
-	void test_if_implicit_wait_works() {
+	void test_waitForPageLoad_works() {
 		ChromeDriverFactory cdFactory = ChromeDriverFactory.newChromeDriverFactory()
 		cdFactory.pageLoadTimeout(10)
 		driver = cdFactory.newChromeDriver()
