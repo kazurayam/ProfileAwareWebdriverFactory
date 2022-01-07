@@ -29,11 +29,20 @@ include::../src/test/groovy/examples/LaunchChromeWithUserProfile.groovy[]
 include::../src/test/groovy/examples/LaunchChromeWithProfileDirectory.groovy[]
 ----
 
+=== Launch Multiple Chrome windows in Tiling layout
 
-*STILL TO BE AUTHORED*
+[source, groovy]
+----
+include::../src/test/groovy/examples/LaunchMultipleChromeWindowsInTilingLayout.groovy[]
+----
 
+=== Launch Multiple Chrome windows in Stacking layout
 
-https://forum.katalon.com/t/open-browser-with-custom-profile/19268[Open Browser with Custom Profile]
+[source, groovy]
+----
+include::../src/test/groovy/examples/LaunchMultipleChromeWindowsInStackingLayout.groovy[]
+----
+
 
 
 

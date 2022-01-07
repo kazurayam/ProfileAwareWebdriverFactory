@@ -27,25 +27,6 @@ Basic case where we launch Chrome browser without profile specified. The example
 
         ChromeDriver browser
 
-        @BeforeClass
-        static void beforeClass() {
-            // setup the ChromeDriver binary
-            WebDriverManager.chromedriver().setup()
-        }
-
-        @Before
-        void setUp() {
-            browser = null
-        }
-
-        @After
-        void tearDown() {
-            if (browser != null) {
-                browser.quit()
-                browser = null
-            }
-        }
-
         @Test
         void test_launch_browser() {
             ChromeDriverFactory factory = ChromeDriverFactory.newChromeDriverFactory()
@@ -72,25 +53,6 @@ Basic case where we launch Chrome browser without profile specified. The example
             browser.navigate().to("http://example.com")
             Thread.sleep(1000)
         }
-    }
-
-### Launch Chrome browser with UserProfile specified
-
-    package examples
-
-    import com.kazurayam.webdriverfactory.UserProfile
-    import com.kazurayam.webdriverfactory.chrome.ChromeDriverFactory
-    import io.github.bonigarcia.wdm.WebDriverManager
-    import org.junit.After
-    import org.junit.Before
-    import org.junit.BeforeClass
-    import org.junit.Ignore
-    import org.junit.Test
-    import org.openqa.selenium.chrome.ChromeDriver
-
-    class LaunchChromeWithUserProfile {
-
-        ChromeDriver browser
 
         @BeforeClass
         static void beforeClass() {
@@ -110,6 +72,26 @@ Basic case where we launch Chrome browser without profile specified. The example
                 browser = null
             }
         }
+
+    }
+
+### Launch Chrome browser with UserProfile specified
+
+    package examples
+
+    import com.kazurayam.webdriverfactory.UserProfile
+    import com.kazurayam.webdriverfactory.chrome.ChromeDriverFactory
+    import io.github.bonigarcia.wdm.WebDriverManager
+    import org.junit.After
+    import org.junit.Before
+    import org.junit.BeforeClass
+    import org.junit.Ignore
+    import org.junit.Test
+    import org.openqa.selenium.chrome.ChromeDriver
+
+    class LaunchChromeWithUserProfile {
+
+        ChromeDriver browser
 
         @Test
         void test_launch_browser_with_profile() {
@@ -139,25 +121,6 @@ Basic case where we launch Chrome browser without profile specified. The example
             browser.navigate().to("http://example.com")
             Thread.sleep(1000)
         }
-    }
-
-### Launch Headless Chrome with ProfileDirectoryName specified
-
-    package examples
-
-    import com.kazurayam.webdriverfactory.chrome.ChromeDriverFactory
-    import com.kazurayam.webdriverfactory.chrome.ProfileDirectoryName
-    import io.github.bonigarcia.wdm.WebDriverManager
-    import org.junit.After
-    import org.junit.Before
-    import org.junit.BeforeClass
-    import org.junit.Ignore
-    import org.junit.Test
-    import org.openqa.selenium.chrome.ChromeDriver
-
-    class LaunchChromeWithProfileDirectory {
-
-        ChromeDriver browser
 
         @BeforeClass
         static void beforeClass() {
@@ -177,6 +140,26 @@ Basic case where we launch Chrome browser without profile specified. The example
                 browser = null
             }
         }
+
+    }
+
+### Launch Headless Chrome with ProfileDirectoryName specified
+
+    package examples
+
+    import com.kazurayam.webdriverfactory.chrome.ChromeDriverFactory
+    import com.kazurayam.webdriverfactory.chrome.ProfileDirectoryName
+    import io.github.bonigarcia.wdm.WebDriverManager
+    import org.junit.After
+    import org.junit.Before
+    import org.junit.BeforeClass
+    import org.junit.Ignore
+    import org.junit.Test
+    import org.openqa.selenium.chrome.ChromeDriver
+
+    class LaunchChromeWithProfileDirectory {
+
+        ChromeDriver browser
 
         @Test
         void test_launch_browser_with_profile_directory() {
@@ -201,14 +184,119 @@ Basic case where we launch Chrome browser without profile specified. The example
         void test_launch_browser_with_profile_FOR_HERE() {
             ChromeDriverFactory factory = ChromeDriverFactory.newChromeDriverFactory()
             browser = factory.newChromeDriver(
-                    new ProfileDirectoryName("Default"),
+                    new ProfileDirectoryName("Profile 6"),
                     ChromeDriverFactory.UserDataAccess.FOR_HERE)
             browser.navigate().to("http://example.com")
             Thread.sleep(1000)
         }
 
+        @BeforeClass
+        static void beforeClass() {
+            // setup the ChromeDriver binary
+            WebDriverManager.chromedriver().setup()
+        }
+
+        @Before
+        void setUp() {
+            browser = null
+        }
+
+        @After
+        void tearDown() {
+            if (browser != null) {
+                browser.quit()
+                browser = null
+            }
+        }
+
     }
 
-**STILL TO BE AUTHORED**
+### Launch Multiple Chrome windows in Tiling layout
 
-[Open Browser with Custom Profile](https://forum.katalon.com/t/open-browser-with-custom-profile/19268)
+    package examples
+
+    import com.kazurayam.browserwindowlayout.BrowserWindowLayoutManager
+    import com.kazurayam.browserwindowlayout.TilingWindowLayoutMetrics
+
+    import com.kazurayam.webdriverfactory.UserProfile
+    import com.kazurayam.webdriverfactory.chrome.ChromeDriverFactory
+    import io.github.bonigarcia.wdm.WebDriverManager
+    import org.junit.BeforeClass
+    import org.junit.Test
+    import org.openqa.selenium.chrome.ChromeDriver
+
+    class LaunchMultipleChromeWindowsInTilingLayout {
+
+        @Test
+        void test_open2windows_in_tiling_layout() {
+            TilingWindowLayoutMetrics layoutMetrics = new TilingWindowLayoutMetrics.Builder(2).build()
+            ChromeDriverFactory factory = ChromeDriverFactory.newChromeDriverFactory()
+            ChromeDriver browser0 = factory.newChromeDriver(new UserProfile("Picasso"))
+            BrowserWindowLayoutManager.layout(browser0,
+                    layoutMetrics.getWindowPosition(0),
+                    layoutMetrics.getWindowDimension(0))
+            ChromeDriver browser1 = factory.newChromeDriver(new UserProfile("Gogh"))
+            BrowserWindowLayoutManager.layout(browser1,
+                    layoutMetrics.getWindowPosition(1),
+                    layoutMetrics.getWindowDimension(1))
+            browser0.navigate().to("https://www.pablopicasso.org/")
+            browser1.navigate().to("https://www.vincentvangogh.org/")
+            Thread.sleep(1000)
+            browser0.quit()
+            browser1.quit()
+        }
+
+        @BeforeClass
+        static void beforeClass() {
+            // setup the ChromeDriver binary
+            WebDriverManager.chromedriver().setup()
+        }
+    }
+
+### Launch Multiple Chrome windows in Stacking layout
+
+    package examples
+
+    import com.kazurayam.browserwindowlayout.BrowserWindowLayoutManager
+    import com.kazurayam.browserwindowlayout.StackingWindowLayoutMetrics
+    import com.kazurayam.webdriverfactory.UserProfile
+    import com.kazurayam.webdriverfactory.chrome.ChromeDriverFactory
+    import io.github.bonigarcia.wdm.WebDriverManager
+    import org.junit.BeforeClass
+    import org.junit.Test
+    import org.openqa.selenium.Dimension
+    import org.openqa.selenium.Point
+    import org.openqa.selenium.chrome.ChromeDriver
+
+    class LaunchMultipleChromeWindowsInStackingLayout {
+
+        @Test
+        void test_open2windows_in_stacking_layout() {
+            StackingWindowLayoutMetrics layoutMetrics =
+                    new StackingWindowLayoutMetrics.Builder(2)
+                            .windowDimension(new Dimension(1000, 600))
+                            .disposition(new Point(400, 200))
+                            .build()
+            ChromeDriverFactory factory = ChromeDriverFactory.newChromeDriverFactory()
+            ChromeDriver browser0 = factory.newChromeDriver(new UserProfile("Picasso"))
+            BrowserWindowLayoutManager.layout(browser0,
+                    layoutMetrics.getWindowPosition(0),
+                    layoutMetrics.getWindowDimension(0))
+            ChromeDriver browser1 = factory.newChromeDriver(new UserProfile("Gogh"))
+            BrowserWindowLayoutManager.layout(browser1,
+                    layoutMetrics.getWindowPosition(1),
+                    layoutMetrics.getWindowDimension(1))
+            browser0.navigate().to("https://www.pablopicasso.org/")
+            browser1.navigate().to("https://www.vincentvangogh.org/")
+            Thread.sleep(1000)
+            browser0.quit()
+            browser1.quit()
+        }
+
+        @BeforeClass
+        static void beforeClass() {
+            // setup the ChromeDriver binary
+            WebDriverManager.chromedriver().setup()
+        }
+
+    }
