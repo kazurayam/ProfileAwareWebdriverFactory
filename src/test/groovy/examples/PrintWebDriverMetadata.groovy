@@ -25,10 +25,11 @@ class PrintWebDriverMetadata {
     ChromeDriver browser
 
     @Test
-    void test_getEmployedDesiredCapabilities() {
+    void test_printUserProfile() {
         ChromeDriverFactory factory = ChromeDriverFactory.newChromeDriverFactory()
         factory.addChromeOptionsModifier(ChromeOptionsModifiers.incognito())
-        browser = factory.newChromeDriver(new ProfileDirectoryName("Default"))
+        browser = factory.newChromeDriver(new ProfileDirectoryName("Default"),
+                ChromeDriverFactory.UserDataAccess.TO_GO)
         assertTrue(browser.userProfile.isPresent())
         assertTrue(browser.userDataAccess.isPresent())
         browser.userProfile.ifPresent({ ChromeUserProfile cup ->

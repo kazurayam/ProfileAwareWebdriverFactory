@@ -5,9 +5,7 @@
 webdriverfactory is a Java/Groovy library that wraps `org.openqa.selenium.webdriver.chrome.ChromeDriver`.
 It enables you to launch Chrome browser while specifying a "User Profile", for example "Picasso". And also you can lauch Chrome browser while specifying a "Profile Directory Name", for example "Default" or "Profile 1".
 
-You have an option where to find the profile directory:
-
-## Examples
+## Sample codes
 
 ### Launch Chrome browser without profile specified
 
@@ -416,10 +414,11 @@ This emits:
         ChromeDriver browser
 
         @Test
-        void test_getEmployedDesiredCapabilities() {
+        void test_printUserProfile() {
             ChromeDriverFactory factory = ChromeDriverFactory.newChromeDriverFactory()
             factory.addChromeOptionsModifier(ChromeOptionsModifiers.incognito())
-            browser = factory.newChromeDriver(new ProfileDirectoryName("Default"))
+            browser = factory.newChromeDriver(new ProfileDirectoryName("Default"),
+                    ChromeDriverFactory.UserDataAccess.TO_GO)
             assertTrue(browser.userProfile.isPresent())
             assertTrue(browser.userDataAccess.isPresent())
             browser.userProfile.ifPresent({ ChromeUserProfile cup ->
@@ -454,9 +453,9 @@ This emits:
 This emits
 
     ChromeUserProfile : {
-        "userProfile": "Kazurayam",
-        "profileDirectoryName": "Default",
-        "userDataDir": "/Users/kazurayam/Library/Application Support/Google/Chrome"
+        "userProfile": "kazurayam",
+        "userDataDir": "/var/folders/lh/jkh513dn7f3c0j09z131g1z00000gn/T/__user-data-dir__7144377108201112266",
+        "profileDirectoryName": "Default"
     }
     UserDataAccess: TO_GO
 
@@ -471,6 +470,8 @@ What is "user profile" in Chrome browser? There are a few articles about it, for
 ## Solution
 
 ## Description
+
+You have an option where to find the profile directory:
 
 1.  `UserDataAccess.FOR_HERE` : ChromeDriverFactory tries to find the profile directory in the Chrome’s genuine "user-data-dir". On Mac, it is `/Users/myosusername/Library/Application Support/Google/Chrome/`. A process of Chrome browser demands to lock the genuine profile directory. While a Chrome process is already running, when you try to open another Chrome with FOR\_HERE option, the new comer process will fail.
 

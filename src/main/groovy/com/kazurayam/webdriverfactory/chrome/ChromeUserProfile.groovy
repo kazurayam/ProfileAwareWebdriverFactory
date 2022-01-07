@@ -110,15 +110,15 @@ class ChromeUserProfile implements Comparable<ChromeUserProfile> {
 		sb.append("\"")
 		sb.append(",")
 		//
-		sb.append("\"profileDirectoryName\":\"")
-		sb.append(this.getProfileDirectoryName())
-		sb.append("\"")
-		sb.append(",")
-		//
 		sb.append("\"userDataDir\":\"")
 		sb.append(this.getUserDataDir().toString())
 		sb.append("\"")
+		sb.append(",")
+		sb.append("\"profileDirectoryName\":\"")
+		sb.append(this.getProfileDirectoryName())
+		sb.append("\"")
 		sb.append("}")
+		//
 		return JsonOutput.prettyPrint(sb.toString())
 	}
 }

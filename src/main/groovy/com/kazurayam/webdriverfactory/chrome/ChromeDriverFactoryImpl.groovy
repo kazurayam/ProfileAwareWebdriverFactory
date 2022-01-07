@@ -320,7 +320,8 @@ class ChromeDriverFactoryImpl extends ChromeDriverFactory {
 		ChromeDriver driver = null
 		try {
 			driver = this.createInstance()
-			driver.metaClass.userProfile = Optional.of(userProfile)
+			ChromeUserProfile cup = new ChromeUserProfile(userDataDir, profileDirectoryName)
+			driver.metaClass.userProfile = Optional.of(cup)
 			driver.metaClass.userDataAccess = Optional.of(instruction)
 			setPageLoadTimeout(driver, this.pageLoadTimeout)
 			return driver
