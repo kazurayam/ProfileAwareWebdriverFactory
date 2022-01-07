@@ -49,7 +49,7 @@ abstract class ChromeDriverFactory {
 	abstract void addAllDesiredCapabilitiesModifiers(
 			List<DesiredCapabilitiesModifier> desiredCapabilitiesModifierList)
 
-	abstract void setImplicitWaitSeconds(Integer waitSeconds)
+	abstract void pageLoadTimeout(Integer waitSeconds)
 
 	abstract ChromeDriver newChromeDriver()
 

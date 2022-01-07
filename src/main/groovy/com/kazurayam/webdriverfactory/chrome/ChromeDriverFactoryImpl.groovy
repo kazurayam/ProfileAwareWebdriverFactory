@@ -32,7 +32,7 @@ class ChromeDriverFactoryImpl extends ChromeDriverFactory {
 	private final List<DesiredCapabilitiesModifier> desiredCapabilitiesModifiers
 
 	private DesiredCapabilities desiredCapabilities
-	private Integer implicitWaitSeconds
+	private Integer pageLoadTimeout
 
 	ChromeDriverFactoryImpl() {
 		this(true)
@@ -46,8 +46,7 @@ class ChromeDriverFactoryImpl extends ChromeDriverFactory {
 		if (requireDefaultSettings) {
 			this.prepareDefaultSettings()
 		}
-		//implicitWaitSeconds = Integer.MIN_VALUE   // not set
-		implicitWaitSeconds = 30   // perform implicit wait for 30 seconds
+		pageLoadTimeout = 30   // perform implicit wait for 30 seconds
 	}
 
 	private void prepareDefaultSettings() {
@@ -117,7 +116,7 @@ class ChromeDriverFactoryImpl extends ChromeDriverFactory {
 	}
 
 	@Override
-	void setImplicitWaitSeconds(Integer waitSeconds) {
+	void pageLoadTimeout(Integer waitSeconds) {
 		Objects.requireNonNull(waitSeconds)
 		if (waitSeconds <= 0) {
 			throw new IllegalArgumentException("waitSeconds=${waitSeconds} must not be <=0")
@@ -125,7 +124,7 @@ class ChromeDriverFactoryImpl extends ChromeDriverFactory {
 		if (waitSeconds > 999) {
 			throw new IllegalArgumentException("waitSeconds=${waitSeconds} must not be > 999")
 		}
-		this.implicitWaitSeconds = waitSeconds
+		this.pageLoadTimeout = waitSeconds
 	}
 
 	@Override
@@ -133,15 +132,15 @@ class ChromeDriverFactoryImpl extends ChromeDriverFactory {
 		WebDriver driver = this.createInstance()
 		driver.metaClass.userProfile = Optional.empty()
 		driver.metaClass.userDataAccess = Optional.empty()
-		setImplicitWait(driver, this.implicitWaitSeconds)
+		setPageLoadTimeout(driver, this.pageLoadTimeout)
 		return driver
 	}
 
-	protected void setImplicitWait(ChromeDriver driver, Integer seconds) {
+	protected void setPageLoadTimeout(ChromeDriver driver, Integer seconds) {
 		if (seconds != Integer.MIN_VALUE) {
 			Duration dur = Duration.ofSeconds((long)seconds)
 			long millis = dur.toMillis()
-			driver.manage().timeouts().implicitlyWait(millis, TimeUnit.MILLISECONDS);
+			driver.manage().timeouts().pageLoadTimeout(millis, TimeUnit.MILLISECONDS);
 		}
 	}
 
@@ -212,21 +211,21 @@ class ChromeDriverFactoryImpl extends ChromeDriverFactory {
 	ChromeDriver newChromeDriver(ProfileDirectoryName profileDirectoryName, UserDataAccess instruction) {
 		Objects.requireNonNull(profileDirectoryName, "profileDirectoryName must not be null")
 		Objects.requireNonNull(instruction, "instruction must not be null")
-		ChromeUserProfile userProfile =
+		ChromeUserProfile chromeUserProfile =
 				ChromeProfileUtils.findChromeUserProfileByProfileDirectoryName(profileDirectoryName)
-		if (userProfile == null) {
+		if (chromeUserProfile == null) {
 			throw new WebDriverFactoryException(
 					"ChromeUserProfile of directory \"${profileDirectoryName}\" is not found in :" +
 							"\n" + ChromeProfileUtils.allChromeUserProfilesAsString())
 		}
-		Path originalProfileDirectory = userProfile.getProfileDirectory()
+		Path originalProfileDirectory = chromeUserProfile.getProfileDirectory()
 		if (!Files.exists(originalProfileDirectory)) {
 			throw new WebDriverFactoryException(
 					"Profile directory \"${originalProfileDirectory.toString()}\" does not exist")
 		}
 		Path userDataDir = ChromeProfileUtils.getDefaultUserDataDir()
 		return launchChrome(
-				userProfile,
+				chromeUserProfile,
 				originalProfileDirectory,
 				userDataDir,
 				profileDirectoryName,
@@ -323,7 +322,7 @@ class ChromeDriverFactoryImpl extends ChromeDriverFactory {
 			driver = this.createInstance()
 			driver.metaClass.userProfile = Optional.of(userProfile)
 			driver.metaClass.userDataAccess = Optional.of(instruction)
-			setImplicitWait(driver, this.implicitWaitSeconds)
+			setPageLoadTimeout(driver, this.pageLoadTimeout)
 			return driver
 		} catch (InvalidArgumentException iae) {
 			if (driver != null) {

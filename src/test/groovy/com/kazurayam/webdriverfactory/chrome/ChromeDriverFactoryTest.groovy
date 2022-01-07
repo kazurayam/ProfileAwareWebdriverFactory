@@ -316,7 +316,7 @@ class ChromeDriverFactoryTest {
 	@Test
 	void test_if_implicit_wait_works() {
 		ChromeDriverFactory cdFactory = ChromeDriverFactory.newChromeDriverFactory()
-		cdFactory.setImplicitWaitSeconds(10)
+		cdFactory.pageLoadTimeout(10)
 		driver = cdFactory.newChromeDriver()
 		assertNotNull(driver)
 		driver.navigate().to("http://example.com")
