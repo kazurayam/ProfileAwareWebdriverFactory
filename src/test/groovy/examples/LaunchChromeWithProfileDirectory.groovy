@@ -14,25 +14,6 @@ class LaunchChromeWithProfileDirectory {
 
     ChromeDriver browser
 
-    @BeforeClass
-    static void beforeClass() {
-        // setup the ChromeDriver binary
-        WebDriverManager.chromedriver().setup()
-    }
-
-    @Before
-    void setUp() {
-        browser = null
-    }
-
-    @After
-    void tearDown() {
-        if (browser != null) {
-            browser.quit()
-            browser = null
-        }
-    }
-
     @Test
     void test_launch_browser_with_profile_directory() {
         ChromeDriverFactory factory = ChromeDriverFactory.newChromeDriverFactory()
@@ -56,10 +37,29 @@ class LaunchChromeWithProfileDirectory {
     void test_launch_browser_with_profile_FOR_HERE() {
         ChromeDriverFactory factory = ChromeDriverFactory.newChromeDriverFactory()
         browser = factory.newChromeDriver(
-                new ProfileDirectoryName("Default"),
+                new ProfileDirectoryName("Profile 6"),
                 ChromeDriverFactory.UserDataAccess.FOR_HERE)
         browser.navigate().to("http://example.com")
         Thread.sleep(1000)
+    }
+
+    @BeforeClass
+    static void beforeClass() {
+        // setup the ChromeDriver binary
+        WebDriverManager.chromedriver().setup()
+    }
+
+    @Before
+    void setUp() {
+        browser = null
+    }
+
+    @After
+    void tearDown() {
+        if (browser != null) {
+            browser.quit()
+            browser = null
+        }
     }
 
 }

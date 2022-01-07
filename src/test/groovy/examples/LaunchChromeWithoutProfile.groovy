@@ -16,25 +16,6 @@ class LaunchChromeWithoutProfile {
 
     ChromeDriver browser
 
-    @BeforeClass
-    static void beforeClass() {
-        // setup the ChromeDriver binary
-        WebDriverManager.chromedriver().setup()
-    }
-
-    @Before
-    void setUp() {
-        browser = null
-    }
-
-    @After
-    void tearDown() {
-        if (browser != null) {
-            browser.quit()
-            browser = null
-        }
-    }
-
     @Test
     void test_launch_browser() {
         ChromeDriverFactory factory = ChromeDriverFactory.newChromeDriverFactory()
@@ -61,4 +42,24 @@ class LaunchChromeWithoutProfile {
         browser.navigate().to("http://example.com")
         Thread.sleep(1000)
     }
+
+    @BeforeClass
+    static void beforeClass() {
+        // setup the ChromeDriver binary
+        WebDriverManager.chromedriver().setup()
+    }
+
+    @Before
+    void setUp() {
+        browser = null
+    }
+
+    @After
+    void tearDown() {
+        if (browser != null) {
+            browser.quit()
+            browser = null
+        }
+    }
+
 }
