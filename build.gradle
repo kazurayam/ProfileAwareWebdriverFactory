@@ -8,7 +8,7 @@ plugins {
 }
 
 group 'com.kazurayam'
-version '0.2.4-SNAPSHOT'
+version '0.2.4'
 
 ext.isReleaseVersion = ! version.endsWith("SNAPSHOT")
 
@@ -93,7 +93,7 @@ publishing {
             pom {
                 groupId = project.group
                 name = project.rootProject.name
-                description = 'A Java/Groovy library that enbles launching Selenium WebDriver while specifying User Profile to launch browser with'
+                description = 'A Java/Groovy library that enbles launching Selenium WebDriver specifying User Profile'
                 url = 'https://kazurayam.github.io/webdriverfactory/'
                 from components.java
                 licenses {
@@ -134,8 +134,8 @@ signing {
     sign publishing.publications.webdriverfactory
 }
 // I do not want to sign the SNAPSHOT
-/*
+
 tasks.withType(Sign) {
     onlyIf { isReleaseVersion }
 }
-*/
+
