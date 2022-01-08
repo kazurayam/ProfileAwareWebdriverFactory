@@ -39,6 +39,10 @@ include::../src/test/groovy/examples/LaunchChromeWithProfileDirectory.groovy[]
 include::../src/test/groovy/examples/LaunchMultipleChromeWindowsInTilingLayout.groovy[]
 ----
 
+Here is a https://drive.google.com/file/d/1sx57ywf4yVqNO4sCHZ8FWsBcHTz9jo9G/view?usp=sharing[demonstration movie].
+
+image:images/10_LaunchMultipleChromeWindowsInTilingLayout.png[]
+
 === Launch Multiple Chrome windows in Stacking layout
 
 [source, groovy]
@@ -117,3 +121,6 @@ You have an option where to find the profile directory:
 
 1. `UserDataAccess.FOR_HERE` : ChromeDriverFactory tries to find the profile directory in the Chrome's genuine "user-data-dir". On Mac, it is `/Users/myosusername/Library/Application Support/Google/Chrome/`. A process of Chrome browser demands to lock the genuine profile directory. While a Chrome process is already running, when you try to open another Chrome with FOR_HERE option, the new comer process will fail.
 2. `UserDataAccess.TO_GO` : ChromeDriverFactory allocates a new temporary directory and in there will create a profile directory. Then ChromeDriverFactory will copy the content of the genuine profile directory into the temporary directory. When you open Chrome with TO_GO option the process will run. However, all of session data saved into this temporary profile directory will be discarded (cookies, cached page resources, etc) when you close the session.
+
+
+https://developer.mozilla.org/en-US/docs/Web/HTTP/Cookies[Using HTTP Cookies, MDN Web Docs]

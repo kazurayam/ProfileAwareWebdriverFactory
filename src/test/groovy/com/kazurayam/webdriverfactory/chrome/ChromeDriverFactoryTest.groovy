@@ -5,10 +5,12 @@ import com.kazurayam.timekeeper.Record
 import com.kazurayam.timekeeper.Table
 import com.kazurayam.timekeeper.Timekeeper
 import com.kazurayam.webdriverfactory.UserProfile
+import com.kazurayam.webdriverfactory.chrome.ChromeDriverFactory.UserDataAccess
 import org.junit.After
 import org.junit.BeforeClass
 import org.openqa.selenium.chrome.ChromeDriver
 
+import java.security.MessageDigest
 import java.time.LocalDateTime
 
 import static org.junit.Assert.*
@@ -121,9 +123,27 @@ class ChromeDriverFactoryTest {
 	@Test
 	void test_newChromeDriver_byUserProfile_TOGO() {
 		ChromeDriverFactory cdFactory = ChromeDriverFactory.newChromeDriverFactory()
-		driver = cdFactory.newChromeDriver(new UserProfile('Picasso'))
+		driver = cdFactory.newChromeDriver(
+				new UserProfile('Picasso'),
+				UserDataAccess.TO_GO)
 		assertNotNull(driver)
 
+		// check if the user-data-dir/ProfileDireName/Cookie file is properly copied from the genuine one
+		if (driver.userProfile.isPresent()) {
+			driver.userProfile.ifPresent({ chromeUserProfile ->
+				Path originalCookieFile = ChromeProfileUtils.getDefaultUserDataDir()
+						.resolve(chromeUserProfile.getProfileDirectoryName().toString())
+						.resolve("Cookies")
+				Path clonedCookieFile = chromeUserProfile.getProfileDirectory().resolve("Cookies")
+				boolean identical = filesAreIdentical(originalCookieFile, clonedCookieFile)
+				assert identical: "${clonedCookieFile} (size=${clonedCookieFile.size()}) is not identical "+
+						"to ${originalCookieFile} (size=${originalCookieFile.size()})"
+			})
+		} else {
+			throw new IllegalStateException("driver.userProfile is empty")
+		}
+
+		//
 		DesiredCapabilities dc = cdFactory.getEmployedDesiredCapabilities()
 		assertNotNull(dc)
 		String dcJson = cdFactory.getEmployedDesiredCapabilitiesAsJSON()
@@ -136,7 +156,9 @@ class ChromeDriverFactoryTest {
 	@Test
 	void test_newChromeDriver_byProfileDirectoryName_TO_GO() {
 		ChromeDriverFactory cdFactory = ChromeDriverFactory.newChromeDriverFactory()
-		driver = cdFactory.newChromeDriver(new ProfileDirectoryName('Profile 1'))  // or 'Default'
+		driver = cdFactory.newChromeDriver(
+				new ProfileDirectoryName('Profile 1'),
+				UserDataAccess.TO_GO)  // or 'Default'
 		assertNotNull(driver)
 
 		DesiredCapabilities dc = cdFactory.getEmployedDesiredCapabilities()
@@ -155,8 +177,9 @@ class ChromeDriverFactoryTest {
 	@Test
 	void test_newChromeDriver_byProfileDirectoryName_FOR_HERE() {
 		ChromeDriverFactory cdFactory = ChromeDriverFactory.newChromeDriverFactory()
-		driver = cdFactory.newChromeDriver(new ProfileDirectoryName('Profile 1'),
-				ChromeDriverFactory.UserDataAccess.FOR_HERE)
+		driver = cdFactory.newChromeDriver(
+				new ProfileDirectoryName('Profile 1'),
+				UserDataAccess.FOR_HERE)
 		assertNotNull(driver)
 
 		DesiredCapabilities dc = cdFactory.getEmployedDesiredCapabilities()
@@ -184,7 +207,7 @@ class ChromeDriverFactoryTest {
 		ChromeDriverFactory cdFactory = ChromeDriverFactory.newChromeDriverFactory()
 		driver = cdFactory.newChromeDriver(
 				new UserProfile('Picasso'),
-				ChromeDriverFactory.UserDataAccess.FOR_HERE)
+				UserDataAccess.FOR_HERE)
 		assertNotNull(driver)
 
 		DesiredCapabilities dc = cdFactory.getEmployedDesiredCapabilities()
@@ -322,4 +345,34 @@ class ChromeDriverFactoryTest {
 		driver.navigate().to("http://example.com")
 	}
 
+
+	private static boolean filesAreIdentical(Path file1, Path file2) {
+		Objects.requireNonNull(file1)
+		Objects.requireNonNull(file2)
+		if ( ! Files.exists(file1)) {
+			throw new IllegalArgumentException("${file1} is not present")
+		}
+		if ( ! Files.exists(file2)) {
+			throw new IllegalArgumentException("${file2} is not present")
+		}
+		MessageDigest md = MessageDigest.getInstance("MD5")
+		md.update(Files.readAllBytes(file1))
+		byte[] digest1 = md.digest()
+		md.update(Files.readAllBytes(file2))
+		byte[] digest2 = md.digest();
+		if (digest1.length == digest2.length) {
+			boolean result = true
+			for (int i = 0; i < digest1.length; i++) {
+				if (digest1[i] == digest2[1]) {
+					;
+				} else {
+					result = false
+					break
+				}
+			}
+			return result
+		} else {
+			return false
+		}
+	}
 }

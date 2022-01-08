@@ -17,7 +17,7 @@ cli.with {
     p longOpt: 'port', args: 1, argName: 'port', 'port number. default : 80.'
     b longOpt: 'base-dir', args: 1, argName: 'path', 'base directory path. default : current directory.'
     h longOpt: 'help', 'show this help.'
-    _ longOpt: 'print-request', 'display request information.'
+    _ longOpt: 'print-request', 'display request infomation.'
     _ longOpt: 'debug', 'run with debug mode.'
 }
 
@@ -62,10 +62,10 @@ class Handler implements HttpHandler {
 
             // copy all cookies in the request into the response.
             // add "timestamp" cookie if not there
-            // the cookies in the response will have Max-Age=600 (10minutes)
+            // the cookies in the response will have Max-Age=60 (1minutes)
             operateCookies(exchange)
 
-            // now we build the response body and send responce back
+            // now we build the response body and send response back
             File file = new File(basePath.toFile(), decodedUri)
             if (file.exists()) {
                 if (file.isFile()) {
@@ -86,33 +86,33 @@ class Handler implements HttpHandler {
     }
 
     private operateCookies(exchange) {
-        // copy cookies from the request to the response
-        // if the request doesn't have "timestamp" cookie, add it
-        Headers reqHeaders = exchange.getRequestHeaders()
-        List<String> cookies = reqHeaders.get("Cookie")
-        this.debugLog {"request: cookies=${cookies}"}
-        List<String> values = new ArrayList<>()
-        long maxAgeSeconds = 30L;
-        boolean foundTimestamp = false
-        for (String cookie in cookies) {
-            values.add(cookie + "; Max-Age=" + maxAgeSeconds);
-            if (cookie.startsWith("timestamp")) {
-                foundTimestamp = true
-            }
+      // copy cookies from the request to the response
+      // if the request doesn't have "timestamp" cookie, add it
+      Headers reqHeaders = exchange.getRequestHeaders()
+      List<String> cookies = reqHeaders.get("Cookie")
+      this.debugLog {"request: cookies=${cookies}"}
+      List<String> values = new ArrayList<>()
+      long maxAgeSeconds = 60L;
+      boolean foundTimestamp = false
+      for (String cookie in cookies) {
+        values.add(cookie + "; Max-Age=" + maxAgeSeconds);
+        if (cookie.startsWith("timestamp")) {
+          foundTimestamp = true
         }
-        // if there is no "timestamp" cookie, create it
-        if (! foundTimestamp) {
-            ZonedDateTime now = ZonedDateTime.now();
-            DateTimeFormatter rfc7231 = DateTimeFormatter
-                    .ofPattern("EEE, dd MMM yyyy HH:mm:ss z", Locale.ENGLISH)
-                    .withZone(ZoneId.of("GMT"))
-            String timestampString = "timestamp=" + rfc7231.format(now) + "; " +
-                    "Max-Age=" + maxAgeSeconds + ";";
-            values.add(timestampString);
-        }
-        Headers respHeaders = exchange.getResponseHeaders()
-        respHeaders.put("Set-Cookie", values)
-        this.debugLog {"response: cookies=${values}"}
+      }
+      // if there is no "timestamp" cookie, create it
+      if (! foundTimestamp) {
+        ZonedDateTime now = ZonedDateTime.now();
+        DateTimeFormatter rfc7231 = DateTimeFormatter
+            .ofPattern("EEE, dd MMM yyyy HH:mm:ss z", Locale.ENGLISH)
+            .withZone(ZoneId.of("GMT"))
+        String timestampString = "timestamp=" + rfc7231.format(now) + "; " + 
+            "Max-Age=" + maxAgeSeconds + ";";
+        values.add(timestampString);
+      }
+      Headers respHeaders = exchange.getResponseHeaders()
+      respHeaders.put("Set-Cookie", values)
+      this.debugLog {"response: cookies=${values}"}
     }
 
 
@@ -183,20 +183,20 @@ body = ${exchange.requestBody}
     private static final String DEFAULT_CONTENT_TYPE = 'text/plain';
 
     private static final def CONTENT_MAP = [
-            'html': 'text/html',
-            'jpg': 'image/jpeg',
-            'jpeg': 'image/jpeg',
-            'png': 'image/png',
-            'gif': 'image/gif',
-            'pdf': 'application/pdf',
-            'xls': 'application/octet-stream',
-            'xlsx': 'application/octet-stream',
-            'doc': 'application/octet-stream',
-            'docx': 'application/octet-stream',
-            'js': 'application/javascript',
-            'json': 'application/javascript',
-            'css': 'text/css',
-            'xml': 'application/xml',
-            // append mapping entry if you need.
+        'html': 'text/html',
+        'jpg': 'image/jpeg',
+        'jpeg': 'image/jpeg',
+        'png': 'image/png',
+        'gif': 'image/gif',
+        'pdf': 'application/pdf',
+        'xls': 'application/octet-stream',
+        'xlsx': 'application/octet-stream',
+        'doc': 'application/octet-stream',
+        'docx': 'application/octet-stream',
+        'js': 'application/javascript',
+        'json': 'application/javascript',
+        'css': 'text/css',
+        'xml': 'application/xml',
+        // append mapping entry if you need.
     ];
 }

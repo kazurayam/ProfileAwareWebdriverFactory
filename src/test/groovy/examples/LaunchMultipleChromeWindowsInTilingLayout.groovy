@@ -24,8 +24,8 @@ class LaunchMultipleChromeWindowsInTilingLayout {
         BrowserWindowLayoutManager.layout(browser1,
                 layoutMetrics.getWindowPosition(1),
                 layoutMetrics.getWindowDimension(1))
-        browser0.navigate().to("https://www.pablopicasso.org/")
-        browser1.navigate().to("https://www.vincentvangogh.org/")
+        browser0.navigate().to("https://en.wikipedia.org/wiki/Pablo_Picasso")
+        browser1.navigate().to("https://en.wikipedia.org/wiki/Vincent_van_Gogh")
         Thread.sleep(1000)
         browser0.quit()
         browser1.quit()
