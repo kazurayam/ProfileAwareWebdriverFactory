@@ -2,6 +2,7 @@ package examples
 
 import com.kazurayam.webdriverfactory.UserProfile
 import com.kazurayam.webdriverfactory.chrome.ChromeDriverFactory
+import com.kazurayam.webdriverfactory.chrome.ProfileDirectoryName
 import io.github.bonigarcia.wdm.WebDriverManager
 import org.junit.BeforeClass
 import org.junit.Test
@@ -24,6 +25,26 @@ import java.time.format.DateTimeFormatter
 
 class CarryingCookieOverSessionsViaProfile {
 
+    /**
+     * This code will open Chrome browser and navigate to the URL "http://127.0.0.1" twice.
+     * The http server will send a cookie named "timestamp" with value of
+     * 1. if the HTTP Request has no "timestamp" cookie, will create a new cookie with current timestamp
+     * 2. if the HTTP Request sent a "timestamp" cookie, will echo it
+     * The cookie has a expiry that lasts only 60 seconds.
+     *
+     * At the 1st time, Chrome is opened with UserDataAccess option of "FOR_HERE".
+     * Then the "timestamp" cookie will be persisted in the profile storage.
+     *
+     * At the 2nd time, Chrome is opened with UserDataAccess option of "TO_GO".
+     * TO_GO means that the files in the profile directory will be copied from the genuine location
+     * to the temporary location. Therefore I expect the cookies are carried over to
+     * the second session. In the second session,
+     * I expect the "timestamp" cookie should be sent from Chrome to the server again.
+     *
+     * This code makes assertion if the values of "timestamp" cookie of the 1st session
+     * and the 2nd session are equal.
+     * If these are not equal, it means that cookie was not carried over.
+     */
     @Test
     void test_carrying_cookie_over_sessions_via_profile() {
         ChromeDriverFactory factory = ChromeDriverFactory.newHeadlessChromeDriverFactory()
@@ -32,26 +53,28 @@ class CarryingCookieOverSessionsViaProfile {
         // 1st session
         browser = factory.newChromeDriver(new UserProfile("Picasso"),
                 ChromeDriverFactory.UserDataAccess.FOR_HERE)
-        Cookie timestamp1 = processCookie(browser)
+        Cookie timestamp1 = observeCookie(browser)
         browser.quit()
 
         // 2nd session
-        browser = factory.newChromeDriver(new UserProfile("Picasso"),
-                ChromeDriverFactory.UserDataAccess.TO_GO)
-        Cookie timestamp2 = processCookie(browser)
+        browser = factory.newChromeDriver(new ProfileDirectoryName("Default"),
+                ChromeDriverFactory.UserDataAccess.FOR_HERE)
+        Cookie timestamp2 = observeCookie(browser)
         browser.quit()
         //
         assertEquals(timestamp1.getValue(), timestamp2.getValue())
         assertNotEquals(timestamp1.getExpiry(), timestamp2.getExpiry())
     }
 
-    private Cookie processCookie(ChromeDriver browser, String cookieName = "timestamp") {
-        DevTools devTool = browser.getDevTools()
+    private Cookie observeCookie(ChromeDriver browser, String cookieName = "timestamp") {
+        browser.desiredCapabilities.ifPresent({ dc ->
+            println "DesiredCapabilities => " + dc.toString() })
         browser.userProfile.ifPresent({ up ->
             println "userProfile => " + up.toString() })
         browser.userDataAccess.ifPresent({ uda ->
             println "userDataAccess => " + uda.toString() })
         println "-------------------------------------------------"
+        DevTools devTool = browser.getDevTools()
         devTool.createSession()
         devTool.send(Network.enable(Optional.empty(), Optional.empty(), Optional.empty()))
         // setting up the Network event listeners

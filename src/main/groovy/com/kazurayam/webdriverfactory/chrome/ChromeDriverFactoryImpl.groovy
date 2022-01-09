@@ -11,7 +11,6 @@ import org.openqa.selenium.InvalidArgumentException
 import java.nio.file.Files
 import java.nio.file.Path
 
-import org.openqa.selenium.WebDriver
 import org.openqa.selenium.chrome.ChromeDriver
 import org.openqa.selenium.chrome.ChromeOptions
 import org.openqa.selenium.remote.DesiredCapabilities
@@ -32,7 +31,7 @@ class ChromeDriverFactoryImpl extends ChromeDriverFactory {
 	private final List<DesiredCapabilitiesModifier> desiredCapabilitiesModifiers
 
 	private DesiredCapabilities desiredCapabilities
-	private Integer pageLoadTimeout
+	private Integer pageLoadTimeoutSeconds
 
 	ChromeDriverFactoryImpl() {
 		this(true)
@@ -46,7 +45,7 @@ class ChromeDriverFactoryImpl extends ChromeDriverFactory {
 		if (requireDefaultSettings) {
 			this.prepareDefaultSettings()
 		}
-		pageLoadTimeout = 30   // perform implicit wait for 30 seconds
+		pageLoadTimeoutSeconds = 30   // perform implicit wait for 30 seconds
 	}
 
 	private void prepareDefaultSettings() {
@@ -124,16 +123,7 @@ class ChromeDriverFactoryImpl extends ChromeDriverFactory {
 		if (waitSeconds > 999) {
 			throw new IllegalArgumentException("waitSeconds=${waitSeconds} must not be > 999")
 		}
-		this.pageLoadTimeout = waitSeconds
-	}
-
-	@Override
-	ChromeDriver newChromeDriver() {
-		WebDriver driver = this.createInstance()
-		driver.metaClass.userProfile = Optional.empty()
-		driver.metaClass.userDataAccess = Optional.empty()
-		setPageLoadTimeout(driver, this.pageLoadTimeout)
-		return driver
+		this.pageLoadTimeoutSeconds = waitSeconds
 	}
 
 	protected void setPageLoadTimeout(ChromeDriver driver, Integer seconds) {
@@ -142,6 +132,21 @@ class ChromeDriverFactoryImpl extends ChromeDriverFactory {
 			long millis = dur.toMillis()
 			driver.manage().timeouts().pageLoadTimeout(millis, TimeUnit.MILLISECONDS);
 		}
+	}
+
+	@Override
+	ChromeDriver newChromeDriver() {
+		this.desiredCapabilities = buildDesiredCapabilities(
+				this.chromePreferencesModifiers,
+				this.chromeOptionsModifiers,
+				this.desiredCapabilitiesModifiers
+		)
+		ChromeDriver driver = new ChromeDriver(this.desiredCapabilities)
+		setPageLoadTimeout(driver, this.pageLoadTimeoutSeconds)
+		driver.metaClass.userProfile = Optional.empty()
+		driver.metaClass.userDataAccess = Optional.empty()
+		driver.metaClass.desiredCapabilities = Optional.of (this.employedDesiredCapabilitiesAsJSON)
+		return driver
 	}
 
 	/**
@@ -184,12 +189,6 @@ class ChromeDriverFactoryImpl extends ChromeDriverFactory {
 					"ChromeUserProfile of \"${userProfile}\" is not found in :" +
 							"\n" + ChromeProfileUtils.allChromeUserProfilesAsString())
 		}
-		Path originalProfileDirectory = chromeUserProfile.getProfileDirectory()
-		if (!Files.exists(originalProfileDirectory)) {
-			throw new WebDriverFactoryException(
-					"Profile directory \"${originalProfileDirectory.toString()}\" does not exist")
-		}
-
 		Path userDataDir = ChromeProfileUtils.getDefaultUserDataDir()
 		ProfileDirectoryName profileDirectoryName = chromeUserProfile.getProfileDirectoryName()
 		return launchChrome(userDataDir, profileDirectoryName, instruction)
@@ -210,18 +209,6 @@ class ChromeDriverFactoryImpl extends ChromeDriverFactory {
 	ChromeDriver newChromeDriver(ProfileDirectoryName profileDirectoryName, UserDataAccess instruction) {
 		Objects.requireNonNull(profileDirectoryName, "profileDirectoryName must not be null")
 		Objects.requireNonNull(instruction, "instruction must not be null")
-		ChromeUserProfile chromeUserProfile =
-				ChromeProfileUtils.findChromeUserProfileByProfileDirectoryName(profileDirectoryName)
-		if (chromeUserProfile == null) {
-			throw new WebDriverFactoryException(
-					"ChromeUserProfile of directory \"${profileDirectoryName}\" is not found in :" +
-							"\n" + ChromeProfileUtils.allChromeUserProfilesAsString())
-		}
-		Path originalProfileDirectory = chromeUserProfile.getProfileDirectory()
-		if (!Files.exists(originalProfileDirectory)) {
-			throw new WebDriverFactoryException(
-					"Profile directory \"${originalProfileDirectory.toString()}\" does not exist")
-		}
 		Path userDataDir = ChromeProfileUtils.getDefaultUserDataDir()
 		return launchChrome(userDataDir, profileDirectoryName, instruction)
 	}
@@ -237,42 +224,6 @@ class ChromeDriverFactoryImpl extends ChromeDriverFactory {
 	}
 
 
-	/**
-	 * Create an instance of Chrome Driver with configuration
-	 * setup through the chain of
-	 *     Chrome Preferences => Chrome Options => Desired Capabilities
-	 * while modifying each containers with specified Modifiers
-	 */
-	private ChromeDriver createInstance() {
-
-		// create a Chrome Preferences object as the seed
-		Map<String, Object> preferences = new HashMap<>()
-
-		// modify the instance of Chrome Preferences
-		for (ChromePreferencesModifier cpm in chromePreferencesModifiers) {
-			preferences = cpm.modify(preferences)
-		}
-
-		// create Chrome Options taking over the Chrome Preferences
-		ChromeOptions chromeOptions = ChromeOptionsBuilder.newInstance(preferences).build()
-		// modify the Chrome Options
-		for (ChromeOptionsModifier com in chromeOptionsModifiers) {
-			chromeOptions = com.modify(chromeOptions)
-		}
-
-		// create Desired Capabilities taking over settings in the Chrome Options
-		desiredCapabilities = new DesiredCapabilitiesBuilderImpl().build(chromeOptions)
-		// modify the Desired Capabilities
-		for (DesiredCapabilitiesModifier dcm in desiredCapabilitiesModifiers) {
-			desiredCapabilities = dcm.modify(desiredCapabilities)
-		}
-
-		// now launch the Chrome browser
-		ChromeDriver driver = new ChromeDriver(desiredCapabilities)
-
-		// well done
-		return driver
-	}
 
 
 	/**
@@ -323,11 +274,19 @@ class ChromeDriverFactoryImpl extends ChromeDriverFactory {
 		// launch the Chrome driver
 		ChromeDriver driver = null
 		try {
-			driver = this.createInstance()
+			this.desiredCapabilities = buildDesiredCapabilities(
+					this.chromePreferencesModifiers,
+					this.chromeOptionsModifiers,
+					this.desiredCapabilitiesModifiers
+			)
+			driver = new ChromeDriver(this.desiredCapabilities)
+			setPageLoadTimeout(driver, this.pageLoadTimeoutSeconds)
+			//
 			ChromeUserProfile cup = new ChromeUserProfile(targetUserDataDir, profileDirectoryName)
 			driver.metaClass.userProfile = Optional.of(cup)
 			driver.metaClass.userDataAccess = Optional.of(instruction)
-			setPageLoadTimeout(driver, this.pageLoadTimeout)
+			driver.metaClass.desiredCapabilities = Optional.of (this.employedDesiredCapabilitiesAsJSON)
+			//
 			return driver
 		} catch (InvalidArgumentException iae) {
 			if (driver != null) {
@@ -335,12 +294,59 @@ class ChromeDriverFactoryImpl extends ChromeDriverFactory {
 				logger_.info("forcibly closed the browser")
 			}
 			StringBuilder sb = new StringBuilder()
-			sb.append("profileDirectory=\"${genuineProfileDirectory}\"\n")
+			sb.append("targetUserDataDir=\"${targetUserDataDir}\"\n")
+			sb.append("profileDirectoryName=\"${profileDirectoryName}\"\n")
 			sb.append("org.openqa.selenium.InvalidArgumentException was thrown.\n")
 			sb.append("Exception message:\n\n")
 			sb.append(iae.getMessage())
 			throw new WebDriverFactoryException(sb.toString())
 		}
+	}
+
+	/**
+	 * Create an instance of Chrome Driver with configuration
+	 * setup through the chain of
+	 *     Chrome Preferences => Chrome Options => Desired Capabilities
+	 * while modifying each containers with specified Modifiers
+	 */
+	private DesiredCapabilities buildDesiredCapabilities(
+			List<ChromePreferencesModifier> chromePreferencesModifierList,
+			List<ChromeOptionsModifier> chromeOptionsModifierList,
+			List<DesiredCapabilitiesModifier> desiredCapabilitiesModifierList
+	) {
+		// create a Chrome Preferences object as the seed
+		Map<String, Object> preferences = new HashMap<>()
+
+		// modify the instance of Chrome Preferences
+		for (ChromePreferencesModifier cpm in chromePreferencesModifierList) {
+			preferences = cpm.modify(preferences)
+		}
+
+		// create Chrome Options taking over the Chrome Preferences
+		ChromeOptions chromeOptions =
+				ChromeOptionsBuilder.newInstance(preferences).build()
+		// modify the Chrome Options
+		for (ChromeOptionsModifier com in chromeOptionsModifierList) {
+			chromeOptions = com.modify(chromeOptions)
+		}
+
+		// create Desired Capabilities taking over settings in the Chrome Options
+		DesiredCapabilities desiredCapabilities =
+				new DesiredCapabilitiesBuilderImpl().build(chromeOptions)
+		// modify the Desired Capabilities
+		for (DesiredCapabilitiesModifier dcm in desiredCapabilitiesModifierList) {
+			desiredCapabilities = dcm.modify(desiredCapabilities)
+		}
+
+		return desiredCapabilities
+	}
+
+	static Map<String, Object> applyChromePreferencesModifiers(
+			Map<String, Object> chromePreferences, List<ChromePreferencesModifiers> modifiers) {
+	}
+
+	static ChromeOptions applyChromeOptionsModifiers(
+			ChromeOptions chromeOptions, List<ChromeOptionsModifiers> modifiers) {
 	}
 
 }

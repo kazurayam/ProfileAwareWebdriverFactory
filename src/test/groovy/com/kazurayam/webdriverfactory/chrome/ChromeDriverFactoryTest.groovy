@@ -263,7 +263,7 @@ class ChromeDriverFactoryTest {
 		DesiredCapabilities dc = cdFactory.getEmployedDesiredCapabilities()
 		assertNotNull(dc)
 		String dcJson = cdFactory.getEmployedDesiredCapabilitiesAsJSON()
-		//println("DesiredCapabilities is\n${dcJson}")
+		println("DesiredCapabilities is\n${dcJson}")
 		driver.navigate().to('http://example.com/')
 		//
 		def jo = new JsonSlurper().parseText(dcJson)
