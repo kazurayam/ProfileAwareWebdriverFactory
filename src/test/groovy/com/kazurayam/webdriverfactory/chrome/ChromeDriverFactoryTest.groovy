@@ -346,6 +346,12 @@ class ChromeDriverFactoryTest {
 	}
 
 
+	@Test
+	void test_filesAreIdentical() {
+		Path file = Paths.get("build.gradle")
+		assert filesAreIdentical(file, file)
+	}
+
 	private static boolean filesAreIdentical(Path file1, Path file2) {
 		Objects.requireNonNull(file1)
 		Objects.requireNonNull(file2)
@@ -363,9 +369,7 @@ class ChromeDriverFactoryTest {
 		if (digest1.length == digest2.length) {
 			boolean result = true
 			for (int i = 0; i < digest1.length; i++) {
-				if (digest1[i] == digest2[1]) {
-					;
-				} else {
+				if (digest1[i] != digest2[i]) {
 					result = false
 					break
 				}

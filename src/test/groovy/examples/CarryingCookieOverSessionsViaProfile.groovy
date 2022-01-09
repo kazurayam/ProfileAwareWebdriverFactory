@@ -8,8 +8,12 @@ import org.junit.Test
 import org.openqa.selenium.Cookie
 import org.openqa.selenium.chrome.ChromeDriver
 import org.openqa.selenium.devtools.DevTools
+import org.openqa.selenium.devtools.v85.network.model.ResponseReceived
+import org.openqa.selenium.devtools.v85.network.model.ResponseReceivedExtraInfo
+import org.openqa.selenium.devtools.v96.network.model.RequestWillBeSent
 import org.openqa.selenium.devtools.v96.network.Network
 import org.openqa.selenium.devtools.v96.network.model.Headers
+import org.openqa.selenium.devtools.v96.network.model.RequestWillBeSentExtraInfo
 import groovy.json.*
 
 import static org.junit.Assert.*
@@ -26,12 +30,14 @@ class CarryingCookieOverSessionsViaProfile {
         ChromeDriver browser
 
         // 1st session
-        browser = factory.newChromeDriver(new UserProfile("Picasso"), ChromeDriverFactory.UserDataAccess.FOR_HERE)
+        browser = factory.newChromeDriver(new UserProfile("Picasso"),
+                ChromeDriverFactory.UserDataAccess.FOR_HERE)
         Cookie timestamp1 = processCookie(browser)
         browser.quit()
 
         // 2nd session
-        browser = factory.newChromeDriver(new UserProfile("Picasso"), ChromeDriverFactory.UserDataAccess.TO_GO)
+        browser = factory.newChromeDriver(new UserProfile("Picasso"),
+                ChromeDriverFactory.UserDataAccess.TO_GO)
         Cookie timestamp2 = processCookie(browser)
         browser.quit()
         //
@@ -41,40 +47,67 @@ class CarryingCookieOverSessionsViaProfile {
 
     private Cookie processCookie(ChromeDriver browser, String cookieName = "timestamp") {
         DevTools devTool = browser.getDevTools()
+        browser.userProfile.ifPresent({ up ->
+            println "userProfile => " + up.toString() })
+        browser.userDataAccess.ifPresent({ uda ->
+            println "userDataAccess => " + uda.toString() })
+        println "-------------------------------------------------"
         devTool.createSession()
         devTool.send(Network.enable(Optional.empty(), Optional.empty(), Optional.empty()))
+        // setting up the Network event listeners
+        Optional<RequestWillBeSent> requestWillBeSent = Optional.empty()
+        Optional<RequestWillBeSentExtraInfo> requestWillBeSentExtraInfo = Optional.empty()
+        Optional<ResponseReceived> responseReceived = Optional.empty()
+        Optional<ResponseReceivedExtraInfo> responseReceivedExtraInfo = Optional.empty()
         devTool.addListener(
                 Network.requestWillBeSent(),
-                { requestSent ->
-                    println "Request URL => ${requestSent.getRequest().getUrl()}"
-                    println "Request Method => ${requestSent.getRequest().getMethod()}"
-                    println "Request Headers => ${stringifyHeaders(requestSent.getRequest().getHeaders())}"
-                    println "-------------------------------------------------"
+                { rs ->
+                    requestWillBeSent = Optional.of(rs)
                 })
         devTool.addListener(
                 Network.requestWillBeSentExtraInfo(),
-                {requestWillBeSentExtraInfo ->
-                    println "RequestExtraInfo Headers => ${stringifyHeaders(requestWillBeSentExtraInfo.getHeaders())}"
-                    println "-------------------------------------------------"
+                {rsExtraInfo ->
+                    requestWillBeSentExtraInfo = Optional.of(rsExtraInfo)
                 }
         )
         devTool.addListener(
                 Network.responseReceived(),
-                {responseReceived ->
-                    println "Response URL => ${responseReceived.getResponse().getUrl()}"
-                    println "Response Status => ${responseReceived.getResponse().getStatus()}"
-                    println "Response Headers => ${stringifyHeaders(responseReceived.getResponse().getHeaders())}"
-                    println "Response MIME Type => ${responseReceived.getResponse().getMimeType().toString()}"
-                    println "-------------------------------------------------"
+                {resReceived ->
+                    responseReceived = Optional.of(resReceived)
                 })
         devTool.addListener(
                 Network.responseReceivedExtraInfo(),
-                {responseReceivedExtraInfo ->
-                    println "ResponseExtraInfo Headers => ${stringifyHeaders(responseReceivedExtraInfo.getHeaders())}"
-                    println "-------------------------------------------------"
+                {resReceivedExtraInfo ->
+                    responseReceivedExtraInfo = Optional.of(resReceivedExtraInfo)
                 }
         )
-        browser.navigate().to("http://127.0.0.1")
+        URL url = new URL("http://127.0.0.1")
+        try {
+            browser.navigate().to(url.toString())
+            requestWillBeSent.ifPresent({ reqSent ->
+                println "Request URL => ${reqSent.getRequest().getUrl()}"
+                println "Request Method => ${reqSent.getRequest().getMethod()}"
+                println "Request Headers => ${stringifyHeaders(reqSent.getRequest().getHeaders())}"
+                println "-------------------------------------------------"
+            })
+            requestWillBeSentExtraInfo.ifPresent({ reqSentExtraInfo ->
+                println "RequestExtraInfo Headers => ${stringifyHeaders(reqSentExtraInfo.getHeaders())}"
+                println "-------------------------------------------------"
+            })
+            responseReceived.ifPresent({ resReceived ->
+                println "Response URL => ${resReceived.getResponse().getUrl()}"
+                println "Response Status => ${resReceived.getResponse().getStatus()}"
+                println "Response Headers => ${stringifyHeaders(resReceived.getResponse().getHeaders())}"
+                println "Response MIME Type => ${resReceived.getResponse().getMimeType().toString()}"
+                println "-------------------------------------------------"
+            })
+            responseReceivedExtraInfo.ifPresent({ resReceivedExtraInfo ->
+                println "ResponseExtraInfo Headers => ${stringifyHeaders(resReceivedExtraInfo.getHeaders())}"
+                println "-------------------------------------------------"
+            })
+        } catch (Exception e) {
+            throw new Exception("Possibly the URL ${url.toString()} is down. Start it up by executing \"./starup-server.sh\"", e)
+        }
         Cookie timestamp = browser.manage().getCookieNamed(cookieName)
         return timestamp
     }

@@ -192,8 +192,7 @@ class ChromeDriverFactoryImpl extends ChromeDriverFactory {
 
 		Path userDataDir = ChromeProfileUtils.getDefaultUserDataDir()
 		ProfileDirectoryName profileDirectoryName = chromeUserProfile.getProfileDirectoryName()
-
-		return launchChrome(chromeUserProfile, originalProfileDirectory, userDataDir, profileDirectoryName, instruction)
+		return launchChrome(userDataDir, profileDirectoryName, instruction)
 	}
 
 	@Override
@@ -224,12 +223,7 @@ class ChromeDriverFactoryImpl extends ChromeDriverFactory {
 					"Profile directory \"${originalProfileDirectory.toString()}\" does not exist")
 		}
 		Path userDataDir = ChromeProfileUtils.getDefaultUserDataDir()
-		return launchChrome(
-				chromeUserProfile,
-				originalProfileDirectory,
-				userDataDir,
-				profileDirectoryName,
-				instruction)
+		return launchChrome(userDataDir, profileDirectoryName, instruction)
 	}
 
 
@@ -282,37 +276,47 @@ class ChromeDriverFactoryImpl extends ChromeDriverFactory {
 
 
 	/**
+	 * Launch a Chrome browser.
+	 * If the instruction is UserDataAccess.FOR_HERE, will launch a Chrome with the profile directory
+	 * under the userDataDir with the profileDirectoryName.
+	 * Else (the instruction is UserDataAccess.TO_GO), will allocate a temporary directory
+	 * under which a directory with the profileDirectoryName is created, and into which
+	 * the contents of the genuine profile are copied; then a Chrome is launched with the
+	 * profileDirectory
 	 *
-	 * @param originalProfileDirectory
 	 * @param userDataDir
 	 * @param profileDirectoryName
 	 * @param instruction
 	 * @return
 	 */
-	private ChromeDriver launchChrome(ChromeUserProfile userProfile,
-									  Path originalProfileDirectory,
-									  Path userDataDir,
+	private ChromeDriver launchChrome(Path userDataDir,
 									  ProfileDirectoryName profileDirectoryName,
 									  UserDataAccess instruction) {
+		Objects.requireNonNull(userDataDir)
+		Objects.requireNonNull(profileDirectoryName)
+		Objects.requireNonNull(instruction)
+		if (! Files.exists(userDataDir)) {
+			throw new IllegalArgumentException("${userDataDir} is not present")
+		}
+		Path sourceProfileDirectory = userDataDir.resolve(profileDirectoryName.toString())
+		assert Files.exists(sourceProfileDirectory)
+		Path targetUserDataDir = userDataDir
 		if (instruction == UserDataAccess.TO_GO) {
-			// create a temporary directory with name "User Data", into which
-			// copy the Profile directory contents from the Chrome's internal "User Data",
-			// this is done in order to workaround "User Data is used" contention problem.
-			userDataDir = Files.createTempDirectory("__user-data-dir__")
-			Path destinationDirectory = userDataDir.resolve(profileDirectoryName.getName())
+			targetUserDataDir = Files.createTempDirectory("__user-data-dir__")
+			Path targetProfileDirectory = targetUserDataDir.resolve(profileDirectoryName.getName())
 			PathUtils.copyDirectoryRecursively(
-					originalProfileDirectory,
-					destinationDirectory)
-			int numCopied = PathUtils.listDirectoryRecursively(destinationDirectory).size()
-			logger_.info("copied ${numCopied} files from ${originalProfileDirectory} into ${destinationDirectory} ")
+					sourceProfileDirectory,
+					targetProfileDirectory)
+			int numCopied = PathUtils.listDirectoryRecursively(targetProfileDirectory).size()
+			logger_.info("copied ${numCopied} files from ${sourceProfileDirectory} into ${targetProfileDirectory} ")
 		} else {
-			logger_.debug("will use ${originalProfileDirectory} ")
+			logger_.debug("will use ${sourceProfileDirectory} ")
 		}
 
 		// use the specified UserProfile with which Chrome browser is launched
 		ChromeOptionsModifier com =
 				ChromeOptionsModifiers.withUserProfile(
-						userDataDir,
+						targetUserDataDir,
 						profileDirectoryName.getName())
 		this.addChromeOptionsModifier(com)
 
@@ -320,7 +324,7 @@ class ChromeDriverFactoryImpl extends ChromeDriverFactory {
 		ChromeDriver driver = null
 		try {
 			driver = this.createInstance()
-			ChromeUserProfile cup = new ChromeUserProfile(userDataDir, profileDirectoryName)
+			ChromeUserProfile cup = new ChromeUserProfile(targetUserDataDir, profileDirectoryName)
 			driver.metaClass.userProfile = Optional.of(cup)
 			driver.metaClass.userDataAccess = Optional.of(instruction)
 			setPageLoadTimeout(driver, this.pageLoadTimeout)
@@ -331,7 +335,7 @@ class ChromeDriverFactoryImpl extends ChromeDriverFactory {
 				logger_.info("forcibly closed the browser")
 			}
 			StringBuilder sb = new StringBuilder()
-			sb.append("profileDirectory=\"${originalProfileDirectory}\"\n")
+			sb.append("profileDirectory=\"${genuineProfileDirectory}\"\n")
 			sb.append("org.openqa.selenium.InvalidArgumentException was thrown.\n")
 			sb.append("Exception message:\n\n")
 			sb.append(iae.getMessage())
