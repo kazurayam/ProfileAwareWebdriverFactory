@@ -71,7 +71,9 @@ class ChromeDriverFactoryImpl extends ChromeDriverFactory {
 
 	@Override
 	void addAllChromePreferencesModifiers(List<ChromePreferencesModifier> list) {
-		chromePreferencesModifiers.addAll(list)
+		list.each ({ ChromePreferencesModifier cpm ->
+			chromePreferencesModifiers.add(cpm)
+		})
 	}
 
 	@Override
@@ -81,7 +83,10 @@ class ChromeDriverFactoryImpl extends ChromeDriverFactory {
 
 	@Override
 	void addAllChromeOptionsModifiers(List<ChromeOptionsModifier> list) {
-		chromeOptionsModifiers.addAll(list)
+		list.each({ ChromeOptionsModifier com ->
+			chromeOptionsModifiers.add(com)
+		})
+
 	}
 
 	@Override
@@ -91,7 +96,9 @@ class ChromeDriverFactoryImpl extends ChromeDriverFactory {
 
 	@Override
 	void addAllDesiredCapabilitiesModifiers(List<DesiredCapabilitiesModifier> list) {
-		desiredCapabilitiesModifiers.addAll(list)
+		list.each ({ DesiredCapabilitiesModifier dcm ->
+			desiredCapabilitiesModifiers.add(dcm)
+		})
 	}
 
 

@@ -2,10 +2,9 @@ package com.kazurayam.webdriverfactory.chrome
 
 import org.openqa.selenium.chrome.ChromeOptions
 
-import java.nio.file.Files
 import java.nio.file.Path
 
-class ChromeOptionsModifiers {
+enum ChromeOptionsModifiers {
 
     static ChromeOptionsModifier headless() {
         ChromeOptionsModifier com = new Base({ ChromeOptions chromeOptions ->
@@ -96,9 +95,11 @@ class ChromeOptionsModifiers {
     static ChromeOptionsModifier withUserProfile(Path userDataDir, String profileDirectoryName) {
         Objects.requireNonNull(userDataDir)
         Objects.requireNonNull(profileDirectoryName)
+        /* FIXME: should I check this?
         if (!Files.exists(userDataDir)) {
             throw new IllegalStateException("${userDataDir} is not found")
         }
+         */
         ChromeOptionsModifier com = new Base({ ChromeOptions chromeOptions ->
             chromeOptions.addArguments("user-data-dir=${userDataDir.toString()}")
             chromeOptions.addArguments("profile-directory=${profileDirectoryName}")
@@ -123,5 +124,4 @@ class ChromeOptionsModifiers {
         }
     }
 
-    private ChromeOptionsModifiers() {}
 }

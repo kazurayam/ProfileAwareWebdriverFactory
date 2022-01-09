@@ -6,9 +6,11 @@ import com.kazurayam.timekeeper.Table
 import com.kazurayam.timekeeper.Timekeeper
 import com.kazurayam.webdriverfactory.UserProfile
 import com.kazurayam.webdriverfactory.chrome.ChromeDriverFactory.UserDataAccess
+import com.kazurayam.webdriverfactory.desiredcapabilities.DesiredCapabilitiesModifier
 import org.junit.After
 import org.junit.BeforeClass
 import org.openqa.selenium.chrome.ChromeDriver
+import org.openqa.selenium.chrome.ChromeOptions
 
 import java.security.MessageDigest
 import java.time.LocalDateTime
@@ -100,7 +102,7 @@ class ChromeDriverFactoryTest {
 		DesiredCapabilities dc = cdFactory.getEmployedDesiredCapabilities()
 		assertNotNull(dc)
 		String dcJson = cdFactory.getEmployedDesiredCapabilitiesAsJSON()
-		//println("DesiredCapabilities is\n${dcJson}")
+		println("DesiredCapabilities is\n${dcJson}")
 		//
 		driver.navigate().to('http://example.com/')
 	}
@@ -345,6 +347,26 @@ class ChromeDriverFactoryTest {
 		driver.navigate().to("http://example.com")
 	}
 
+
+	@Ignore
+	@Test
+	void test_applyChromeOptionsModifiers() {
+		ChromeOptions chromeOptions = new ChromeOptions()
+		List<ChromeOptionsModifier> modifiers = new ArrayList<>()
+		modifiers.add(ChromeOptionsModifiers.withUserProfile(
+				Paths.get("/Users/kazurayam/Library/Application Support/Google/Chrome/"),
+				"Default"
+		))
+		modifiers.add(ChromeOptionsModifiers.withUserProfile(
+				Paths.get("/private/var/folders/lh/jkh513dn7f3c0j09z131g1z00000gn/T/__user-data-dir__2083508313415793756/"),
+				"Profile 6"
+		))
+		chromeOptions = ChromeDriverFactoryImpl.applyChromeOptionsModifiers(chromeOptions, modifiers)
+		String s = chromeOptions.toString()
+		// Capabilities {browserName: chrome, goog:chromeOptions: {args: [user-data-dir=/Users/kazura..., profile-directory=Default, user-data-dir=/private/var/..., profile-directory=Profile 6], extensions: []}}
+		println s
+		assert ! s.contains("profile-directory=Default")
+	}
 
 	@Test
 	void test_filesAreIdentical() {
