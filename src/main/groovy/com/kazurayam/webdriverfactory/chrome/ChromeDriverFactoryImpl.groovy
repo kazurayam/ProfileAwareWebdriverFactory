@@ -27,7 +27,7 @@ class ChromeDriverFactoryImpl extends ChromeDriverFactory {
 	static Logger logger_ = LoggerFactory.getLogger(ChromeDriverFactoryImpl.class)
 
 	private final List<ChromePreferencesModifier> chromePreferencesModifiers
-	private final List<ChromeOptionsModifier> chromeOptionsModifiers
+	private final Set<ChromeOptionsModifier> chromeOptionsModifiers
 	private final List<DesiredCapabilitiesModifier> desiredCapabilitiesModifiers
 
 	private DesiredCapabilities desiredCapabilities
@@ -39,7 +39,7 @@ class ChromeDriverFactoryImpl extends ChromeDriverFactory {
 
 	ChromeDriverFactoryImpl(boolean requireDefaultSettings) {
 		chromePreferencesModifiers = new ArrayList<>()
-		chromeOptionsModifiers = new ArrayList<>()
+		chromeOptionsModifiers = new HashSet<>()
 		desiredCapabilitiesModifiers = new ArrayList<>()
 		desiredCapabilities = new DesiredCapabilities()
 		if (requireDefaultSettings) {
@@ -77,8 +77,12 @@ class ChromeDriverFactoryImpl extends ChromeDriverFactory {
 	}
 
 	@Override
-	void addChromeOptionsModifier(ChromeOptionsModifier chromeOptionsModifier) {
-		chromeOptionsModifiers.add(chromeOptionsModifier)
+	void addChromeOptionsModifier(ChromeOptionsModifier com) {
+		if (chromeOptionsModifiers.contains(com)) {
+			// The late comer wins
+			chromeOptionsModifiers.remove(com)
+		}
+		chromeOptionsModifiers.add(com)
 	}
 
 	@Override
@@ -318,7 +322,7 @@ class ChromeDriverFactoryImpl extends ChromeDriverFactory {
 	 */
 	private DesiredCapabilities buildDesiredCapabilities(
 			List<ChromePreferencesModifier> chromePreferencesModifierList,
-			List<ChromeOptionsModifier> chromeOptionsModifierList,
+			Set<ChromeOptionsModifier> chromeOptionsModifierSet,
 			List<DesiredCapabilitiesModifier> desiredCapabilitiesModifierList
 	) {
 		// create a Chrome Preferences object as the seed
@@ -333,7 +337,7 @@ class ChromeDriverFactoryImpl extends ChromeDriverFactory {
 				ChromeOptionsBuilder.newInstance(preferences).build()
 		// modify the Chrome Options
 		chromeOptions = applyChromeOptionsModifiers(chromeOptions,
-				chromeOptionsModifierList)
+				chromeOptionsModifierSet)
 
 		// create Desired Capabilities taking over settings in the Chrome Options
 		DesiredCapabilities desiredCapabilities =
@@ -355,7 +359,7 @@ class ChromeDriverFactoryImpl extends ChromeDriverFactory {
 	}
 
 	static ChromeOptions applyChromeOptionsModifiers(
-			ChromeOptions chromeOptions, List<ChromeOptionsModifier> modifiers) {
+			ChromeOptions chromeOptions, Set<ChromeOptionsModifier> modifiers) {
 		ChromeOptions cp = chromeOptions
 		for (ChromeOptionsModifier com in modifiers) {
 			cp = com.modify(cp)

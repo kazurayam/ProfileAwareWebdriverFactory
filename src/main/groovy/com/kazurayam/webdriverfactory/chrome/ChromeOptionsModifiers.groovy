@@ -7,7 +7,9 @@ import java.nio.file.Path
 enum ChromeOptionsModifiers {
 
     static ChromeOptionsModifier headless() {
-        ChromeOptionsModifier com = new Base({ ChromeOptions chromeOptions ->
+        ChromeOptionsModifier com = new Base(
+                ChromeOptionsModifier.Type.headless,
+                { ChromeOptions chromeOptions ->
             chromeOptions.addArguments("--headless")
             return chromeOptions
         })
@@ -15,7 +17,9 @@ enum ChromeOptionsModifiers {
     }
 
     static ChromeOptionsModifier incognito() {
-        ChromeOptionsModifier com = new Base({ ChromeOptions chromeOptions ->
+        ChromeOptionsModifier com = new Base(
+                ChromeOptionsModifier.Type.incognito,
+                { ChromeOptions chromeOptions ->
             chromeOptions.addArguments("--incognito")
             return chromeOptions
         })
@@ -37,7 +41,9 @@ enum ChromeOptionsModifiers {
         if (height <= 0) {
             throw new IllegalArgumentException("height=${height} must be a positive integer")
         }
-        ChromeOptionsModifier com = new Base({ ChromeOptions chromeOptions ->
+        ChromeOptionsModifier com = new Base(
+                ChromeOptionsModifier.Type.windowSize,
+                { ChromeOptions chromeOptions ->
             chromeOptions.addArguments("window-size=${width},${height}")
             return chromeOptions
         })
@@ -45,7 +51,9 @@ enum ChromeOptionsModifiers {
     }
 
     static ChromeOptionsModifier noSandbox() {
-        ChromeOptionsModifier com = new Base({ ChromeOptions chromeOptions ->
+        ChromeOptionsModifier com = new Base(
+                ChromeOptionsModifier.Type.noSandbox,
+                { ChromeOptions chromeOptions ->
             chromeOptions.addArguments("--no-sandbox")
             return chromeOptions
         })
@@ -53,7 +61,9 @@ enum ChromeOptionsModifiers {
     }
 
     static ChromeOptionsModifier disableInfobars() {
-        ChromeOptionsModifier com = new Base({ ChromeOptions chromeOptions ->
+        ChromeOptionsModifier com = new Base(
+                ChromeOptionsModifier.Type.disableInfobars,
+                { ChromeOptions chromeOptions ->
             chromeOptions.addArguments("disable-infobars")
             return chromeOptions
         })
@@ -61,7 +71,9 @@ enum ChromeOptionsModifiers {
     }
 
     static ChromeOptionsModifier disableGpu() {
-        ChromeOptionsModifier com = new Base({ ChromeOptions chromeOptions ->
+        ChromeOptionsModifier com = new Base(
+                ChromeOptionsModifier.Type.disableGpu,
+                { ChromeOptions chromeOptions ->
             chromeOptions.addArguments("disable-gpu")
             return chromeOptions
         })
@@ -69,7 +81,9 @@ enum ChromeOptionsModifiers {
     }
 
     static ChromeOptionsModifier disableDevShmUsage() {
-        ChromeOptionsModifier com = new Base({ ChromeOptions chromeOptions ->
+        ChromeOptionsModifier com = new Base(
+                ChromeOptionsModifier.Type.disableDevShmUsage,
+                { ChromeOptions chromeOptions ->
             chromeOptions.addArguments("disable-dev-shm-usage")
             return chromeOptions
         })
@@ -77,7 +91,9 @@ enum ChromeOptionsModifiers {
     }
 
     static ChromeOptionsModifier disableExtensions() {
-        ChromeOptionsModifier com = new Base({ ChromeOptions chromeOptions ->
+        ChromeOptionsModifier com = new Base(
+                ChromeOptionsModifier.Type.disableExtensions,
+                { ChromeOptions chromeOptions ->
             chromeOptions.addArguments("disableExtensions")
             return chromeOptions
         })
@@ -85,7 +101,9 @@ enum ChromeOptionsModifiers {
     }
 
     static ChromeOptionsModifier singleProcess() {
-        ChromeOptionsModifier com = new Base({ ChromeOptions chromeOptions ->
+        ChromeOptionsModifier com = new Base(
+                ChromeOptionsModifier.Type.singleProcess,
+                { ChromeOptions chromeOptions ->
             chromeOptions.addArguments("--single-process")
             return chromeOptions
         })
@@ -100,27 +118,46 @@ enum ChromeOptionsModifiers {
             throw new IllegalStateException("${userDataDir} is not found")
         }
          */
-        ChromeOptionsModifier com = new Base({ ChromeOptions chromeOptions ->
+        ChromeOptionsModifier com = new Base(
+                ChromeOptionsModifier.Type.withUserProfile,
+                { ChromeOptions chromeOptions ->
             chromeOptions.addArguments("user-data-dir=${userDataDir.toString()}")
             chromeOptions.addArguments("profile-directory=${profileDirectoryName}")
             return chromeOptions
         })
         return com
-
     }
 
     /**
      *
      */
     private static class Base implements ChromeOptionsModifier {
-        private Closure closure
-        Base(Closure closure) {
+        private final Type type
+        private final Closure closure
+        Base(Type type, Closure closure) {
+            this.type = type
             this.closure = closure
         }
         @Override
         ChromeOptions modify(ChromeOptions chromeOptions) {
             Objects.requireNonNull(chromeOptions)
             return (ChromeOptions)closure.call(chromeOptions)
+        }
+        @Override
+        Type getType() {
+            return this.type
+        }
+        @Override
+        boolean equals(Object obj) {
+            if (! obj instanceof Base) {
+                return false
+            }
+            Base other = (Base)obj
+            return this.getType() == other.getType()
+        }
+        @Override
+        int hashCode() {
+            return this.getType().hashCode()
         }
     }
 

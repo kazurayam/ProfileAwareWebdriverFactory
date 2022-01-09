@@ -57,8 +57,8 @@ class CarryingCookieOverSessionsViaProfile {
         browser.quit()
 
         // 2nd session
-        browser = factory.newChromeDriver(new ProfileDirectoryName("Default"),
-                ChromeDriverFactory.UserDataAccess.FOR_HERE)
+        browser = factory.newChromeDriver(new ProfileDirectoryName("Profile 6"),
+                ChromeDriverFactory.UserDataAccess.TO_GO)
         Cookie timestamp2 = observeCookie(browser)
         browser.quit()
         //
