@@ -318,35 +318,51 @@ class ChromeDriverFactoryImpl extends ChromeDriverFactory {
 		Map<String, Object> preferences = new HashMap<>()
 
 		// modify the instance of Chrome Preferences
-		for (ChromePreferencesModifier cpm in chromePreferencesModifierList) {
-			preferences = cpm.modify(preferences)
-		}
+		preferences = applyChromePreferencesModifiers(preferences,
+				chromePreferencesModifierList)
 
 		// create Chrome Options taking over the Chrome Preferences
 		ChromeOptions chromeOptions =
 				ChromeOptionsBuilder.newInstance(preferences).build()
 		// modify the Chrome Options
-		for (ChromeOptionsModifier com in chromeOptionsModifierList) {
-			chromeOptions = com.modify(chromeOptions)
-		}
+		chromeOptions = applyChromeOptionsModifiers(chromeOptions,
+				chromeOptionsModifierList)
 
 		// create Desired Capabilities taking over settings in the Chrome Options
 		DesiredCapabilities desiredCapabilities =
 				new DesiredCapabilitiesBuilderImpl().build(chromeOptions)
 		// modify the Desired Capabilities
-		for (DesiredCapabilitiesModifier dcm in desiredCapabilitiesModifierList) {
-			desiredCapabilities = dcm.modify(desiredCapabilities)
-		}
+		desiredCapabilities = applyDesiredCapabilitiesModifiers(desiredCapabilities,
+				desiredCapabilitiesModifierList)
 
 		return desiredCapabilities
 	}
 
 	static Map<String, Object> applyChromePreferencesModifiers(
-			Map<String, Object> chromePreferences, List<ChromePreferencesModifiers> modifiers) {
+			Map<String, Object> chromePreferences, List<ChromePreferencesModifier> modifiers) {
+		Map<String, Object> cp = chromePreferences
+		for (ChromePreferencesModifier cpm in modifiers) {
+			cp = cpm.modify(cp)
+		}
+		return cp
 	}
 
 	static ChromeOptions applyChromeOptionsModifiers(
-			ChromeOptions chromeOptions, List<ChromeOptionsModifiers> modifiers) {
+			ChromeOptions chromeOptions, List<ChromeOptionsModifier> modifiers) {
+		ChromeOptions cp = chromeOptions
+		for (ChromeOptionsModifier com in modifiers) {
+			cp = com.modify(cp)
+		}
+		return cp
+	}
+
+	static DesiredCapabilities applyDesiredCapabilitiesModifiers(
+			DesiredCapabilities desiredCapabilities, List<DesiredCapabilitiesModifier> modifiers) {
+		DesiredCapabilities dc = desiredCapabilities
+		for (DesiredCapabilitiesModifier dcm in modifiers) {
+			dc = dcm.modify(dc)
+		}
+		return dc
 	}
 
 }
