@@ -10,9 +10,9 @@ enum ChromeOptionsModifiers {
         ChromeOptionsModifier com = new Base(
                 ChromeOptionsModifier.Type.headless,
                 { ChromeOptions chromeOptions ->
-            chromeOptions.addArguments("--headless")
-            return chromeOptions
-        })
+                    chromeOptions.addArguments("--headless")
+                    return chromeOptions
+                })
         return com
     }
 
@@ -20,9 +20,9 @@ enum ChromeOptionsModifiers {
         ChromeOptionsModifier com = new Base(
                 ChromeOptionsModifier.Type.incognito,
                 { ChromeOptions chromeOptions ->
-            chromeOptions.addArguments("--incognito")
-            return chromeOptions
-        })
+                    chromeOptions.addArguments("--incognito")
+                    return chromeOptions
+                })
         return com
     }
 
@@ -44,9 +44,9 @@ enum ChromeOptionsModifiers {
         ChromeOptionsModifier com = new Base(
                 ChromeOptionsModifier.Type.windowSize,
                 { ChromeOptions chromeOptions ->
-            chromeOptions.addArguments("window-size=${width},${height}")
-            return chromeOptions
-        })
+                    chromeOptions.addArguments("window-size=${width},${height}")
+                    return chromeOptions
+                })
         return com
     }
 
@@ -54,9 +54,9 @@ enum ChromeOptionsModifiers {
         ChromeOptionsModifier com = new Base(
                 ChromeOptionsModifier.Type.noSandbox,
                 { ChromeOptions chromeOptions ->
-            chromeOptions.addArguments("--no-sandbox")
-            return chromeOptions
-        })
+                    chromeOptions.addArguments("--no-sandbox")
+                    return chromeOptions
+                })
         return com
     }
 
@@ -64,9 +64,9 @@ enum ChromeOptionsModifiers {
         ChromeOptionsModifier com = new Base(
                 ChromeOptionsModifier.Type.disableInfobars,
                 { ChromeOptions chromeOptions ->
-            chromeOptions.addArguments("disable-infobars")
-            return chromeOptions
-        })
+                    chromeOptions.addArguments("disable-infobars")
+                    return chromeOptions
+                })
         return com
     }
 
@@ -74,9 +74,9 @@ enum ChromeOptionsModifiers {
         ChromeOptionsModifier com = new Base(
                 ChromeOptionsModifier.Type.disableGpu,
                 { ChromeOptions chromeOptions ->
-            chromeOptions.addArguments("disable-gpu")
-            return chromeOptions
-        })
+                    chromeOptions.addArguments("disable-gpu")
+                    return chromeOptions
+                })
         return com
     }
 
@@ -84,9 +84,9 @@ enum ChromeOptionsModifiers {
         ChromeOptionsModifier com = new Base(
                 ChromeOptionsModifier.Type.disableDevShmUsage,
                 { ChromeOptions chromeOptions ->
-            chromeOptions.addArguments("disable-dev-shm-usage")
-            return chromeOptions
-        })
+                    chromeOptions.addArguments("disable-dev-shm-usage")
+                    return chromeOptions
+                })
         return com
     }
 
@@ -94,9 +94,9 @@ enum ChromeOptionsModifiers {
         ChromeOptionsModifier com = new Base(
                 ChromeOptionsModifier.Type.disableExtensions,
                 { ChromeOptions chromeOptions ->
-            chromeOptions.addArguments("disableExtensions")
-            return chromeOptions
-        })
+                    chromeOptions.addArguments("disableExtensions")
+                    return chromeOptions
+                })
         return com
     }
 
@@ -104,9 +104,9 @@ enum ChromeOptionsModifiers {
         ChromeOptionsModifier com = new Base(
                 ChromeOptionsModifier.Type.singleProcess,
                 { ChromeOptions chromeOptions ->
-            chromeOptions.addArguments("--single-process")
-            return chromeOptions
-        })
+                    chromeOptions.addArguments("--single-process")
+                    return chromeOptions
+                })
         return com
     }
 
@@ -121,10 +121,10 @@ enum ChromeOptionsModifiers {
         ChromeOptionsModifier com = new Base(
                 ChromeOptionsModifier.Type.withUserProfile,
                 { ChromeOptions chromeOptions ->
-            chromeOptions.addArguments("user-data-dir=${userDataDir.toString()}")
-            chromeOptions.addArguments("profile-directory=${profileDirectoryName}")
-            return chromeOptions
-        })
+                    chromeOptions.addArguments("user-data-dir=${userDataDir.toString()}")
+                    chromeOptions.addArguments("profile-directory=${profileDirectoryName}")
+                    return chromeOptions
+                })
         return com
     }
 

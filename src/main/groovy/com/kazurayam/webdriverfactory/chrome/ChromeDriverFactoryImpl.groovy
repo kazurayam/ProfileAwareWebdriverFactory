@@ -26,7 +26,7 @@ class ChromeDriverFactoryImpl extends ChromeDriverFactory {
 
 	static Logger logger_ = LoggerFactory.getLogger(ChromeDriverFactoryImpl.class)
 
-	private final List<ChromePreferencesModifier> chromePreferencesModifiers
+	private final Set<ChromePreferencesModifier> chromePreferencesModifiers
 	private final Set<ChromeOptionsModifier> chromeOptionsModifiers
 	private final List<DesiredCapabilitiesModifier> desiredCapabilitiesModifiers
 
@@ -38,9 +38,9 @@ class ChromeDriverFactoryImpl extends ChromeDriverFactory {
 	}
 
 	ChromeDriverFactoryImpl(boolean requireDefaultSettings) {
-		chromePreferencesModifiers = new ArrayList<>()
-		chromeOptionsModifiers = new HashSet<>()
-		desiredCapabilitiesModifiers = new ArrayList<>()
+		this.chromePreferencesModifiers = new HashSet<>()
+		this.chromeOptionsModifiers = new HashSet<>()
+		this.desiredCapabilitiesModifiers = new ArrayList<>()
 		desiredCapabilities = new DesiredCapabilities()
 		if (requireDefaultSettings) {
 			this.prepareDefaultSettings()
@@ -65,43 +65,47 @@ class ChromeDriverFactoryImpl extends ChromeDriverFactory {
 	}
 
 	@Override
-	void addChromePreferencesModifier(ChromePreferencesModifier preferencesModifier) {
-		chromePreferencesModifiers.add(preferencesModifier)
+	void addChromePreferencesModifier(ChromePreferencesModifier cpm) {
+		if (this.chromePreferencesModifiers.contains(cpm)) {
+			// The late comer wins
+			this.chromePreferencesModifiers.remove(cpm)
+		}
+		this.chromePreferencesModifiers.add(cpm)
 	}
 
 	@Override
 	void addAllChromePreferencesModifiers(List<ChromePreferencesModifier> list) {
 		list.each ({ ChromePreferencesModifier cpm ->
-			chromePreferencesModifiers.add(cpm)
+			this.chromePreferencesModifiers.add(cpm)
 		})
 	}
 
 	@Override
 	void addChromeOptionsModifier(ChromeOptionsModifier com) {
-		if (chromeOptionsModifiers.contains(com)) {
+		if (this.chromeOptionsModifiers.contains(com)) {
 			// The late comer wins
-			chromeOptionsModifiers.remove(com)
+			this.chromeOptionsModifiers.remove(com)
 		}
-		chromeOptionsModifiers.add(com)
+		this.chromeOptionsModifiers.add(com)
 	}
 
 	@Override
 	void addAllChromeOptionsModifiers(List<ChromeOptionsModifier> list) {
 		list.each({ ChromeOptionsModifier com ->
-			chromeOptionsModifiers.add(com)
+			this.chromeOptionsModifiers.add(com)
 		})
 
 	}
 
 	@Override
 	void addDesiredCapabilitiesModifier(DesiredCapabilitiesModifier desiredCapabilitiesModifier) {
-		desiredCapabilitiesModifiers.add(desiredCapabilitiesModifier)
+		this.desiredCapabilitiesModifiers.add(desiredCapabilitiesModifier)
 	}
 
 	@Override
 	void addAllDesiredCapabilitiesModifiers(List<DesiredCapabilitiesModifier> list) {
 		list.each ({ DesiredCapabilitiesModifier dcm ->
-			desiredCapabilitiesModifiers.add(dcm)
+			this.desiredCapabilitiesModifiers.add(dcm)
 		})
 	}
 
@@ -137,7 +141,7 @@ class ChromeDriverFactoryImpl extends ChromeDriverFactory {
 		this.pageLoadTimeoutSeconds = waitSeconds
 	}
 
-	protected void setPageLoadTimeout(ChromeDriver driver, Integer seconds) {
+	static protected void setPageLoadTimeout(ChromeDriver driver, Integer seconds) {
 		if (seconds != Integer.MIN_VALUE) {
 			Duration dur = Duration.ofSeconds((long)seconds)
 			long millis = dur.toMillis()
@@ -321,36 +325,36 @@ class ChromeDriverFactoryImpl extends ChromeDriverFactory {
 	 * while modifying each containers with specified Modifiers
 	 */
 	private DesiredCapabilities buildDesiredCapabilities(
-			List<ChromePreferencesModifier> chromePreferencesModifierList,
-			Set<ChromeOptionsModifier> chromeOptionsModifierSet,
-			List<DesiredCapabilitiesModifier> desiredCapabilitiesModifierList
+			Set<ChromePreferencesModifier> chromePreferencesModifiers,
+			Set<ChromeOptionsModifier> chromeOptionsModifiers,
+			List<DesiredCapabilitiesModifier> desiredCapabilitiesModifiers
 	) {
 		// create a Chrome Preferences object as the seed
 		Map<String, Object> preferences = new HashMap<>()
 
 		// modify the instance of Chrome Preferences
 		preferences = applyChromePreferencesModifiers(preferences,
-				chromePreferencesModifierList)
+				chromePreferencesModifiers)
 
 		// create Chrome Options taking over the Chrome Preferences
 		ChromeOptions chromeOptions =
 				ChromeOptionsBuilder.newInstance(preferences).build()
 		// modify the Chrome Options
 		chromeOptions = applyChromeOptionsModifiers(chromeOptions,
-				chromeOptionsModifierSet)
+				chromeOptionsModifiers)
 
 		// create Desired Capabilities taking over settings in the Chrome Options
 		DesiredCapabilities desiredCapabilities =
 				new DesiredCapabilitiesBuilderImpl().build(chromeOptions)
 		// modify the Desired Capabilities
 		desiredCapabilities = applyDesiredCapabilitiesModifiers(desiredCapabilities,
-				desiredCapabilitiesModifierList)
+				desiredCapabilitiesModifiers)
 
 		return desiredCapabilities
 	}
 
 	static Map<String, Object> applyChromePreferencesModifiers(
-			Map<String, Object> chromePreferences, List<ChromePreferencesModifier> modifiers) {
+			Map<String, Object> chromePreferences, Set<ChromePreferencesModifier> modifiers) {
 		Map<String, Object> cp = chromePreferences
 		for (ChromePreferencesModifier cpm in modifiers) {
 			cp = cpm.modify(cp)

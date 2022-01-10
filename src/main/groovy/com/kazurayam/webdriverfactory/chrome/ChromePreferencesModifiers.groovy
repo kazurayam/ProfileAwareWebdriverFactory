@@ -7,12 +7,14 @@ import java.nio.file.Paths
 class ChromePreferencesModifiers {
 
     static ChromePreferencesModifier downloadWithoutPrompt() {
-        ChromePreferencesModifier pm = new Base({ Map<String, Object> preferences ->
-            // Below two preference settings will disable popup dialog when download file
-            preferences.put('profile.default_content_settings.popups', 0)
-            preferences.put('download.prompt_for_download', false)
-            return preferences
-        })
+        ChromePreferencesModifier pm = new Base(
+                ChromePreferencesModifier.Type.downloadWithoutPrompt,
+                { Map<String, Object> preferences ->
+                    // Below two preference settings will disable popup dialog when download file
+                    preferences.put('profile.default_content_settings.popups', 0)
+                    preferences.put('download.prompt_for_download', false)
+                    return preferences
+                })
         return pm
     }
 
@@ -27,21 +29,25 @@ class ChromePreferencesModifiers {
             println "created ${directory}"
             Files.createDirectories(directory)
         }
-        ChromePreferencesModifier pm = new Base({ Map<String, Object> preferences ->
-            preferences.put('download.default_directory', directory.toString())
-            return preferences
-        })
+        ChromePreferencesModifier pm = new Base(
+                ChromePreferencesModifier.Type.downloadIntoDirectory,
+                { Map<String, Object> preferences ->
+                    preferences.put('download.default_directory', directory.toString())
+                    return preferences
+                })
         return pm
     }
 
     static ChromePreferencesModifier disableViewersOfFlashAndPdf() {
-        ChromePreferencesModifier pm = new Base({ Map<String, Object> preferences ->
-            preferences.put('plugins.plugins_disabled', [
-                    'Adobe Flash Player',
-                    'Chrome PDF Viewer'
-            ])
-            return preferences
-        })
+        ChromePreferencesModifier pm = new Base(
+                ChromePreferencesModifier.Type.disableViewersOfFlashAndPdf,
+                { Map<String, Object> preferences ->
+                    preferences.put('plugins.plugins_disabled', [
+                            'Adobe Flash Player',
+                            'Chrome PDF Viewer'
+                    ])
+                    return preferences
+                })
         return pm
     }
 
@@ -49,9 +55,15 @@ class ChromePreferencesModifiers {
      *
      */
     private static class Base implements ChromePreferencesModifier {
+        private Type type
         private Closure closure
-        Base(Closure closure) {
+        Base(Type type, Closure closure) {
+            this.type = type
             this.closure = closure
+        }
+        @Override
+        Type getType() {
+            return this.type
         }
         @Override
         Map<String, Object> modify(Map<String, Object> preferences) {
