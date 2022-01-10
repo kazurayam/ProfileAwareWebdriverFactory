@@ -1,6 +1,7 @@
 package examples
 
 import com.kazurayam.webdriverfactory.chrome.ChromeDriverFactory
+import com.kazurayam.webdriverfactory.chrome.LaunchedChromeDriver
 import com.kazurayam.webdriverfactory.chrome.ProfileDirectoryName
 import io.github.bonigarcia.wdm.WebDriverManager
 import org.junit.After
@@ -8,27 +9,26 @@ import org.junit.Before
 import org.junit.BeforeClass
 import org.junit.Ignore
 import org.junit.Test
-import org.openqa.selenium.chrome.ChromeDriver
 
 class LaunchChromeWithProfileDirectory {
 
-    ChromeDriver browser
+    LaunchedChromeDriver launched
 
     @Test
     void test_launch_browser_with_profile_directory() {
         ChromeDriverFactory factory = ChromeDriverFactory.newChromeDriverFactory()
-        browser = factory.newChromeDriver(new ProfileDirectoryName("Profile 6"))
-        browser.navigate().to("http://example.com")
+        launched = factory.newChromeDriver(new ProfileDirectoryName("Profile 6"))
+        launched.getDriver().navigate().to("http://example.com")
         Thread.sleep(1000)
     }
 
     @Test
     void test_launch_browser_with_profile_TO_GO() {
         ChromeDriverFactory factory = ChromeDriverFactory.newChromeDriverFactory()
-        browser = factory.newChromeDriver(
+        launched = factory.newChromeDriver(
                 new ProfileDirectoryName("Profile 6"),
                 ChromeDriverFactory.UserDataAccess.TO_GO)
-        browser.navigate().to("http://example.com")
+        launched.getDriver().navigate().to("http://example.com")
         Thread.sleep(1000)
     }
 
@@ -36,10 +36,10 @@ class LaunchChromeWithProfileDirectory {
     @Test
     void test_launch_browser_with_profile_FOR_HERE() {
         ChromeDriverFactory factory = ChromeDriverFactory.newChromeDriverFactory()
-        browser = factory.newChromeDriver(
+        launched = factory.newChromeDriver(
                 new ProfileDirectoryName("Profile 6"),
                 ChromeDriverFactory.UserDataAccess.FOR_HERE)
-        browser.navigate().to("http://example.com")
+        launched.getDriver().navigate().to("http://example.com")
         Thread.sleep(1000)
     }
 
@@ -51,14 +51,14 @@ class LaunchChromeWithProfileDirectory {
 
     @Before
     void setUp() {
-        browser = null
+        launched = null
     }
 
     @After
     void tearDown() {
-        if (browser != null) {
-            browser.quit()
-            browser = null
+        if (launched != null) {
+            launched.getDriver().quit()
+            launched = null
         }
     }
 

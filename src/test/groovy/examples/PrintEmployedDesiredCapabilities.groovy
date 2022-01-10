@@ -1,31 +1,32 @@
 package examples
 
-import com.kazurayam.webdriverfactory.UserProfile
+
 import com.kazurayam.webdriverfactory.chrome.ChromeDriverFactory
 import com.kazurayam.webdriverfactory.chrome.ChromeOptionsModifiers
-import com.kazurayam.webdriverfactory.chrome.ProfileDirectoryName
+import com.kazurayam.webdriverfactory.chrome.LaunchedChromeDriver
 import io.github.bonigarcia.wdm.WebDriverManager
 import org.junit.After
 import org.junit.Before
 import org.junit.BeforeClass
 import org.junit.Test
-import org.openqa.selenium.chrome.ChromeDriver
 import org.openqa.selenium.remote.DesiredCapabilities
 
 class PrintEmployedDesiredCapabilities {
 
-    ChromeDriver browser
+    LaunchedChromeDriver launched
 
     @Test
     void test_getEmployedDesiredCapabilities() {
-        ChromeDriverFactory factory = ChromeDriverFactory.newChromeDriverFactory()
+        ChromeDriverFactory factory = ChromeDriverFactory.newHeadlessChromeDriverFactory()
         factory.addChromeOptionsModifier(ChromeOptionsModifiers.incognito())
-        browser = factory.newChromeDriver()
-        DesiredCapabilities dc = factory.getEmployedDesiredCapabilities()
-        assert dc != null
-        String str = factory.getEmployedDesiredCapabilitiesAsJSON()
-        assert str != null
-        println str
+        launched = factory.newChromeDriver()
+        launched.getEmployedDesiredCapabilities().ifPresent { DesiredCapabilities dc ->
+            println dc
+        }
+        launched.getEmployedDesiredCapabilitiesAsJSON().ifPresent { String json ->
+            println json
+            assert json.contains("incognito")
+        }
     }
 
     @BeforeClass
@@ -36,14 +37,14 @@ class PrintEmployedDesiredCapabilities {
 
     @Before
     void setUp() {
-        browser = null
+        launched = null
     }
 
     @After
     void tearDown() {
-        if (browser != null) {
-            browser.quit()
-            browser = null
+        if (launched != null) {
+            launched.getDriver().quit()
+            launched = null
         }
     }
 

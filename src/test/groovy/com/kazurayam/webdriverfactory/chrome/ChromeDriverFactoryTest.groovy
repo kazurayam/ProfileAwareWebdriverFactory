@@ -6,11 +6,8 @@ import com.kazurayam.timekeeper.Table
 import com.kazurayam.timekeeper.Timekeeper
 import com.kazurayam.webdriverfactory.UserProfile
 import com.kazurayam.webdriverfactory.chrome.ChromeDriverFactory.UserDataAccess
-import com.kazurayam.webdriverfactory.desiredcapabilities.DesiredCapabilitiesModifier
 import org.junit.After
 import org.junit.BeforeClass
-import org.openqa.selenium.chrome.ChromeDriver
-import org.openqa.selenium.chrome.ChromeOptions
 
 import java.security.MessageDigest
 import java.time.LocalDateTime
@@ -23,7 +20,6 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
 import org.openqa.selenium.Cookie
-import org.openqa.selenium.remote.DesiredCapabilities
 
 import io.github.bonigarcia.wdm.WebDriverManager
 import groovy.json.*
@@ -38,7 +34,7 @@ import java.nio.file.Paths
 class ChromeDriverFactoryTest {
 
 	static Path outputFolder
-	ChromeDriver driver
+	LaunchedChromeDriver launched
 
 	@BeforeClass
 	static void beforeClass() {
@@ -50,31 +46,31 @@ class ChromeDriverFactoryTest {
 
 	@Before
 	void setup() {
-		driver = null
+		launched = null
 	}
 
 	@After
 	void tearDown() {
-		if (driver != null) {
-			driver.quit()
-			driver = null
+		if (launched != null) {
+			launched.getDriver().quit()
+			launched = null
 		}
 	}
 
 	@Test
 	void test_newChromeDriver_no_default_settings() {
 		ChromeDriverFactory cdFactory = ChromeDriverFactory.newChromeDriverFactory(false)
-		driver = cdFactory.newChromeDriver()
-		assertNotNull(driver)
-		DesiredCapabilities dc = cdFactory.getEmployedDesiredCapabilities()
-		assertNotNull(dc)
-		String dcJson = cdFactory.getEmployedDesiredCapabilitiesAsJSON()
-		println("DesiredCapabilities is\n${dcJson}")
+		launched = cdFactory.newChromeDriver()
+		assertNotNull(launched)
+		launched.getEmployedDesiredCapabilitiesAsJSON().ifPresent({ json ->
+			println("DesiredCapabilities is\n${json}")
+		})
 		//
-		driver.navigate().to('http://example.com/')
+		launched.getDriver().navigate().to('http://example.com/')
 		//
-		def jsonObject = new JsonSlurper().parseText(dcJson)
-		/* in case "with default setting" you will see
+		launched.getEmployedDesiredCapabilitiesAsJSON().ifPresent({ String dcJson ->
+			def jsonObject = new JsonSlurper().parseText(dcJson)
+			/* in case "with default setting" you will see
 		DesiredCapabilities is
 		{
 			"acceptSslCerts": true,
@@ -84,9 +80,10 @@ class ChromeDriverFactoryTest {
 						"window-size=1024,768",
 						...
 		 */
-		assertFalse("window-size option should not be there when no default setting",
-				jsonObject["goog:chromeOptions"]["args"].contains("window-size=1024,768")
-		)
+			assertFalse("window-size option should not be there when no default setting",
+					jsonObject["goog:chromeOptions"]["args"].contains("window-size=1024,768")
+			)
+		})
 	}
 
 	/**
@@ -97,22 +94,21 @@ class ChromeDriverFactoryTest {
 	@Test
 	void test_newChromeDriver_noUserProfileSpecified() {
 		ChromeDriverFactory cdFactory = ChromeDriverFactory.newChromeDriverFactory()
-		driver = cdFactory.newChromeDriver()
-		assertNotNull(driver)
-		DesiredCapabilities dc = cdFactory.getEmployedDesiredCapabilities()
-		assertNotNull(dc)
-		String dcJson = cdFactory.getEmployedDesiredCapabilitiesAsJSON()
-		println("DesiredCapabilities is\n${dcJson}")
+		launched = cdFactory.newChromeDriver()
+		assertNotNull(launched)
+		launched.getEmployedDesiredCapabilitiesAsJSON().ifPresent({ json ->
+			println("DesiredCapabilities is\n${json}")
+		})
 		//
-		driver.navigate().to('http://example.com/')
+		launched.getDriver().navigate().to('http://example.com/')
 	}
 
 	@Test
 	void test_enableChromeDriverLog() {
 		ChromeDriverFactory cdFactory = ChromeDriverFactory.newChromeDriverFactory()
 		cdFactory.enableChromeDriverLog(outputFolder)
-		driver = cdFactory.newChromeDriver()
-		assertNotNull(driver)
+		launched = cdFactory.newChromeDriver()
+		assertNotNull(launched)
 		Path logFile = outputFolder.resolve(ChromeDriverUtils.LOG_FILE_NAME)
 		assertTrue(Files.exists(logFile))
 		assertTrue(logFile.size() > 0)
@@ -125,52 +121,37 @@ class ChromeDriverFactoryTest {
 	@Test
 	void test_newChromeDriver_byUserProfile_TOGO() {
 		ChromeDriverFactory cdFactory = ChromeDriverFactory.newChromeDriverFactory()
-		driver = cdFactory.newChromeDriver(
+		launched = cdFactory.newChromeDriver(
 				new UserProfile('Picasso'),
 				UserDataAccess.TO_GO)
-		assertNotNull(driver)
+		assertNotNull(launched)
 
 		// check if the user-data-dir/ProfileDireName/Cookie file is properly copied
 		// from the genuine one into the temporary directory
-		if (driver.userProfile.isPresent()) {
-			driver.userProfile.ifPresent({ ChromeUserProfile chromeUserProfile ->
-				Path originalCookieFile = ChromeProfileUtils.getDefaultUserDataDir()
-						.resolve(chromeUserProfile.getProfileDirectoryName().toString())
-						.resolve("Cookies")
-				Path clonedCookieFile = chromeUserProfile.getProfileDirectory().resolve("Cookies")
-				boolean identical = filesAreIdentical(originalCookieFile, clonedCookieFile)
-				assert identical: "${clonedCookieFile} (size=${clonedCookieFile.size()}) is not identical "+
-						"to ${originalCookieFile} (size=${originalCookieFile.size()})"
-			})
-		} else {
-			throw new IllegalStateException("driver.userProfile is empty")
-		}
-
-		//
-		DesiredCapabilities dc = cdFactory.getEmployedDesiredCapabilities()
-		assertNotNull(dc)
-		String dcJson = cdFactory.getEmployedDesiredCapabilitiesAsJSON()
-		//println("DesiredCapabilities is\n${dcJson}")
+		launched.getChromeUserProfile().ifPresent({ ChromeUserProfile chromeUserProfile ->
+			Path originalCookieFile = ChromeProfileUtils.getDefaultUserDataDir()
+					.resolve(chromeUserProfile.getProfileDirectoryName().toString())
+					.resolve("Cookies")
+			Path clonedCookieFile = chromeUserProfile.getProfileDirectory().resolve("Cookies")
+			boolean identical = filesAreIdentical(originalCookieFile, clonedCookieFile)
+			assert identical: "${clonedCookieFile} (size=${clonedCookieFile.size()}) is not identical "+
+					"to ${originalCookieFile} (size=${originalCookieFile.size()})"
+		})
 
 		//println("ChromeDriver has been instantiated with profile Picasso")
-		driver.navigate().to('http://example.com/')
+		launched.getDriver().navigate().to('http://example.com/')
 	}
 
 	@Test
 	void test_newChromeDriver_byProfileDirectoryName_TO_GO() {
 		ChromeDriverFactory cdFactory = ChromeDriverFactory.newChromeDriverFactory()
-		driver = cdFactory.newChromeDriver(
+		launched = cdFactory.newChromeDriver(
 				new ProfileDirectoryName('Profile 1'),
 				UserDataAccess.TO_GO)  // or 'Default'
-		assertNotNull(driver)
-
-		DesiredCapabilities dc = cdFactory.getEmployedDesiredCapabilities()
-		assertNotNull(dc)
-		String dcJson = cdFactory.getEmployedDesiredCapabilitiesAsJSON()
-		//println("DesiredCapabilities is\n${dcJson}")
+		assertNotNull(launched)
 
 		//println("ChromeDriver has been instantiated with profile directory Default")
-		driver.navigate().to('http://example.com/')
+		launched.getDriver().navigate().to('http://example.com/')
 	}
 
 
@@ -180,18 +161,13 @@ class ChromeDriverFactoryTest {
 	@Test
 	void test_newChromeDriver_byProfileDirectoryName_FOR_HERE() {
 		ChromeDriverFactory cdFactory = ChromeDriverFactory.newChromeDriverFactory()
-		driver = cdFactory.newChromeDriver(
+		launched = cdFactory.newChromeDriver(
 				new ProfileDirectoryName('Profile 1'),
 				UserDataAccess.FOR_HERE)
-		assertNotNull(driver)
-
-		DesiredCapabilities dc = cdFactory.getEmployedDesiredCapabilities()
-		assertNotNull(dc)
-		String dcJson = cdFactory.getEmployedDesiredCapabilitiesAsJSON()
-		//println("DesiredCapabilities is\n${dcJson}")
+		assertNotNull(launched)
 
 		//println("ChromeDriver has been instantiated with profile directory Default")
-		driver.navigate().to('http://example.com/')
+		launched.getDriver().navigate().to('http://example.com/')
 	}
 
 
@@ -208,17 +184,12 @@ class ChromeDriverFactoryTest {
 	@Test
 	void test_newChromeDriver_withUserProfile_FOR_HERE() {
 		ChromeDriverFactory cdFactory = ChromeDriverFactory.newChromeDriverFactory()
-		driver = cdFactory.newChromeDriver(
+		launched = cdFactory.newChromeDriver(
 				new UserProfile('Picasso'),
 				UserDataAccess.FOR_HERE)
-		assertNotNull(driver)
+		assertNotNull(launched)
 
-		DesiredCapabilities dc = cdFactory.getEmployedDesiredCapabilities()
-		assertNotNull(dc)
-		String dcJson = cdFactory.getEmployedDesiredCapabilitiesAsJSON()
-		//println("DesiredCapabilities is\n${dcJson}")
-
-		driver.navigate().to('http://example.com/')
+		launched.getDriver().navigate().to('http://example.com/')
 	}
 
 	/**
@@ -238,19 +209,19 @@ class ChromeDriverFactoryTest {
 		//
 		String url = 'http://localhost/'
 		// 1st session
-		driver = cdFactory.newChromeDriver(new UserProfile('Picasso'))
-		driver.navigate().to(url)
-		Set<Cookie> cookies = driver.manage().getCookies()
+		launched = cdFactory.newChromeDriver(new UserProfile('Picasso'))
+		launched.getDriver().navigate().to(url)
+		Set<Cookie> cookies = launched.getDriver().manage().getCookies()
 		println "1st session: " + cookies
-		String phpsessid1st = driver.manage().getCookieNamed('timestamp')
-		driver.quit()
+		String phpsessid1st = launched.getDriver().manage().getCookieNamed('timestamp')
+		launched.quit()
 
 		// 2nd session
-		driver = cdFactory.newChromeDriver(new UserProfile('Picasso'))
-		driver.navigate().to(url)
-		cookies = driver.manage().getCookies()
+		launched = cdFactory.newChromeDriver(new UserProfile('Picasso'))
+		launched.getDriver().navigate().to(url)
+		cookies = launched.getDriver().manage().getCookies()
 		println "2nd session: " + cookies
-		String phpsessid2nd = driver.manage().getCookieNamed('timestamp')
+		String phpsessid2nd = launched.getDriver().manage().getCookieNamed('timestamp')
 		//
 		assert phpsessid1st == phpsessid2nd
 	}
@@ -261,44 +232,45 @@ class ChromeDriverFactoryTest {
 		//
 		cdFactory.addChromeOptionsModifier(ChromeOptionsModifiers.incognito())
 		//
-		driver = cdFactory.newChromeDriver()
-		assertNotNull(driver)
-		DesiredCapabilities dc = cdFactory.getEmployedDesiredCapabilities()
-		assertNotNull(dc)
-		String dcJson = cdFactory.getEmployedDesiredCapabilitiesAsJSON()
-		println("DesiredCapabilities is\n${dcJson}")
-		driver.navigate().to('http://example.com/')
+		launched = cdFactory.newChromeDriver()
+		assertNotNull(launched)
+		launched.getEmployedDesiredCapabilitiesAsJSON().ifPresent({ json ->
+			println("DesiredCapabilities is\n${json}")
+		})
+		launched.getDriver().navigate().to('http://example.com/')
 		//
-		def jo = new JsonSlurper().parseText(dcJson)
-		/*
-		DesiredCapabilities is
-		{
-			"acceptSslCerts": true,
-			"browserName": "chrome",
-			"goog:chromeOptions": {
-				"args": [
-						"--incognito",
-						...
-		 */
-		assertTrue(jo["goog:chromeOptions"]["args"].contains("--incognito"))
+		launched.getEmployedDesiredCapabilitiesAsJSON().ifPresent({ String dcJson ->
+			def jo = new JsonSlurper().parseText(dcJson)
+			/*
+            {
+                "acceptSslCerts": true,
+                "browserName": "chrome",
+                "goog:chromeOptions": {
+                    "args": [
+                            "--incognito",
+                            ...
+             */
+			assertTrue(jo["goog:chromeOptions"]["args"].contains("--incognito"))
+		})
+
 	}
 
 	@Test
 	void test_ChromeDriver_metadata_empty() {
 		ChromeDriverFactory cdFactory = ChromeDriverFactory.newChromeDriverFactory()
-		driver = cdFactory.newChromeDriver()
-		assertEquals(Optional.empty(), driver.userProfile)
-		assertEquals(Optional.empty(), driver.userDataAccess)
+		launched = cdFactory.newChromeDriver()
+		assertEquals(Optional.empty(), launched.getChromeUserProfile())
+		assertEquals(Optional.empty(), launched.getInstruction())
 	}
 
 	@Test
 	void test_ChromeDriver_metadata() {
 		ChromeDriverFactory cdFactory = ChromeDriverFactory.newChromeDriverFactory()
-		driver = cdFactory.newChromeDriver(new ProfileDirectoryName('Default'))
-		assertNotNull(driver)
-		assertTrue(driver.userProfile.isPresent())
-		assertTrue(driver.userDataAccess.isPresent())
-		driver.userProfile.ifPresent({ ChromeUserProfile up ->
+		launched = cdFactory.newChromeDriver(new ProfileDirectoryName('Default'))
+		assertNotNull(launched)
+		assertTrue(launched.getChromeUserProfile().isPresent())
+		assertTrue(launched.getInstruction().isPresent())
+		launched.getChromeUserProfile().ifPresent({ ChromeUserProfile up ->
 			println up
 			assertEquals(new UserProfile("Kazuaki"), up.getUserProfile())
 			assertEquals(new ProfileDirectoryName("Default"), up.getProfileDirectoryName())
@@ -317,15 +289,15 @@ class ChromeDriverFactoryTest {
 		// open Chrome as default
 		LocalDateTime before = LocalDateTime.now()
 		ChromeDriverFactory cdFactory = ChromeDriverFactory.newChromeDriverFactory()
-		driver = cdFactory.newChromeDriver()
+		launched = cdFactory.newChromeDriver()
 		LocalDateTime after = LocalDateTime.now()
 		m1.recordDuration(["Case": "no specialization"], before, after)
-		driver.quit()
+		launched.getDriver().quit()
 
 		// open Chrome with ProfileDirectoryName
 		before = LocalDateTime.now()
 		cdFactory = ChromeDriverFactory.newChromeDriverFactory()
-		driver = cdFactory.newChromeDriver(new ProfileDirectoryName('Profile 1'))
+		launched = cdFactory.newChromeDriver(new ProfileDirectoryName('Profile 1'))
 		after = LocalDateTime.now()
 		m1.recordDuration(["Case": "with ProfileDirectoryName"], before, after)
 		// report
@@ -343,9 +315,9 @@ class ChromeDriverFactoryTest {
 	void test_waitForPageLoad_works() {
 		ChromeDriverFactory cdFactory = ChromeDriverFactory.newChromeDriverFactory()
 		cdFactory.pageLoadTimeout(10)
-		driver = cdFactory.newChromeDriver()
-		assertNotNull(driver)
-		driver.navigate().to("http://example.com")
+		launched = cdFactory.newChromeDriver()
+		assertNotNull(launched)
+		launched.getDriver().navigate().to("http://example.com")
 	}
 
 
@@ -368,7 +340,7 @@ class ChromeDriverFactoryTest {
 		md.update(Files.readAllBytes(file1))
 		byte[] digest1 = md.digest()
 		md.update(Files.readAllBytes(file2))
-		byte[] digest2 = md.digest();
+		byte[] digest2 = md.digest()
 		if (digest1.length == digest2.length) {
 			boolean result = true
 			for (int i = 0; i < digest1.length; i++) {

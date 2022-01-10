@@ -1,7 +1,8 @@
-package examples
+package com.kazurayam.webdriverfactory.chrome
 
 import com.kazurayam.webdriverfactory.UserProfile
 import com.kazurayam.webdriverfactory.chrome.ChromeDriverFactory
+import com.kazurayam.webdriverfactory.chrome.LaunchedChromeDriver
 import com.kazurayam.webdriverfactory.chrome.ProfileDirectoryName
 import io.github.bonigarcia.wdm.WebDriverManager
 import org.junit.BeforeClass
@@ -52,33 +53,33 @@ class CarryingCookieOverSessionsViaProfile {
     void test_carrying_cookie_over_sessions_via_profile() {
         //ChromeDriverFactory factory = ChromeDriverFactory.newHeadlessChromeDriverFactory()
         ChromeDriverFactory factory = ChromeDriverFactory.newChromeDriverFactory()
-        ChromeDriver browser
+        LaunchedChromeDriver launched
 
         // 1st session
-        browser = factory.newChromeDriver(new UserProfile("Picasso"),
+        launched = factory.newChromeDriver(new UserProfile("Picasso"),
                 ChromeDriverFactory.UserDataAccess.FOR_HERE)
-        Cookie timestamp1 = observeCookie(browser)
-        browser.quit()   // at .quit(), the Cookies will be stored into disk
+        Cookie timestamp1 = observeCookie(launched)
+        launched.getDriver().quit()   // at .quit(), the Cookies will be stored into disk
 
         // 2nd session
-        browser = factory.newChromeDriver(new UserProfile("Picasso"),  // or new ProfileDirectoryName("Profile 6")
+        launched = factory.newChromeDriver(new UserProfile("Picasso"),  // or new ProfileDirectoryName("Profile 6")
                 ChromeDriverFactory.UserDataAccess.TO_GO)  // the Cookies file will be copied into the temp dir
-        Cookie timestamp2 = observeCookie(browser)
-        browser.quit()
+        Cookie timestamp2 = observeCookie(launched)
+        launched.getDriver().quit()
         //
         assertEquals(timestamp1.getValue(), timestamp2.getValue())
         assertNotEquals(timestamp1.getExpiry(), timestamp2.getExpiry())
     }
 
-    private Cookie observeCookie(ChromeDriver browser, String cookieName = "timestamp") {
-        browser.desiredCapabilities.ifPresent({ dc ->
+    private Cookie observeCookie(LaunchedChromeDriver launched, String cookieName = "timestamp") {
+        launched.getEmployedDesiredCapabilities()ifPresent({ dc ->
             println "DesiredCapabilities => " + dc.toString() })
-        browser.userProfile.ifPresent({ up ->
+        launched.getChromeUserProfile().ifPresent({ up ->
             println "userProfile => " + up.toString() })
-        browser.userDataAccess.ifPresent({ uda ->
+        launched.getInstruction().ifPresent({ uda ->
             println "userDataAccess => " + uda.toString() })
         println "-------------------------------------------------"
-        DevTools devTool = browser.getDevTools()
+        DevTools devTool = launched.getDriver().getDevTools()
         devTool.createSession()
         devTool.send(Network.enable(Optional.empty(), Optional.empty(), Optional.empty()))
         // setting up the Network event listeners
@@ -120,11 +121,11 @@ class CarryingCookieOverSessionsViaProfile {
         //
         URL url = new URL("http://127.0.0.1")
         try {
-            browser.navigate().to(url.toString())
+            launched.getDriver().navigate().to(url.toString())
         } catch (Exception e) {
             throw new Exception("Possibly the URL ${url.toString()} is down. Start it up by executing \"./starup-server.sh\"", e)
         }
-        Cookie timestamp = browser.manage().getCookieNamed(cookieName)
+        Cookie timestamp = launched.getDriver().manage().getCookieNamed(cookieName)
         return timestamp
     }
 

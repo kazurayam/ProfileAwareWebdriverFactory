@@ -2,33 +2,33 @@ package examples
 
 import com.kazurayam.webdriverfactory.UserProfile
 import com.kazurayam.webdriverfactory.chrome.ChromeDriverFactory
+import com.kazurayam.webdriverfactory.chrome.LaunchedChromeDriver
 import io.github.bonigarcia.wdm.WebDriverManager
 import org.junit.After
 import org.junit.Before
 import org.junit.BeforeClass
 import org.junit.Ignore
 import org.junit.Test
-import org.openqa.selenium.chrome.ChromeDriver
 
 class LaunchChromeWithUserProfile {
 
-    ChromeDriver browser
+    LaunchedChromeDriver launched
 
     @Test
     void test_launch_browser_with_profile() {
         ChromeDriverFactory factory = ChromeDriverFactory.newChromeDriverFactory()
-        browser = factory.newChromeDriver(new UserProfile("Picasso"))
-        browser.navigate().to("http://example.com")
+        launched = factory.newChromeDriver(new UserProfile("Picasso"))
+        launched.getDriver().navigate().to("http://example.com")
         Thread.sleep(1000)
     }
 
     @Test
     void test_launch_browser_with_profile_TO_GO() {
         ChromeDriverFactory factory = ChromeDriverFactory.newChromeDriverFactory()
-        browser = factory.newChromeDriver(
+        launched = factory.newChromeDriver(
                 new UserProfile("Picasso"),
                 ChromeDriverFactory.UserDataAccess.TO_GO)
-        browser.navigate().to("http://example.com")
+        launched.getDriver().navigate().to("http://example.com")
         Thread.sleep(1000)
     }
 
@@ -36,10 +36,10 @@ class LaunchChromeWithUserProfile {
     @Test
     void test_launch_browser_with_profile_FOR_HERE() {
         ChromeDriverFactory factory = ChromeDriverFactory.newChromeDriverFactory()
-        browser = factory.newChromeDriver(
+        launched = factory.newChromeDriver(
                 new UserProfile("Picasso"),
                 ChromeDriverFactory.UserDataAccess.FOR_HERE)
-        browser.navigate().to("http://example.com")
+        launched.getDriver().navigate().to("http://example.com")
         Thread.sleep(1000)
     }
 
@@ -51,14 +51,14 @@ class LaunchChromeWithUserProfile {
 
     @Before
     void setUp() {
-        browser = null
+        launched = null
     }
 
     @After
     void tearDown() {
-        if (browser != null) {
-            browser.quit()
-            browser = null
+        if (launched != null) {
+            launched.getDriver().quit()
+            launched = null
         }
     }
 

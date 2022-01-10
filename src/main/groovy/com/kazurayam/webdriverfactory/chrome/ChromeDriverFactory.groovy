@@ -1,9 +1,9 @@
 package com.kazurayam.webdriverfactory.chrome
 
 import com.kazurayam.webdriverfactory.UserProfile
-import org.openqa.selenium.WebDriver
-import org.openqa.selenium.chrome.ChromeDriver
-import org.openqa.selenium.remote.DesiredCapabilities
+//import org.openqa.selenium.WebDriver
+//import org.openqa.selenium.chrome.ChromeDriver
+//import org.openqa.selenium.remote.DesiredCapabilities
 
 import com.kazurayam.webdriverfactory.desiredcapabilities.DesiredCapabilitiesModifier
 
@@ -51,19 +51,15 @@ abstract class ChromeDriverFactory {
 
 	abstract void pageLoadTimeout(Integer waitSeconds)
 
-	abstract ChromeDriver newChromeDriver()
+	abstract LaunchedChromeDriver newChromeDriver()
 
-	abstract ChromeDriver newChromeDriver(UserProfile userProfile)
+	abstract LaunchedChromeDriver newChromeDriver(UserProfile userProfile)
 
-	abstract ChromeDriver newChromeDriver(UserProfile userProfile, UserDataAccess instruction)
+	abstract LaunchedChromeDriver newChromeDriver(UserProfile userProfile, UserDataAccess instruction)
 
-	abstract ChromeDriver newChromeDriver(ProfileDirectoryName profileDirectoryName)
+	abstract LaunchedChromeDriver newChromeDriver(ProfileDirectoryName profileDirectoryName)
 
-	abstract ChromeDriver newChromeDriver(ProfileDirectoryName profileDirectoryName, UserDataAccess instruction)
-
-	abstract DesiredCapabilities getEmployedDesiredCapabilities()
-
-	abstract String getEmployedDesiredCapabilitiesAsJSON()
+	abstract LaunchedChromeDriver newChromeDriver(ProfileDirectoryName profileDirectoryName, UserDataAccess instruction)
 
 	abstract void enableChromeDriverLog(Path outputDirectory)
 

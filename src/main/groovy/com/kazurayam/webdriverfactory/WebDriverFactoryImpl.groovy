@@ -5,6 +5,7 @@ import com.kazurayam.webdriverfactory.chrome.ChromeDriverFactory.UserDataAccess
 import com.kazurayam.webdriverfactory.chrome.ChromeOptionsModifier
 import com.kazurayam.webdriverfactory.chrome.ChromeOptionsModifiers
 import com.kazurayam.webdriverfactory.chrome.ChromePreferencesModifier
+import com.kazurayam.webdriverfactory.chrome.LaunchedChromeDriver
 import com.kazurayam.webdriverfactory.desiredcapabilities.DesiredCapabilitiesModifier
 import org.openqa.selenium.WebDriver
 
@@ -42,13 +43,14 @@ class WebDriverFactoryImpl implements WebDriverFactory {
 			cdf.addAllChromePreferencesModifiers(this.chromePreferencesModifierList)
 			cdf.addAllChromeOptionsModifiers(this.chromeOptionsModifierList)
 			cdf.addAllDesiredCapabilitiesModifiers(this.desiredCapabilitiesModifierList)
-			WebDriver driver
+			LaunchedChromeDriver launched
 			if (this.userProfile == UserProfile.NULL) {
-				driver = cdf.newChromeDriver()
+				launched = cdf.newChromeDriver()
 			} else {
-				driver = cdf.newChromeDriver(this.userProfile)
+				launched = cdf.newChromeDriver(this.userProfile)
 			}
-			this.employedDesiredCapabilities = cdf.getEmployedDesiredCapabilitiesAsJSON()
+			WebDriver driver = launched.getDriver()
+			this.employedDesiredCapabilities = launched.getEmployedDesiredCapabilitiesAsJSON()
 			return driver
 		} else {
 			throw new RuntimeException("DriverTypeName ${driverTypeName} is not supported")

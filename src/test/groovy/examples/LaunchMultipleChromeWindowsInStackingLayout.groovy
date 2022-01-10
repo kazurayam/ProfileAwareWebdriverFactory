@@ -4,6 +4,7 @@ import com.kazurayam.browserwindowlayout.BrowserWindowLayoutManager
 import com.kazurayam.browserwindowlayout.StackingWindowLayoutMetrics
 import com.kazurayam.webdriverfactory.UserProfile
 import com.kazurayam.webdriverfactory.chrome.ChromeDriverFactory
+import com.kazurayam.webdriverfactory.chrome.LaunchedChromeDriver
 import io.github.bonigarcia.wdm.WebDriverManager
 import org.junit.BeforeClass
 import org.junit.Test
@@ -21,19 +22,19 @@ class LaunchMultipleChromeWindowsInStackingLayout {
                         .disposition(new Point(400, 200))
                         .build()
         ChromeDriverFactory factory = ChromeDriverFactory.newChromeDriverFactory()
-        ChromeDriver browser0 = factory.newChromeDriver(new UserProfile("Picasso"))
-        BrowserWindowLayoutManager.layout(browser0,
+        LaunchedChromeDriver launched0 = factory.newChromeDriver(new UserProfile("Picasso"))
+        BrowserWindowLayoutManager.layout(launched0.getDriver(),
                 layoutMetrics.getWindowPosition(0),
                 layoutMetrics.getWindowDimension(0))
-        ChromeDriver browser1 = factory.newChromeDriver(new UserProfile("Gogh"))
-        BrowserWindowLayoutManager.layout(browser1,
+        LaunchedChromeDriver launched1 = factory.newChromeDriver(new UserProfile("Gogh"))
+        BrowserWindowLayoutManager.layout(launched1.getDriver(),
                 layoutMetrics.getWindowPosition(1),
                 layoutMetrics.getWindowDimension(1))
-        browser0.navigate().to("https://en.wikipedia.org/wiki/Pablo_Picasso")
-        browser1.navigate().to("https://en.wikipedia.org/wiki/Vincent_van_Gogh")
+        launched0.getDriver().navigate().to("https://en.wikipedia.org/wiki/Pablo_Picasso")
+        launched1.getDriver().navigate().to("https://en.wikipedia.org/wiki/Vincent_van_Gogh")
         Thread.sleep(1000)
-        browser0.quit()
-        browser1.quit()
+        launched0.getDriver().quit()
+        launched1.getDriver().quit()
     }
 
     @BeforeClass

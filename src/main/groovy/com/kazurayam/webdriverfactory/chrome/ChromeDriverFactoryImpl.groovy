@@ -30,7 +30,6 @@ class ChromeDriverFactoryImpl extends ChromeDriverFactory {
 	private final Set<ChromeOptionsModifier> chromeOptionsModifiers
 	private final Set<DesiredCapabilitiesModifier> desiredCapabilitiesModifiers
 
-	private DesiredCapabilities desiredCapabilities
 	private Integer pageLoadTimeoutSeconds
 
 	ChromeDriverFactoryImpl() {
@@ -41,11 +40,10 @@ class ChromeDriverFactoryImpl extends ChromeDriverFactory {
 		this.chromePreferencesModifiers = new HashSet<>()
 		this.chromeOptionsModifiers = new HashSet<>()
 		this.desiredCapabilitiesModifiers = new HashSet<>()
-		desiredCapabilities = new DesiredCapabilities()
 		if (requireDefaultSettings) {
 			this.prepareDefaultSettings()
 		}
-		pageLoadTimeoutSeconds = 30   // perform implicit wait for 30 seconds
+		pageLoadTimeoutSeconds = 60   // wait for page load for 60 seconds as default
 	}
 
 	private void prepareDefaultSettings() {
@@ -57,7 +55,7 @@ class ChromeDriverFactoryImpl extends ChromeDriverFactory {
 		this.addChromeOptionsModifier(ChromeOptionsModifiers.noSandbox())
 		//this.addChromeOptionsModifier(ChromeOptionsModifiers.singleProcess())
 		this.addChromeOptionsModifier(ChromeOptionsModifiers.disableInfobars())
-		//this.addChromeOptionsModifier(ChromeOptionsModifiers.disableExtensions())
+		this.addChromeOptionsModifier(ChromeOptionsModifiers.disableExtensions())
 		this.addChromeOptionsModifier(ChromeOptionsModifiers.disableGpu())
 		this.addChromeOptionsModifier(ChromeOptionsModifiers.disableDevShmUsage())
 		//
@@ -114,25 +112,6 @@ class ChromeDriverFactoryImpl extends ChromeDriverFactory {
 	}
 
 
-	/**
-	 * returns the DesiredCapability object employed when the factory instantiated ChromeDriver by calling execute().
-	 * If you call this before calling execute(), null will be returned.
-	 */
-	@Override
-	DesiredCapabilities getEmployedDesiredCapabilities() {
-		return this.desiredCapabilities
-	}
-
-	@Override
-	String getEmployedDesiredCapabilitiesAsJSON() {
-		// dynamically override the toJSON() method of the Selenium's built-in class
-		// so that it print in JSON pretty format
-		DesiredCapabilities.metaClass.toJSON = {
-			return JsonOutput.prettyPrint(JsonOutput.toJson(delegate.asMap()))
-		}
-		return this.getEmployedDesiredCapabilities().toJSON()
-	}
-
 	@Override
 	void pageLoadTimeout(Integer waitSeconds) {
 		Objects.requireNonNull(waitSeconds)
@@ -154,25 +133,25 @@ class ChromeDriverFactoryImpl extends ChromeDriverFactory {
 	}
 
 	@Override
-	ChromeDriver newChromeDriver() {
-		this.desiredCapabilities = buildDesiredCapabilities(
+	LaunchedChromeDriver newChromeDriver() {
+		DesiredCapabilities dc = buildDesiredCapabilities(
 				this.chromePreferencesModifiers,
 				this.chromeOptionsModifiers,
 				this.desiredCapabilitiesModifiers
 		)
-		ChromeDriver driver = new ChromeDriver(this.desiredCapabilities)
+		ChromeDriver driver = new ChromeDriver(dc)
 		setPageLoadTimeout(driver, this.pageLoadTimeoutSeconds)
-		driver.metaClass.userProfile = Optional.empty()
-		driver.metaClass.userDataAccess = Optional.empty()
-		driver.metaClass.desiredCapabilities = Optional.of (this.employedDesiredCapabilitiesAsJSON)
-		return driver
+		LaunchedChromeDriver launched =
+				new LaunchedChromeDriver(driver)
+						.setEmployedDesiredCapabilities(dc)
+		return launched
 	}
 
 	/**
 	 *
 	 */
 	@Override
-	ChromeDriver newChromeDriver(UserProfile userProfile) {
+	LaunchedChromeDriver newChromeDriver(UserProfile userProfile) {
 		return newChromeDriver(userProfile, UserDataAccess.TO_GO)
 	}
 
@@ -199,7 +178,7 @@ class ChromeDriverFactoryImpl extends ChromeDriverFactory {
 	 * @return a ChromeDriver object; Chrome browser will be opened.
 	 */
 	@Override
-	ChromeDriver newChromeDriver(UserProfile userProfile, UserDataAccess instruction) {
+	LaunchedChromeDriver newChromeDriver(UserProfile userProfile, UserDataAccess instruction) {
 		Objects.requireNonNull(userProfile, "userProfile must not be null")
 		Objects.requireNonNull(instruction, "instruction must not be null")
 		ChromeUserProfile chromeUserProfile = ChromeProfileUtils.findChromeUserProfile(userProfile)
@@ -214,7 +193,7 @@ class ChromeDriverFactoryImpl extends ChromeDriverFactory {
 	}
 
 	@Override
-	ChromeDriver newChromeDriver(ProfileDirectoryName profileDirectoryName) {
+	LaunchedChromeDriver newChromeDriver(ProfileDirectoryName profileDirectoryName) {
 		return this.newChromeDriver(profileDirectoryName, UserDataAccess.TO_GO)
 	}
 
@@ -225,7 +204,7 @@ class ChromeDriverFactoryImpl extends ChromeDriverFactory {
 	 * @return
 	 */
 	@Override
-	ChromeDriver newChromeDriver(ProfileDirectoryName profileDirectoryName, UserDataAccess instruction) {
+	LaunchedChromeDriver newChromeDriver(ProfileDirectoryName profileDirectoryName, UserDataAccess instruction) {
 		Objects.requireNonNull(profileDirectoryName, "profileDirectoryName must not be null")
 		Objects.requireNonNull(instruction, "instruction must not be null")
 		Path userDataDir = ChromeProfileUtils.getDefaultUserDataDir()
@@ -259,7 +238,7 @@ class ChromeDriverFactoryImpl extends ChromeDriverFactory {
 	 * @param instruction
 	 * @return
 	 */
-	private ChromeDriver launchChrome(Path userDataDir,
+	private LaunchedChromeDriver launchChrome(Path userDataDir,
 									  ProfileDirectoryName profileDirectoryName,
 									  UserDataAccess instruction) {
 		Objects.requireNonNull(userDataDir)
@@ -293,20 +272,19 @@ class ChromeDriverFactoryImpl extends ChromeDriverFactory {
 		// launch the Chrome driver
 		ChromeDriver driver = null
 		try {
-			this.desiredCapabilities = buildDesiredCapabilities(
+			DesiredCapabilities dc = buildDesiredCapabilities(
 					this.chromePreferencesModifiers,
 					this.chromeOptionsModifiers,
 					this.desiredCapabilitiesModifiers
 			)
-			driver = new ChromeDriver(this.desiredCapabilities)
+			driver = new ChromeDriver(dc)
 			setPageLoadTimeout(driver, this.pageLoadTimeoutSeconds)
-			//
 			ChromeUserProfile cup = new ChromeUserProfile(targetUserDataDir, profileDirectoryName)
-			driver.metaClass.userProfile = Optional.of(cup)
-			driver.metaClass.userDataAccess = Optional.of(instruction)
-			driver.metaClass.desiredCapabilities = Optional.of (this.employedDesiredCapabilitiesAsJSON)
-			//
-			return driver
+			LaunchedChromeDriver launched = new LaunchedChromeDriver(driver)
+					.setChromeUserProfile(cup)
+					.setInstruction(instruction)
+					.setEmployedDesiredCapabilities(dc)
+			return launched
 		} catch (InvalidArgumentException iae) {
 			if (driver != null) {
 				driver.quit()

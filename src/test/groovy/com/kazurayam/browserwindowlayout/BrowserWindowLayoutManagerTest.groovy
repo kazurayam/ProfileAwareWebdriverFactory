@@ -1,43 +1,44 @@
 package com.kazurayam.browserwindowlayout
 
 import com.kazurayam.webdriverfactory.WebDriverFactory
+import com.kazurayam.webdriverfactory.chrome.ChromeDriverFactory
+import com.kazurayam.webdriverfactory.chrome.LaunchedChromeDriver
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
-import org.openqa.selenium.WebDriver
 
 @RunWith(JUnit4.class)
 class BrowserWindowLayoutManagerTest {
 
     TilingWindowLayoutMetrics tilingLayout
     StackingWindowLayoutMetrics stackingLayout
-    WebDriver driver
+    LaunchedChromeDriver launched
 
     @Before
     void setup() {
         tilingLayout = new TilingWindowLayoutMetrics.Builder(4).build()
         stackingLayout = new StackingWindowLayoutMetrics.Builder(3).build()
-        WebDriverFactory factory = new WebDriverFactory.Builder().build()   // will use Chrome driver as default
-        driver = factory.newWebDriver()
+        ChromeDriverFactory factory = ChromeDriverFactory.newChromeDriverFactory()
+        launched = factory.newChromeDriver()
     }
 
     @After
     void teardown() {
-        if (driver != null) {
-            driver.quit()
-            driver = null
+        if (launched != null) {
+            launched.getDriver().quit()
+            launched = null
         }
     }
 
     @Test
     void test_tiling() {
         String url = "http://example.com/"
-        driver.navigate().to(url)
+        launched.getDriver().navigate().to(url)
         for (int index in 0..<tilingLayout.getSize()) {
             BrowserWindowLayoutManager.layout(
-                    driver,
+                    launched.getDriver(),
                     tilingLayout.getWindowPosition(index),
                     tilingLayout.getWindowDimension(index)
             )
@@ -47,10 +48,10 @@ class BrowserWindowLayoutManagerTest {
     @Test
     void test_stacking() {
         String url = "http://example.com/"
-        driver.navigate().to(url)
+        launched.getDriver().navigate().to(url)
         for (int index in 0..<stackingLayout.getSize()) {
             BrowserWindowLayoutManager.layout(
-                    driver,
+                    launched.getDriver(),
                     stackingLayout.getWindowPosition(index),
                     stackingLayout.getWindowDimension(index)
             )
