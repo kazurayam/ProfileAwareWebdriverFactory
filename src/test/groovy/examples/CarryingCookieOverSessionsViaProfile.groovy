@@ -26,6 +26,9 @@ import java.time.format.DateTimeFormatter
 class CarryingCookieOverSessionsViaProfile {
 
     /**
+     * This code requires the URL "http://127.0.0.1" is up and running.
+     * To make it up, execute "> ./startup-server.sh".
+     *
      * This code will open Chrome browser and navigate to the URL "http://127.0.0.1" twice.
      * The http server will send a cookie named "timestamp" with value of
      * 1. if the HTTP Request has no "timestamp" cookie, will create a new cookie with current timestamp
@@ -47,18 +50,19 @@ class CarryingCookieOverSessionsViaProfile {
      */
     @Test
     void test_carrying_cookie_over_sessions_via_profile() {
-        ChromeDriverFactory factory = ChromeDriverFactory.newHeadlessChromeDriverFactory()
+        //ChromeDriverFactory factory = ChromeDriverFactory.newHeadlessChromeDriverFactory()
+        ChromeDriverFactory factory = ChromeDriverFactory.newChromeDriverFactory()
         ChromeDriver browser
 
         // 1st session
         browser = factory.newChromeDriver(new UserProfile("Picasso"),
                 ChromeDriverFactory.UserDataAccess.FOR_HERE)
         Cookie timestamp1 = observeCookie(browser)
-        browser.quit()
+        browser.quit()   // at .quit(), the Cookies will be stored into disk
 
         // 2nd session
-        browser = factory.newChromeDriver(new ProfileDirectoryName("Profile 6"),
-                ChromeDriverFactory.UserDataAccess.TO_GO)
+        browser = factory.newChromeDriver(new UserProfile("Picasso"),  // or new ProfileDirectoryName("Profile 6")
+                ChromeDriverFactory.UserDataAccess.TO_GO)  // the Cookies file will be copied into the temp dir
         Cookie timestamp2 = observeCookie(browser)
         browser.quit()
         //
