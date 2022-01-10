@@ -28,7 +28,7 @@ class ChromeDriverFactoryImpl extends ChromeDriverFactory {
 
 	private final Set<ChromePreferencesModifier> chromePreferencesModifiers
 	private final Set<ChromeOptionsModifier> chromeOptionsModifiers
-	private final List<DesiredCapabilitiesModifier> desiredCapabilitiesModifiers
+	private final Set<DesiredCapabilitiesModifier> desiredCapabilitiesModifiers
 
 	private DesiredCapabilities desiredCapabilities
 	private Integer pageLoadTimeoutSeconds
@@ -40,7 +40,7 @@ class ChromeDriverFactoryImpl extends ChromeDriverFactory {
 	ChromeDriverFactoryImpl(boolean requireDefaultSettings) {
 		this.chromePreferencesModifiers = new HashSet<>()
 		this.chromeOptionsModifiers = new HashSet<>()
-		this.desiredCapabilitiesModifiers = new ArrayList<>()
+		this.desiredCapabilitiesModifiers = new HashSet<>()
 		desiredCapabilities = new DesiredCapabilities()
 		if (requireDefaultSettings) {
 			this.prepareDefaultSettings()
@@ -98,8 +98,12 @@ class ChromeDriverFactoryImpl extends ChromeDriverFactory {
 	}
 
 	@Override
-	void addDesiredCapabilitiesModifier(DesiredCapabilitiesModifier desiredCapabilitiesModifier) {
-		this.desiredCapabilitiesModifiers.add(desiredCapabilitiesModifier)
+	void addDesiredCapabilitiesModifier(DesiredCapabilitiesModifier dcm) {
+		if (this.desiredCapabilitiesModifiers.contains(dcm)) {
+			// The late comer wins
+			this.desiredCapabilitiesModifiers.remove(dcm)
+		}
+		this.desiredCapabilitiesModifiers.add(dcm)
 	}
 
 	@Override
@@ -327,7 +331,7 @@ class ChromeDriverFactoryImpl extends ChromeDriverFactory {
 	private DesiredCapabilities buildDesiredCapabilities(
 			Set<ChromePreferencesModifier> chromePreferencesModifiers,
 			Set<ChromeOptionsModifier> chromeOptionsModifiers,
-			List<DesiredCapabilitiesModifier> desiredCapabilitiesModifiers
+			Set<DesiredCapabilitiesModifier> desiredCapabilitiesModifiers
 	) {
 		// create a Chrome Preferences object as the seed
 		Map<String, Object> preferences = new HashMap<>()
@@ -354,7 +358,8 @@ class ChromeDriverFactoryImpl extends ChromeDriverFactory {
 	}
 
 	static Map<String, Object> applyChromePreferencesModifiers(
-			Map<String, Object> chromePreferences, Set<ChromePreferencesModifier> modifiers) {
+			Map<String, Object> chromePreferences,
+			Set<ChromePreferencesModifier> modifiers) {
 		Map<String, Object> cp = chromePreferences
 		for (ChromePreferencesModifier cpm in modifiers) {
 			cp = cpm.modify(cp)
@@ -363,7 +368,8 @@ class ChromeDriverFactoryImpl extends ChromeDriverFactory {
 	}
 
 	static ChromeOptions applyChromeOptionsModifiers(
-			ChromeOptions chromeOptions, Set<ChromeOptionsModifier> modifiers) {
+			ChromeOptions chromeOptions,
+			Set<ChromeOptionsModifier> modifiers) {
 		ChromeOptions cp = chromeOptions
 		for (ChromeOptionsModifier com in modifiers) {
 			cp = com.modify(cp)
@@ -372,7 +378,8 @@ class ChromeDriverFactoryImpl extends ChromeDriverFactory {
 	}
 
 	static DesiredCapabilities applyDesiredCapabilitiesModifiers(
-			DesiredCapabilities desiredCapabilities, List<DesiredCapabilitiesModifier> modifiers) {
+			DesiredCapabilities desiredCapabilities,
+			Set<DesiredCapabilitiesModifier> modifiers) {
 		DesiredCapabilities dc = desiredCapabilities
 		for (DesiredCapabilitiesModifier dcm in modifiers) {
 			dc = dcm.modify(dc)
