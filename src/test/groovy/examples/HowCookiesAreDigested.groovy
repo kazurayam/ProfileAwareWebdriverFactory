@@ -45,7 +45,6 @@ class HowCookiesAreDigested {
         browser = null
     }
 
-    /*
     @After
     void tearDown() {
         if (browser != null) {
@@ -53,6 +52,5 @@ class HowCookiesAreDigested {
             browser = null
         }
     }
-     */
 
 }
