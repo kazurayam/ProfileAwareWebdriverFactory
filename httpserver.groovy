@@ -95,7 +95,7 @@ class Handler implements HttpHandler {
       long maxAgeSeconds = 60L;
       boolean foundTimestamp = false
       for (String cookie in cookies) {
-        values.add(cookie + "; Max-Age=" + maxAgeSeconds);
+        values.add(cookie + "; max-age=" + maxAgeSeconds);
         if (cookie.startsWith("timestamp")) {
           foundTimestamp = true
         }

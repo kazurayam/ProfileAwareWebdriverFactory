@@ -88,50 +88,39 @@ class CarryingCookieOverSessionsViaProfile {
         Optional<ResponseReceivedExtraInfo> responseReceivedExtraInfo = Optional.empty()
         devTool.addListener(
                 Network.requestWillBeSent(),
-                { rs ->
-                    requestWillBeSent = Optional.of(rs)
+                { reqSent ->
+                    println "Request URL => ${reqSent.getRequest().getUrl()}"
+                    println "Request Method => ${reqSent.getRequest().getMethod()}"
+                    println "Request Headers => ${stringifyHeaders(reqSent.getRequest().getHeaders())}"
+                    println "-------------------------------------------------"
                 })
         devTool.addListener(
                 Network.requestWillBeSentExtraInfo(),
-                {rsExtraInfo ->
-                    requestWillBeSentExtraInfo = Optional.of(rsExtraInfo)
+                { reqSentExtraInfo ->
+                    println "RequestExtraInfo Headers => ${stringifyHeaders(reqSentExtraInfo.getHeaders())}"
+                    println "-------------------------------------------------"
                 }
         )
         devTool.addListener(
                 Network.responseReceived(),
-                {resReceived ->
-                    responseReceived = Optional.of(resReceived)
+                { resReceived ->
+                    println "Response URL => ${resReceived.getResponse().getUrl()}"
+                    println "Response Status => ${resReceived.getResponse().getStatus()}"
+                    println "Response Headers => ${stringifyHeaders(resReceived.getResponse().getHeaders())}"
+                    println "Response MIME Type => ${resReceived.getResponse().getMimeType().toString()}"
+                    println "-------------------------------------------------"
                 })
         devTool.addListener(
                 Network.responseReceivedExtraInfo(),
-                {resReceivedExtraInfo ->
-                    responseReceivedExtraInfo = Optional.of(resReceivedExtraInfo)
+                { resReceivedExtraInfo ->
+                    println "ResponseExtraInfo Headers => ${stringifyHeaders(resReceivedExtraInfo.getHeaders())}"
+                    println "-------------------------------------------------"
                 }
         )
+        //
         URL url = new URL("http://127.0.0.1")
         try {
             browser.navigate().to(url.toString())
-            requestWillBeSent.ifPresent({ reqSent ->
-                println "Request URL => ${reqSent.getRequest().getUrl()}"
-                println "Request Method => ${reqSent.getRequest().getMethod()}"
-                println "Request Headers => ${stringifyHeaders(reqSent.getRequest().getHeaders())}"
-                println "-------------------------------------------------"
-            })
-            requestWillBeSentExtraInfo.ifPresent({ reqSentExtraInfo ->
-                println "RequestExtraInfo Headers => ${stringifyHeaders(reqSentExtraInfo.getHeaders())}"
-                println "-------------------------------------------------"
-            })
-            responseReceived.ifPresent({ resReceived ->
-                println "Response URL => ${resReceived.getResponse().getUrl()}"
-                println "Response Status => ${resReceived.getResponse().getStatus()}"
-                println "Response Headers => ${stringifyHeaders(resReceived.getResponse().getHeaders())}"
-                println "Response MIME Type => ${resReceived.getResponse().getMimeType().toString()}"
-                println "-------------------------------------------------"
-            })
-            responseReceivedExtraInfo.ifPresent({ resReceivedExtraInfo ->
-                println "ResponseExtraInfo Headers => ${stringifyHeaders(resReceivedExtraInfo.getHeaders())}"
-                println "-------------------------------------------------"
-            })
         } catch (Exception e) {
             throw new Exception("Possibly the URL ${url.toString()} is down. Start it up by executing \"./starup-server.sh\"", e)
         }
@@ -139,7 +128,7 @@ class CarryingCookieOverSessionsViaProfile {
         return timestamp
     }
 
-    private String stringifyHeaders(Headers headers) {
+    private static String stringifyHeaders(Headers headers) {
         String json = JsonOutput.toJson(headers.delegate())
         String pp = JsonOutput.prettyPrint(json)
         return pp
@@ -149,7 +138,7 @@ class CarryingCookieOverSessionsViaProfile {
     /**
      * @returns "timestamp=Sat, 08 Jan 2022 05:13:04 GMT; expires=Sat, 08 Jan 2022 05:13:34 GMT; path=/; domain=127.0.0.1"
      */
-    private String stringifyCookie(Cookie cookie) {
+    private static String stringifyCookie(Cookie cookie) {
         StringBuilder sb = new StringBuilder()
         sb.append(cookie.getName())
         sb.append("=")
@@ -164,7 +153,7 @@ class CarryingCookieOverSessionsViaProfile {
         return sb.toString()
     }
 
-    private String formatDateInRFC7231(Date date) {
+    private static String formatDateInRFC7231(Date date) {
         ZoneId zid = ZoneId.systemDefault()
         ZonedDateTime zdt = ZonedDateTime.ofInstant(date.toInstant(), zid)
         String formatted = rfc7231.format(zdt)
