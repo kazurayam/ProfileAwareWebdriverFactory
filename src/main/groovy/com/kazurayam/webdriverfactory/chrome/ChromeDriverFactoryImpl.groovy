@@ -2,9 +2,7 @@ package com.kazurayam.webdriverfactory.chrome
 
 import com.kazurayam.webdriverfactory.UserProfile
 import com.kazurayam.webdriverfactory.WebDriverFactoryException
-import com.kazurayam.webdriverfactory.desiredcapabilities.DesiredCapabilitiesModifier
-import com.kazurayam.webdriverfactory.desiredcapabilities.DesiredCapabilitiesModifiers
-import com.kazurayam.webdriverfactory.desiredcapabilities.DesiredCapabilitiesBuilderImpl
+
 import com.kazurayam.webdriverfactory.utils.PathUtils
 import org.openqa.selenium.InvalidArgumentException
 
@@ -13,11 +11,8 @@ import java.nio.file.Path
 
 import org.openqa.selenium.chrome.ChromeDriver
 import org.openqa.selenium.chrome.ChromeOptions
-import org.openqa.selenium.remote.DesiredCapabilities
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
-
-import groovy.json.JsonOutput
 
 import java.time.Duration
 import java.util.concurrent.TimeUnit
@@ -28,7 +23,6 @@ class ChromeDriverFactoryImpl extends ChromeDriverFactory {
 
 	private final Set<ChromePreferencesModifier> chromePreferencesModifiers
 	private final Set<ChromeOptionsModifier> chromeOptionsModifiers
-	private final Set<DesiredCapabilitiesModifier> desiredCapabilitiesModifiers
 
 	private Integer pageLoadTimeoutSeconds
 
@@ -39,7 +33,6 @@ class ChromeDriverFactoryImpl extends ChromeDriverFactory {
 	ChromeDriverFactoryImpl(boolean requireDefaultSettings) {
 		this.chromePreferencesModifiers = new HashSet<>()
 		this.chromeOptionsModifiers = new HashSet<>()
-		this.desiredCapabilitiesModifiers = new HashSet<>()
 		if (requireDefaultSettings) {
 			this.prepareDefaultSettings()
 		}
@@ -58,8 +51,6 @@ class ChromeDriverFactoryImpl extends ChromeDriverFactory {
 		this.addChromeOptionsModifier(ChromeOptionsModifiers.disableExtensions())
 		this.addChromeOptionsModifier(ChromeOptionsModifiers.disableGpu())
 		this.addChromeOptionsModifier(ChromeOptionsModifiers.disableDevShmUsage())
-		//
-		this.addDesiredCapabilitiesModifier(DesiredCapabilitiesModifiers.passThrough())
 	}
 
 	@Override
@@ -96,23 +87,6 @@ class ChromeDriverFactoryImpl extends ChromeDriverFactory {
 	}
 
 	@Override
-	void addDesiredCapabilitiesModifier(DesiredCapabilitiesModifier dcm) {
-		if (this.desiredCapabilitiesModifiers.contains(dcm)) {
-			// The late comer wins
-			this.desiredCapabilitiesModifiers.remove(dcm)
-		}
-		this.desiredCapabilitiesModifiers.add(dcm)
-	}
-
-	@Override
-	void addAllDesiredCapabilitiesModifiers(List<DesiredCapabilitiesModifier> list) {
-		list.each ({ DesiredCapabilitiesModifier dcm ->
-			this.desiredCapabilitiesModifiers.add(dcm)
-		})
-	}
-
-
-	@Override
 	void pageLoadTimeout(Integer waitSeconds) {
 		Objects.requireNonNull(waitSeconds)
 		if (waitSeconds <= 0) {
@@ -134,16 +108,14 @@ class ChromeDriverFactoryImpl extends ChromeDriverFactory {
 
 	@Override
 	LaunchedChromeDriver newChromeDriver() {
-		DesiredCapabilities dc = buildDesiredCapabilities(
+		ChromeOptions options = buildOptions(
 				this.chromePreferencesModifiers,
-				this.chromeOptionsModifiers,
-				this.desiredCapabilitiesModifiers
+				this.chromeOptionsModifiers
 		)
-		ChromeDriver driver = new ChromeDriver(dc)
+		ChromeDriver driver = new ChromeDriver(options)
 		setPageLoadTimeout(driver, this.pageLoadTimeoutSeconds)
 		LaunchedChromeDriver launched =
-				new LaunchedChromeDriver(driver)
-						.setEmployedDesiredCapabilities(dc)
+				new LaunchedChromeDriver(driver).setEmployedOptions(options)
 		return launched
 	}
 
@@ -272,18 +244,17 @@ class ChromeDriverFactoryImpl extends ChromeDriverFactory {
 		// launch the Chrome driver
 		ChromeDriver driver = null
 		try {
-			DesiredCapabilities dc = buildDesiredCapabilities(
+			ChromeOptions options = buildOptions(
 					this.chromePreferencesModifiers,
-					this.chromeOptionsModifiers,
-					this.desiredCapabilitiesModifiers
+					this.chromeOptionsModifiers
 			)
-			driver = new ChromeDriver(dc)
+			driver = new ChromeDriver(options)
 			setPageLoadTimeout(driver, this.pageLoadTimeoutSeconds)
 			ChromeUserProfile cup = new ChromeUserProfile(targetUserDataDir, profileDirectoryName)
 			LaunchedChromeDriver launched = new LaunchedChromeDriver(driver)
 					.setChromeUserProfile(cup)
 					.setInstruction(instruction)
-					.setEmployedDesiredCapabilities(dc)
+					.setEmployedOptions(options)
 			return launched
 		} catch (InvalidArgumentException iae) {
 			if (driver != null) {
@@ -303,14 +274,13 @@ class ChromeDriverFactoryImpl extends ChromeDriverFactory {
 	/**
 	 * Create an instance of Chrome Driver with configuration
 	 * setup through the chain of
-	 *     Chrome Preferences => Chrome Options => Desired Capabilities
+	 *     Chrome Preferences => Chrome Options
 	 * while modifying each containers with specified Modifiers
 	 */
-	private DesiredCapabilities buildDesiredCapabilities(
+	private ChromeOptions buildOptions(
 			Set<ChromePreferencesModifier> chromePreferencesModifiers,
-			Set<ChromeOptionsModifier> chromeOptionsModifiers,
-			Set<DesiredCapabilitiesModifier> desiredCapabilitiesModifiers
-	) {
+			Set<ChromeOptionsModifier> chromeOptionsModifiers)
+	{
 		// create a Chrome Preferences object as the seed
 		Map<String, Object> preferences = new HashMap<>()
 
@@ -325,14 +295,7 @@ class ChromeDriverFactoryImpl extends ChromeDriverFactory {
 		chromeOptions = applyChromeOptionsModifiers(chromeOptions,
 				chromeOptionsModifiers)
 
-		// create Desired Capabilities taking over settings in the Chrome Options
-		DesiredCapabilities desiredCapabilities =
-				new DesiredCapabilitiesBuilderImpl().build(chromeOptions)
-		// modify the Desired Capabilities
-		desiredCapabilities = applyDesiredCapabilitiesModifiers(desiredCapabilities,
-				desiredCapabilitiesModifiers)
-
-		return desiredCapabilities
+		return chromeOptions
 	}
 
 	static Map<String, Object> applyChromePreferencesModifiers(
@@ -354,15 +317,4 @@ class ChromeDriverFactoryImpl extends ChromeDriverFactory {
 		}
 		return cp
 	}
-
-	static DesiredCapabilities applyDesiredCapabilitiesModifiers(
-			DesiredCapabilities desiredCapabilities,
-			Set<DesiredCapabilitiesModifier> modifiers) {
-		DesiredCapabilities dc = desiredCapabilities
-		for (DesiredCapabilitiesModifier dcm in modifiers) {
-			dc = dcm.modify(dc)
-		}
-		return dc
-	}
-
 }

@@ -1,13 +1,11 @@
 package com.kazurayam.webdriverfactory.chrome
 
-import com.kazurayam.webdriverfactory.desiredcapabilities.DesiredCapabilitiesBuilder
+
 import io.github.bonigarcia.wdm.WebDriverManager
 import org.junit.After
 import org.junit.BeforeClass
 import org.junit.Test
 import org.openqa.selenium.chrome.ChromeDriver
-import org.openqa.selenium.chrome.ChromeOptions
-import org.openqa.selenium.remote.DesiredCapabilities
 import org.openqa.selenium.chrome.ChromeOptions
 
 import java.nio.file.Files
@@ -46,10 +44,6 @@ class LaunchedChromeDriverTest {
                 ChromeProfileUtils.findChromeUserProfileByProfileDirectoryName(
                         new ProfileDirectoryName("Default")
                 )
-        /* the following lines does not compile with Selenium 4
-        DesiredCapabilities desiredCapabilities =
-        DesiredCapabilitiesBuilder.build(new ChromeOptions())
-         */
         launched.setChromeUserProfile(chromeUserProfile)
                 .setInstruction(ChromeDriverFactory.UserDataAccess.TO_GO)
         //
@@ -61,21 +55,21 @@ class LaunchedChromeDriverTest {
                 { ChromeDriverFactory.UserDataAccess instruction ->
                     println "UserDataAccess => " + instruction.toString()
                 })
-        launched.getEmployedDesiredCapabilities().ifPresent(
-                { DesiredCapabilities dc ->
-                    println "DesiredCapabilities => " + dc.toString()
+        launched.getEmployedOptions().ifPresent(
+                { ChromeOptions options ->
+                    println "options => " + options.toString()
                 })
     }
 
     @Test
-    void test_getEmployedDesiredCapabilities() {
+    void test_getEmployedOptions() {
         ChromeDriverFactory factory = ChromeDriverFactory.newHeadlessChromeDriverFactory()
         factory.addChromeOptionsModifier(ChromeOptionsModifiers.incognito())
         LaunchedChromeDriver launched = factory.newChromeDriver()
-        launched.getEmployedDesiredCapabilities().ifPresent { DesiredCapabilities dc ->
-            //println dc
+        launched.getEmployedOptions().ifPresent { ChromeOptions options ->
+            println options
         }
-        launched.getEmployedDesiredCapabilitiesAsJSON().ifPresent { String json ->
+        launched.getEmployedOptionsAsJSON().ifPresent { String json ->
             println json
             assert json.contains("incognito")
         }

@@ -62,16 +62,15 @@ class ChromeDriverFactoryTest {
 		ChromeDriverFactory cdFactory = ChromeDriverFactory.newChromeDriverFactory(false)
 		launched = cdFactory.newChromeDriver()
 		assertNotNull(launched)
-		launched.getEmployedDesiredCapabilitiesAsJSON().ifPresent({ json ->
-			println("DesiredCapabilities is\n${json}")
+		launched.getEmployedOptionsAsJSON().ifPresent({ json ->
+			println("options is\n${json}")
 		})
 		//
 		launched.getDriver().navigate().to('http://example.com/')
 		//
-		launched.getEmployedDesiredCapabilitiesAsJSON().ifPresent({ String dcJson ->
-			def jsonObject = new JsonSlurper().parseText(dcJson)
+		launched.getEmployedOptionsAsJSON().ifPresent({ String json ->
+			def jsonObject = new JsonSlurper().parseText(json)
 			/* in case "with default setting" you will see
-		DesiredCapabilities is
 		{
 			"acceptSslCerts": true,
 			"browserName": "chrome",
@@ -96,8 +95,8 @@ class ChromeDriverFactoryTest {
 		ChromeDriverFactory cdFactory = ChromeDriverFactory.newChromeDriverFactory()
 		launched = cdFactory.newChromeDriver()
 		assertNotNull(launched)
-		launched.getEmployedDesiredCapabilitiesAsJSON().ifPresent({ json ->
-			println("DesiredCapabilities is\n${json}")
+		launched.getEmployedOptionsAsJSON().ifPresent({ json ->
+			println("options is\n${json}")
 		})
 		//
 		launched.getDriver().navigate().to('http://example.com/')
@@ -234,21 +233,41 @@ class ChromeDriverFactoryTest {
 		//
 		launched = cdFactory.newChromeDriver()
 		assertNotNull(launched)
-		launched.getEmployedDesiredCapabilitiesAsJSON().ifPresent({ json ->
-			println("DesiredCapabilities is\n${json}")
+		launched.getEmployedOptionsAsJSON().ifPresent({ json ->
+			println("options is\n${json}")
 		})
 		launched.getDriver().navigate().to('http://example.com/')
 		//
-		launched.getEmployedDesiredCapabilitiesAsJSON().ifPresent({ String dcJson ->
-			def jo = new JsonSlurper().parseText(dcJson)
+		launched.getEmployedOptionsAsJSON().ifPresent({ String json ->
+			println json
+			def jo = new JsonSlurper().parseText(json)
 			/*
             {
-                "acceptSslCerts": true,
-                "browserName": "chrome",
-                "goog:chromeOptions": {
-                    "args": [
-                            "--incognito",
-                            ...
+    "browserName": "chrome",
+    "goog:chromeOptions": {
+        "args": [
+            "disable-infobars",
+            "disable-dev-shm-usage",
+            "disableExtensions",
+            "--no-sandbox",
+            "disable-gpu",
+            "window-size=1024,768",
+            "--incognito"
+        ],
+        "extensions": [
+
+        ],
+        "prefs": {
+            "plugins.plugins_disabled": [
+                "Adobe Flash Player",
+                "Chrome PDF Viewer"
+            ],
+            "profile.default_content_settings.popups": 0,
+            "download.prompt_for_download": false,
+            "download.default_directory": "/Users/kazuakiurayama/Downloads"
+        }
+    }
+}
              */
 			assertTrue(jo["goog:chromeOptions"]["args"].contains("--incognito"))
 		})

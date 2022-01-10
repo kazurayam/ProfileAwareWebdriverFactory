@@ -5,13 +5,10 @@ import java.nio.file.Paths
 
 import org.openqa.selenium.firefox.FirefoxDriver
 import org.openqa.selenium.firefox.FirefoxOptions
-import org.openqa.selenium.remote.DesiredCapabilities
 import org.openqa.selenium.WebDriver
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
-import com.kazurayam.webdriverfactory.desiredcapabilities.DesiredCapabilitiesModifier
-import com.kazurayam.webdriverfactory.desiredcapabilities.DesiredCapabilitiesBuilderImpl
 
 import groovy.json.JsonOutput
 
@@ -19,24 +16,14 @@ class FirefoxDriverFactoryImpl extends FirefoxDriverFactory {
 
 	static Logger logger_ = LoggerFactory.getLogger(FirefoxDriverFactoryImpl.class)
 
-	static {
-		// dynamically add toJsonText() method to the built-in classes
-		DesiredCapabilities.metaClass.toString = {
-			return JsonOutput.prettyPrint(JsonOutput.toJson(delegate.asMap()))
-		}
-	}
-
 	private final List<FirefoxPreferencesModifier> firefoxPreferencesModifiers_
 	private final List<FirefoxOptionsModifier> firefoxOptionsModifiers_
-	private final List<DesiredCapabilitiesModifier> desiredCapabilitiesModifiers_
 
-	private DesiredCapabilities desiredCapabilities_
+	private FirefoxOptions employedOptions_
 
 	FirefoxDriverFactoryImpl() {
 		firefoxPreferencesModifiers_  = new ArrayList<>();
 		firefoxOptionsModifiers_      = new ArrayList<>();
-		desiredCapabilitiesModifiers_ = new ArrayList<>();
-		desiredCapabilities_ = null;
 	}
 
 	@Override
@@ -47,11 +34,6 @@ class FirefoxDriverFactoryImpl extends FirefoxDriverFactory {
 	@Override
 	void addFirefoxOptionsModifier(FirefoxOptionsModifier firefoxOptionsModifier) {
 		firefoxOptionsModifiers_.add(firefoxOptionsModifier)
-	}
-
-	@Override
-	void addDesiredCapabilitiesModifier(DesiredCapabilitiesModifier desiredCapabilitiesModifier) {
-		desiredCapabilitiesModifiers_.add(desiredCapabilitiesModifier)
 	}
 
 	/**
@@ -68,7 +50,7 @@ class FirefoxDriverFactoryImpl extends FirefoxDriverFactory {
 	/**
 	 * Create an instance of Gecko Driver with configuration
 	 * setup through the chain of
-	 *     Firefox Prefereces => Firefox Options => Desired Capabilities
+	 *     Firefox Prefereces => Firefox Options
 	 * while modifying each containers with specified Modifiers
 	 */
 	private WebDriver execute() {
@@ -87,15 +69,8 @@ class FirefoxDriverFactoryImpl extends FirefoxDriverFactory {
 			firefoxOptions = modifier.modify(firefoxOptions)
 		}
 
-		// create Desired Capabilities taking over settings in the Chrome Options
-		desiredCapabilities_ = new DesiredCapabilitiesBuilderImpl().build(firefoxOptions)
-		// modify the Desired Capabilities
-		for (DesiredCapabilitiesModifier dcm in desiredCapabilitiesModifiers_) {
-			desiredCapabilities_ = dcm.modify(desiredCapabilities_)
-		}
-
 		// now launch the browser
-		WebDriver driver = new FirefoxDriver(desiredCapabilities_)
+		WebDriver driver = new FirefoxDriver(firefoxOptions)
 
 		// well done
 		return driver
@@ -116,12 +91,13 @@ class FirefoxDriverFactoryImpl extends FirefoxDriverFactory {
 	}
 
 	/**
-	 * returns the DesiredCapabilitiy object employed when the factory instantiated ChromeDriver by calling execute().
+	 * returns the FirefoxOptions object employed
+	 * when the factory instantiated FirefoxDriver by calling execute().
 	 * If you call this before calling execute(), null will be returned.
 	 */
 	@Override
-	DesiredCapabilities getEmployedDesiredCapabilities() {
-		return this.desiredCapabilities_
+	FirefoxOptions getEmployedOptions() {
+		return this.employedOptions
 	}
 
 }

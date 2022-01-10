@@ -6,7 +6,7 @@ import com.kazurayam.webdriverfactory.chrome.ChromeOptionsModifier
 import com.kazurayam.webdriverfactory.chrome.ChromeOptionsModifiers
 import com.kazurayam.webdriverfactory.chrome.ChromePreferencesModifier
 import com.kazurayam.webdriverfactory.chrome.LaunchedChromeDriver
-import com.kazurayam.webdriverfactory.desiredcapabilities.DesiredCapabilitiesModifier
+
 import org.openqa.selenium.WebDriver
 
 
@@ -17,10 +17,9 @@ class WebDriverFactoryImpl implements WebDriverFactory {
 	private UserDataAccess userDataAccess
 	private List<ChromePreferencesModifier> chromePreferencesModifierList
 	private List<ChromeOptionsModifier> chromeOptionsModifierList
-	private List<DesiredCapabilitiesModifier> desiredCapabilitiesModifierList
 	private boolean requireDefaultSettings
 
-	private String employedDesiredCapabilities
+	private String employedOptions
 
 	private WebDriverFactoryImpl(WebDriverFactory.Builder builder) {
 		this.driverTypeName = builder.driverTypeName
@@ -28,9 +27,8 @@ class WebDriverFactoryImpl implements WebDriverFactory {
 		this.userDataAccess = builder.userDataAccess
 		this.chromePreferencesModifierList = builder.chromePreferencesModifierList
 		this.chromeOptionsModifierList = builder.chromeOptionsModifierList
-		this.desiredCapabilitiesModifierList = builder.desiredCapabilitiesModifierList
 		this.requireDefaultSettings = builder.requireDefaultSettings
-		this.employedDesiredCapabilities = ""
+		this.employedOptions = ""
 	}
 
 	WebDriver newWebDriver() {
@@ -42,7 +40,6 @@ class WebDriverFactoryImpl implements WebDriverFactory {
 			}
 			cdf.addAllChromePreferencesModifiers(this.chromePreferencesModifierList)
 			cdf.addAllChromeOptionsModifiers(this.chromeOptionsModifierList)
-			cdf.addAllDesiredCapabilitiesModifiers(this.desiredCapabilitiesModifierList)
 			LaunchedChromeDriver launched
 			if (this.userProfile == UserProfile.NULL) {
 				launched = cdf.newChromeDriver()
@@ -50,15 +47,16 @@ class WebDriverFactoryImpl implements WebDriverFactory {
 				launched = cdf.newChromeDriver(this.userProfile)
 			}
 			WebDriver driver = launched.getDriver()
-			this.employedDesiredCapabilities = launched.getEmployedDesiredCapabilitiesAsJSON()
+			this.employedOptions = launched.getEmployedOptionsAsJSON()
 			return driver
 		} else {
 			throw new RuntimeException("DriverTypeName ${driverTypeName} is not supported")
 		}
 	}
 
-	String getEmployedDesiredCapabilities() {
-		return this.employedDesiredCapabilities
+	@Override
+	String getEmployedOptions() {
+		return this.employedOptions
 	}
 
 }

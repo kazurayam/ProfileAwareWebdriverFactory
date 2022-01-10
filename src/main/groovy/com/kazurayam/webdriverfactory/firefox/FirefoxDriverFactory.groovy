@@ -1,9 +1,7 @@
 package com.kazurayam.webdriverfactory.firefox
 
 import org.openqa.selenium.WebDriver
-import org.openqa.selenium.remote.DesiredCapabilities
-
-import com.kazurayam.webdriverfactory.desiredcapabilities.DesiredCapabilitiesModifier
+import org.openqa.selenium.firefox.FirefoxOptions
 
 abstract class FirefoxDriverFactory {
 
@@ -15,11 +13,9 @@ abstract class FirefoxDriverFactory {
 
 	abstract void addFirefoxOptionsModifier(FirefoxOptionsModifier firefoxOptionsModifier)
 
-	abstract void addDesiredCapabilitiesModifier(DesiredCapabilitiesModifier desiredCapabilityModifier)
-
 	abstract WebDriver newFirefoxDriver()
 
 	abstract WebDriver newFirefoxDriverWithProfile(String userName)
 
-	abstract DesiredCapabilities getEmployedDesiredCapabilities()
+	abstract FirefoxOptions getEmployedOptions()
 }

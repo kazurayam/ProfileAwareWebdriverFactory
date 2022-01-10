@@ -1,11 +1,9 @@
 package com.kazurayam.webdriverfactory
 
-import com.kazurayam.webdriverfactory.chrome.ChromeDriverFactory
 import com.kazurayam.webdriverfactory.chrome.ChromeDriverFactory.UserDataAccess
 import com.kazurayam.webdriverfactory.chrome.ChromeOptionsModifier
-import com.kazurayam.webdriverfactory.chrome.ChromeOptionsModifiers
 import com.kazurayam.webdriverfactory.chrome.ChromePreferencesModifier
-import com.kazurayam.webdriverfactory.desiredcapabilities.DesiredCapabilitiesModifier
+
 import org.openqa.selenium.WebDriver
 
 
@@ -13,7 +11,7 @@ interface WebDriverFactory {
 
 	WebDriver newWebDriver()
 
-	String getEmployedDesiredCapabilities()
+	String getEmployedOptions()
 
 	/**
 	 *
@@ -24,7 +22,6 @@ interface WebDriverFactory {
 		protected UserDataAccess userDataAccess = UserDataAccess.TO_GO
 		protected List<ChromePreferencesModifier> chromePreferencesModifierList = new ArrayList<>()
 		protected List<ChromeOptionsModifier> chromeOptionsModifierList = new ArrayList<>()
-		protected List<DesiredCapabilitiesModifier> desiredCapabilitiesModifierList = new ArrayList<>()
 		protected Boolean requireDefaultSettings = true
 		Builder() {
 			this(DriverTypeName.CHROME_DRIVER)
@@ -50,10 +47,6 @@ interface WebDriverFactory {
 		}
 		Builder addChromeOptionsModifier(ChromeOptionsModifier modifier) {
 			this.chromeOptionsModifierList.add(modifier)
-			return this
-		}
-		Builder addDesiredCapabilitiesModifier(DesiredCapabilitiesModifier modifier) {
-			this.desiredCapabilitiesModifierList.add(modifier)
 			return this
 		}
 		Builder requireDefaultSettings(Boolean requireDefaultSettings) {

@@ -1,6 +1,7 @@
 package com.kazurayam.webdriverfactory.firefox
 
 import org.junit.BeforeClass
+import org.openqa.selenium.firefox.FirefoxOptions
 
 import static org.hamcrest.CoreMatchers.*
 import static org.junit.Assert.*
@@ -8,7 +9,6 @@ import static org.junit.Assert.*
 import org.junit.Ignore
 import org.junit.Test
 import org.openqa.selenium.WebDriver
-import org.openqa.selenium.remote.DesiredCapabilities
 
 import io.github.bonigarcia.wdm.WebDriverManager
 
@@ -39,9 +39,9 @@ class FirefoxDriverFactoryTest {
 		WebDriver driver = factory.newFirefoxDriverWithProfile('Picasso')
 		assertThat(driver, is(notNullValue()))
 
-		DesiredCapabilities dc = factory.getEmployedDesiredCapabilities()
-		assertNotNull(dc)
-		println("DesiredCapabilities: ${dc.toString()}")
+		FirefoxOptions options = factory.getEmployedOptions()
+		assertNotNull(options)
+		println("options: ${options.toString()}")
 
 		println("ChromeDriver has been instantiated with profile Picasso")
 		driver.navigate().to('http://example.com/')

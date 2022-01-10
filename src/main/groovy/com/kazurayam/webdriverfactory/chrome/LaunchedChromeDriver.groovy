@@ -1,7 +1,7 @@
 package com.kazurayam.webdriverfactory.chrome
 
 import org.openqa.selenium.chrome.ChromeDriver
-import org.openqa.selenium.remote.DesiredCapabilities
+import org.openqa.selenium.chrome.ChromeOptions
 import groovy.json.JsonOutput
 
 class LaunchedChromeDriver {
@@ -9,14 +9,14 @@ class LaunchedChromeDriver {
     private final ChromeDriver driver
     private Optional<ChromeUserProfile> chromeUserProfile
     private Optional<ChromeDriverFactory.UserDataAccess> instruction
-    private Optional<DesiredCapabilities> employedDesiredCapabilities
+    private Optional<ChromeOptions> employedOptions
 
     LaunchedChromeDriver(ChromeDriver driver) {
         Objects.requireNonNull(driver)
         this.driver = driver
         this.chromeUserProfile = Optional.empty()
         this.instruction = Optional.empty()
-        this.employedDesiredCapabilities = Optional.empty()
+        this.employedOptions = Optional.empty()
     }
 
     ChromeDriver getDriver() {
@@ -43,22 +43,21 @@ class LaunchedChromeDriver {
         return this.instruction
     }
 
-    LaunchedChromeDriver setEmployedDesiredCapabilities(DesiredCapabilities desiredCapabilities) {
-        Objects.requireNonNull(desiredCapabilities)
-        this.employedDesiredCapabilities = Optional.of(desiredCapabilities)
+    LaunchedChromeDriver setEmployedOptions(ChromeOptions options) {
+        Objects.requireNonNull(options)
+        this.employedOptions = Optional.of(options)
         return this
     }
 
-    Optional<DesiredCapabilities> getEmployedDesiredCapabilities() {
-        return this.employedDesiredCapabilities
+    Optional<ChromeOptions> getEmployedOptions() {
+        return this.employedOptions
     }
 
-    Optional<String> getEmployedDesiredCapabilitiesAsJSON() {
+    Optional<String> getEmployedOptionsAsJSON() {
         String json = ""
-        this.getEmployedDesiredCapabilities().ifPresent(
-                { DesiredCapabilities dc ->
-                    //json = JsonOutput.prettyPrint(JsonOutput.toJson(dc))
-                    json = JsonOutput.prettyPrint(JsonOutput.toJson(dc.toJson()))
+        this.getEmployedOptions().ifPresent(
+                { ChromeOptions options ->
+                    json = JsonOutput.prettyPrint(JsonOutput.toJson(options.toJson()))
                 })
         return Optional.of(json)
     }

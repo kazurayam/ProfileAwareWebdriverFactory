@@ -1,9 +1,6 @@
 package com.kazurayam.webdriverfactory.chrome
 
 import com.kazurayam.webdriverfactory.UserProfile
-import com.kazurayam.webdriverfactory.chrome.ChromeDriverFactory
-import com.kazurayam.webdriverfactory.chrome.LaunchedChromeDriver
-import com.kazurayam.webdriverfactory.chrome.ProfileDirectoryName
 import io.github.bonigarcia.wdm.WebDriverManager
 import org.junit.BeforeClass
 import org.junit.Test
@@ -72,14 +69,15 @@ class CarryingCookieOverSessionsViaProfile {
     }
 
     private Cookie observeCookie(LaunchedChromeDriver launched, String cookieName = "timestamp") {
-        launched.getEmployedDesiredCapabilities()ifPresent({ dc ->
-            println "DesiredCapabilities => " + dc.toString() })
+        launched.getEmployedOptions()ifPresent({ options ->
+            println "options => " + options.toString() })
         launched.getChromeUserProfile().ifPresent({ up ->
             println "userProfile => " + up.toString() })
         launched.getInstruction().ifPresent({ uda ->
             println "userDataAccess => " + uda.toString() })
         println "-------------------------------------------------"
-        DevTools devTool = launched.getDriver().getDevTools()
+        ChromeDriver driver = launched.getDriver()
+        DevTools devTool = driver.getDevTools()
         devTool.createSession()
         devTool.send(Network.enable(Optional.empty(), Optional.empty(), Optional.empty()))
         // setting up the Network event listeners

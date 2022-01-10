@@ -9,21 +9,21 @@ import org.junit.After
 import org.junit.Before
 import org.junit.BeforeClass
 import org.junit.Test
-import org.openqa.selenium.remote.DesiredCapabilities
+import org.openqa.selenium.chrome.ChromeOptions
 
-class PrintEmployedDesiredCapabilities {
+class PrintEmployedOptions {
 
     LaunchedChromeDriver launched
 
     @Test
-    void test_getEmployedDesiredCapabilities() {
+    void test_getEmployedOptions() {
         ChromeDriverFactory factory = ChromeDriverFactory.newHeadlessChromeDriverFactory()
         factory.addChromeOptionsModifier(ChromeOptionsModifiers.incognito())
         launched = factory.newChromeDriver()
-        launched.getEmployedDesiredCapabilities().ifPresent { DesiredCapabilities dc ->
-            println dc
+        launched.getEmployedOptions().ifPresent { ChromeOptions options ->
+            println options
         }
-        launched.getEmployedDesiredCapabilitiesAsJSON().ifPresent { String json ->
+        launched.getEmployedOptionsAsJSON().ifPresent { String json ->
             println json
             assert json.contains("incognito")
         }

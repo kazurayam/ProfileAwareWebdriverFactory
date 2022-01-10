@@ -1,11 +1,6 @@
 package com.kazurayam.webdriverfactory.chrome
 
 import com.kazurayam.webdriverfactory.UserProfile
-//import org.openqa.selenium.WebDriver
-//import org.openqa.selenium.chrome.ChromeDriver
-//import org.openqa.selenium.remote.DesiredCapabilities
-
-import com.kazurayam.webdriverfactory.desiredcapabilities.DesiredCapabilitiesModifier
 
 import java.nio.file.Path
 
@@ -42,12 +37,6 @@ abstract class ChromeDriverFactory {
 
 	abstract void addAllChromeOptionsModifiers(
 			List<ChromeOptionsModifier> chromeOptionsModifierList)
-
-	abstract void addDesiredCapabilitiesModifier(
-			DesiredCapabilitiesModifier desiredCapabilitiesModifier)
-
-	abstract void addAllDesiredCapabilitiesModifiers(
-			List<DesiredCapabilitiesModifier> desiredCapabilitiesModifierList)
 
 	abstract void pageLoadTimeout(Integer waitSeconds)
 

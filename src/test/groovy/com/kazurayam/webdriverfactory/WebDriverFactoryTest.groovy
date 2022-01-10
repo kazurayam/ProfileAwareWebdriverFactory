@@ -43,12 +43,12 @@ class WebDriverFactoryTest {
 	}
 
 	@Test
-	void test_getEmployedDesiredCapabilities() {
+	void test_getEmployedOptions() {
 		WebDriverFactory wdf = new WebDriverFactory.Builder(DriverTypeName.CHROME_DRIVER).build()
 		driver = wdf.newWebDriver()
-		String json = wdf.getEmployedDesiredCapabilities()
-		assertNotNull(json)
-		println json
+		//String json = wdf.getEmployedOptionsAsJSON()
+		//assertNotNull(json)
+		//println json
 	}
 
 	@Test
