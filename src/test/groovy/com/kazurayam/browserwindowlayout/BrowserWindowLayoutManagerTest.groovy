@@ -1,6 +1,5 @@
 package com.kazurayam.browserwindowlayout
 
-import com.kazurayam.webdriverfactory.WebDriverFactory
 import com.kazurayam.webdriverfactory.chrome.ChromeDriverFactory
 import com.kazurayam.webdriverfactory.chrome.LaunchedChromeDriver
 import org.junit.After
