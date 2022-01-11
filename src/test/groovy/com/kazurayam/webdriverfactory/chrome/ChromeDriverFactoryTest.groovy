@@ -4,6 +4,7 @@ import com.kazurayam.timekeeper.Measurement
 import com.kazurayam.timekeeper.Record
 import com.kazurayam.timekeeper.Table
 import com.kazurayam.timekeeper.Timekeeper
+import com.kazurayam.webdriverfactory.ProfileDirectoryName
 import com.kazurayam.webdriverfactory.UserProfile
 import com.kazurayam.webdriverfactory.chrome.ChromeDriverFactory.UserDataAccess
 import org.junit.After

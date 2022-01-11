@@ -1,4 +1,4 @@
-package com.kazurayam.webdriverfactory.chrome
+package com.kazurayam.webdriverfactory
 
 class ProfileDirectoryName implements Comparable<ProfileDirectoryName> {
 

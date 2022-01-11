@@ -150,7 +150,7 @@ Basic case where we launch Chrome browser without profile specified. The example
     package examples
 
     import com.kazurayam.webdriverfactory.chrome.ChromeDriverFactory
-    import com.kazurayam.webdriverfactory.chrome.ProfileDirectoryName
+    import com.kazurayam.webdriverfactory.ProfileDirectoryName
     import io.github.bonigarcia.wdm.WebDriverManager
     import org.junit.After
     import org.junit.Before
@@ -310,7 +310,7 @@ Basic case where we launch Chrome browser without profile specified. The example
     import com.kazurayam.webdriverfactory.UserProfile
     import com.kazurayam.webdriverfactory.chrome.ChromeDriverFactory
     import com.kazurayam.webdriverfactory.chrome.ChromeOptionsModifiers
-    import com.kazurayam.webdriverfactory.chrome.ProfileDirectoryName
+    import com.kazurayam.webdriverfactory.ProfileDirectoryName
     import io.github.bonigarcia.wdm.WebDriverManager
     import org.junit.After
     import org.junit.Before
@@ -393,7 +393,7 @@ This emits:
     import com.kazurayam.webdriverfactory.chrome.ChromeDriverFactory
     import com.kazurayam.webdriverfactory.chrome.ChromeOptionsModifiers
     import com.kazurayam.webdriverfactory.chrome.ChromeUserProfile
-    import com.kazurayam.webdriverfactory.chrome.ProfileDirectoryName
+    import com.kazurayam.webdriverfactory.ProfileDirectoryName
     import io.github.bonigarcia.wdm.WebDriverManager
     import org.junit.After
     import org.junit.Before

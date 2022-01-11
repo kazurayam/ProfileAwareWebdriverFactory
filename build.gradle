@@ -8,7 +8,7 @@ plugins {
 }
 
 group 'com.kazurayam'
-version '0.2.7'
+version '0.2.8-SNAPSHOT'
 
 ext.isReleaseVersion = ! version.endsWith("SNAPSHOT")
 
