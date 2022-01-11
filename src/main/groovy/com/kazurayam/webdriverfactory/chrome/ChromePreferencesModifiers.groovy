@@ -1,16 +1,17 @@
 package com.kazurayam.webdriverfactory.chrome
 
 import com.kazurayam.webdriverfactory.PreferencesModifier
+import com.kazurayam.webdriverfactory.PreferencesModifierBase
 
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
 
-class ChromePreferencesModifiers {
+enum ChromePreferencesModifiers {
 
     static PreferencesModifier downloadWithoutPrompt() {
-        PreferencesModifier pm = new Base(
-                PreferencesModifier.Type.downloadWithoutPrompt,
+        PreferencesModifier pm = new PreferencesModifierBase(
+                PreferencesModifier.Type.CHROME_downloadWithoutPrompt,
                 { Map<String, Object> preferences ->
                     // Below two preference settings will disable popup dialog when download file
                     preferences.put('profile.default_content_settings.popups', 0)
@@ -31,8 +32,8 @@ class ChromePreferencesModifiers {
             println "created ${directory}"
             Files.createDirectories(directory)
         }
-        PreferencesModifier pm = new Base(
-                PreferencesModifier.Type.downloadIntoDirectory,
+        PreferencesModifier pm = new PreferencesModifierBase(
+                PreferencesModifier.Type.CHROME_downloadIntoDirectory,
                 { Map<String, Object> preferences ->
                     preferences.put('download.default_directory', directory.toString())
                     return preferences
@@ -41,8 +42,8 @@ class ChromePreferencesModifiers {
     }
 
     static PreferencesModifier disableViewersOfFlashAndPdf() {
-        PreferencesModifier pm = new Base(
-                PreferencesModifier.Type.disableViewersOfFlashAndPdf,
+        PreferencesModifier pm = new PreferencesModifierBase(
+                PreferencesModifier.Type.CHROME_disableViewersOfFlashAndPdf,
                 { Map<String, Object> preferences ->
                     preferences.put('plugins.plugins_disabled', [
                             'Adobe Flash Player',
@@ -53,26 +54,4 @@ class ChromePreferencesModifiers {
         return pm
     }
 
-    /**
-     *
-     */
-    private static class Base implements PreferencesModifier {
-        private Type type
-        private Closure closure
-        Base(Type type, Closure closure) {
-            this.type = type
-            this.closure = closure
-        }
-        @Override
-        Type getType() {
-            return this.type
-        }
-        @Override
-        Map<String, Object> modify(Map<String, Object> preferences) {
-            Objects.requireNonNull(preferences)
-            return (Map)closure.call(preferences)
-        }
-    }
-
-    private ChromePreferencesModifiers() {}
 }

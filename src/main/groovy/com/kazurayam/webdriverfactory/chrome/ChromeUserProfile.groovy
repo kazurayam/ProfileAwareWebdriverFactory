@@ -16,8 +16,6 @@ import groovy.json.JsonSlurper
  */
 class ChromeUserProfile implements Comparable<ChromeUserProfile> {
 
-	static final String PREFERENCES_FILE_NAME = 'Preferences'
-
 	private final Path userDataDir
 	private final ProfileDirectoryName profileDirectoryName
 
@@ -41,13 +39,7 @@ class ChromeUserProfile implements Comparable<ChromeUserProfile> {
 		this.userDataDir = userDataDir
 		this.profileDirectoryName = profileDirectoryName
 
-		Path preferencesPath = profilePath.resolve(PREFERENCES_FILE_NAME)
-		if (!Files.exists(preferencesPath)) {
-			throw new IOException("${preferencesPath} is not found")
-		}
-		this.preferences = JsonOutput.prettyPrint(preferencesPath.toFile().text)
-
-		Map m = new JsonSlurper().parseText(this.preferences)
+		Map m = new JsonSlurper().parseText(getPreferences())
 		String name = m['profile']['name']
 		this.userProfile = new UserProfile(name)
 		assert this.userProfile != null
@@ -62,15 +54,28 @@ class ChromeUserProfile implements Comparable<ChromeUserProfile> {
 	}
 
 	Path getProfileDirectory() {
-		return this.getUserDataDir().resolve(this.getProfileDirectoryName().getName())
+		return this.getUserDataDir()
+				.resolve(this.getProfileDirectoryName().getName())
 	}
 
 	UserProfile getUserProfile() {
 		return this.userProfile
 	}
 
+	// I want to find out that the Profile directory "Profile 6" is
+	// associated with a Profile "Picasso". But how can I find
+	// the name "Picasso"?
+	// ANS: I need to look into the "Preferences" file
+	// in the user-data-dir
+	private static final String PREFERENCES_FILE_NAME = 'Preferences'
+
 	String getPreferences() {
-		return this.preferences
+		Path profilePath = userDataDir.resolve(profileDirectoryName.toString())
+		Path preferencesPath = profilePath.resolve(PREFERENCES_FILE_NAME)
+		if (!Files.exists(preferencesPath)) {
+			throw new IOException("${preferencesPath} is not found")
+		}
+		return JsonOutput.prettyPrint(preferencesPath.toFile().text)
 	}
 
 	/**

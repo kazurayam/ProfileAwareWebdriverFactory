@@ -108,6 +108,7 @@ class ChromeDriverFactoryImpl extends ChromeDriverFactory {
 		}
 	}
 
+
 	@Override
 	LaunchedChromeDriver newChromeDriver() {
 		ChromeOptions options = buildOptions(
@@ -240,9 +241,9 @@ class ChromeDriverFactoryImpl extends ChromeDriverFactory {
 
 		// use the specified UserProfile with which Chrome browser is launched
 		ChromeOptionsModifier com =
-				ChromeOptionsModifiers.withUserProfile(
+				ChromeOptionsModifiers.withProfileDirectoryName(
 						targetUserDataDir,
-						profileDirectoryName.getName())
+						profileDirectoryName)
 		this.addChromeOptionsModifier(com)
 
 		// launch the Chrome driver

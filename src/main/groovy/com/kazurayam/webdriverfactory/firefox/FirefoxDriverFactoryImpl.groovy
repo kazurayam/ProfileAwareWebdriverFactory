@@ -1,5 +1,7 @@
 package com.kazurayam.webdriverfactory.firefox
 
+import com.kazurayam.webdriverfactory.PreferencesModifier
+import com.kazurayam.webdriverfactory.ProfileDirectoryName
 import com.kazurayam.webdriverfactory.UserProfile
 import com.kazurayam.webdriverfactory.WebDriverFactoryException
 import com.kazurayam.webdriverfactory.utils.PathUtils
@@ -20,7 +22,7 @@ class FirefoxDriverFactoryImpl extends FirefoxDriverFactory {
 
 	static Logger logger_ = LoggerFactory.getLogger(FirefoxDriverFactoryImpl.class)
 
-	private final Set<FirefoxPreferencesModifier> firefoxPreferencesModifiers
+	private final Set<PreferencesModifier> firefoxPreferencesModifiers
 	private final Set<FirefoxOptionsModifier> firefoxOptionsModifiers
 
 	private Integer pageLoadTimeoutSeconds
@@ -46,7 +48,7 @@ class FirefoxDriverFactoryImpl extends FirefoxDriverFactory {
 	}
 
 	@Override
-	void addFirefoxPreferencesModifier(FirefoxPreferencesModifier fpm) {
+	void addFirefoxPreferencesModifier(PreferencesModifier fpm) {
 		if (this.firefoxPreferencesModifiers.contains(fpm)) {
 			// The late comer wins
 			this.firefoxPreferencesModifiers.remove(fpm)
@@ -55,8 +57,8 @@ class FirefoxDriverFactoryImpl extends FirefoxDriverFactory {
 	}
 
 	@Override
-	void addAllFirefoxPreferencesModifier(List<FirefoxPreferencesModifier> list) {
-		list.each({ FirefoxPreferencesModifier fpm ->
+	void addAllFirefoxPreferencesModifier(List<PreferencesModifier> list) {
+		list.each({ PreferencesModifier fpm ->
 			this.firefoxPreferencesModifiers.add(fpm)
 		})
 	}
@@ -98,8 +100,6 @@ class FirefoxDriverFactoryImpl extends FirefoxDriverFactory {
 	}
 
 
-
-
 	@Override
 	LaunchedFirefoxDriver newFirefoxDriver() {
 		FirefoxOptions options = buildOptions(
@@ -119,10 +119,17 @@ class FirefoxDriverFactoryImpl extends FirefoxDriverFactory {
 	}
 
 	@Override
-	LaunchedFirefoxDriver newFirefoxDriver(UserProfile userProfile, UserDataAccess instruction) {
+	LaunchedFirefoxDriver newFirefoxDriver(UserProfile userProfile,
+										   UserDataAccess instruction) {
 		Objects.requireNonNull(userProfile, "userProfile must not be null")
 		Objects.requireNonNull(instruction, "instruction must not be null")
-		FirefoxUserProfile firefoxUserProfile = FirefoxProfileUtils.findFirefoxUserProfile(userProfile)
+		Optional<FirefoxUserProfile> opt =
+				FirefoxProfileUtils.findFirefoxUserProfileOf(userProfile)
+		assert opt.isPresent()
+		FirefoxUserProfile firefoxUserProfile
+		opt.ifPresent({it ->
+			firefoxUserProfile = it
+		})
 		if (firefoxUserProfile == null) {
 			throw new WebDriverFactoryException(
 					"FirefoxUserProfile of \"${userProfile}\" is not found in :" +
@@ -135,11 +142,12 @@ class FirefoxDriverFactoryImpl extends FirefoxDriverFactory {
 
 	@Override
 	LaunchedFirefoxDriver newFirefoxDriver(ProfileDirectoryName profileDirectoryName) {
-		return this.newChromeDriver(profileDirectoryName, UserDataAccess.TO_GO)
+		return this.newFirefoxDriver(profileDirectoryName, UserDataAccess.TO_GO)
 	}
 
 	@Override
-	LaunchedFirefoxDriver newFirefoxDriver(ProfileDirectoryName profileDirectoryName, UserDataAccess instruction) {
+	LaunchedFirefoxDriver newFirefoxDriver(ProfileDirectoryName profileDirectoryName,
+										   UserDataAccess instruction) {
 		Objects.requireNonNull(profileDirectoryName, "profileDirectoryName must not be null")
 		Objects.requireNonNull(instruction, "instruction must not be null")
 		Path userDataDir = FirefoxProfileUtils.getDefaultUserDataDir()
@@ -172,7 +180,7 @@ class FirefoxDriverFactoryImpl extends FirefoxDriverFactory {
 		Path sourceProfileDirectory = userDataDir.resolve(profileDirectoryName.toString())
 		assert Files.exists(sourceProfileDirectory)
 		Path targetUserDataDir = userDataDir
-		if (instruction == FirefoxDriverFactory.UserDataAccess.TO_GO) {
+		if (instruction == UserDataAccess.TO_GO) {
 			targetUserDataDir = Files.createTempDirectory("__user-data-dir__")
 			Path targetProfileDirectory = targetUserDataDir.resolve(profileDirectoryName.getName())
 			PathUtils.copyDirectoryRecursively(
@@ -186,12 +194,12 @@ class FirefoxDriverFactoryImpl extends FirefoxDriverFactory {
 
 		// use the specified UserProfile with which Firefox browser is launched
 		FirefoxOptionsModifier fom =
-				FirefoxOptionsModifiers.withUserProfile(
+				FirefoxOptionsModifiers.withProfileDirectoryName(
 						targetUserDataDir,
-						profileDirectoryName.getName())
+						profileDirectoryName)
 		this.addFirefoxOptionsModifier(fom)
 
-		// launch the Firefix driver
+		// launch the Firefox driver
 		FirefoxDriver driver = null
 		try {
 			FirefoxOptions options = buildOptions(
@@ -203,7 +211,8 @@ class FirefoxDriverFactoryImpl extends FirefoxDriverFactory {
 			FirefoxUserProfile fup = new FirefoxUserProfile(targetUserDataDir, profileDirectoryName)
 			LaunchedFirefoxDriver launched = new LaunchedFirefoxDriver(driver)
 					.setFirefoxUserProfile(fup)
-					.setInstruction(instruction).setEmployedOptions(options)
+					.setInstruction(instruction)
+					.setEmployedOptions(options)
 			return launched
 		} catch (InvalidArgumentException iae) {
 			if (driver != null) {
@@ -221,7 +230,7 @@ class FirefoxDriverFactoryImpl extends FirefoxDriverFactory {
 	}
 
 	private FirefoxOptions buildOptions(
-			Set<FirefoxPreferencesModifier> firefoxPreferencesModifiers,
+			Set<PreferencesModifier> firefoxPreferencesModifiers,
 			Set<FirefoxOptionsModifier> firefoxOptionsModifiers
 	) {
 		Map<String, Object> preferences = new HashMap<>()
@@ -240,9 +249,9 @@ class FirefoxDriverFactoryImpl extends FirefoxDriverFactory {
 
 	static Map<String, Object> applyFirefoxPreferencesModifiers(
 			Map<String, Object> firefoxPreferences,
-			Set<FirefoxPreferencesModifier> modifiers) {
+			Set<PreferencesModifier> modifiers) {
 		Map<String, Object> fp = firefoxPreferences
-		for (FirefoxPreferencesModifier fpm in modifiers) {
+		for (PreferencesModifier fpm in modifiers) {
 			fp = fpm.modify(fp)
 		}
 		return fp

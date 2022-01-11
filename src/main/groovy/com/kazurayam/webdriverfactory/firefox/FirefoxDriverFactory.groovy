@@ -1,7 +1,8 @@
 package com.kazurayam.webdriverfactory.firefox
 
+import com.kazurayam.webdriverfactory.PreferencesModifier
 import com.kazurayam.webdriverfactory.UserProfile
-
+import com.kazurayam.webdriverfactory.ProfileDirectoryName
 import java.nio.file.Path
 
 abstract class FirefoxDriverFactory {
@@ -27,10 +28,10 @@ abstract class FirefoxDriverFactory {
 	}
 
 	abstract void addFirefoxPreferencesModifier(
-			FirefoxPreferencesModifier firefoxPreferencesModifier)
+			PreferencesModifier firefoxPreferencesModifier)
 
 	abstract void addAllFirefoxPreferencesModifier(
-			List<FirefoxPreferencesModifier> firefoxPreferencesModifierList)
+			List<PreferencesModifier> firefoxPreferencesModifierList)
 
 	abstract void addFirefoxOptionsModifier(
 			FirefoxOptionsModifier firefoxOptionsModifier)

@@ -38,7 +38,8 @@ class LaunchedChromeDriverTest {
     @Test
     void test_smoke() {
         driver = new ChromeDriver()
-        LaunchedChromeDriver launched = new LaunchedChromeDriver(driver)
+        LaunchedChromeDriver launched =
+                new LaunchedChromeDriver(driver)
         assertNotNull(launched)
         ChromeUserProfile chromeUserProfile =
                 ChromeProfileUtils.findChromeUserProfileByProfileDirectoryName(

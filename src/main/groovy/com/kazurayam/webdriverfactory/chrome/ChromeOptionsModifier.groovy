@@ -15,7 +15,7 @@ interface ChromeOptionsModifier {
 		singleProcess,
 		windowSize,
 		windowSize1024_768,
-		withUserProfile
+		withProfileDirectoryName
 	}
 
 	Type getType()

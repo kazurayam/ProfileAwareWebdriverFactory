@@ -1,5 +1,6 @@
 package com.kazurayam.webdriverfactory.chrome
 
+import com.kazurayam.webdriverfactory.ProfileDirectoryName
 import org.openqa.selenium.chrome.ChromeOptions
 
 import java.nio.file.Path
@@ -110,19 +111,14 @@ enum ChromeOptionsModifiers {
         return com
     }
 
-    static ChromeOptionsModifier withUserProfile(Path userDataDir, String profileDirectoryName) {
+    static ChromeOptionsModifier withProfileDirectoryName(Path userDataDir, ProfileDirectoryName profileDirectoryName) {
         Objects.requireNonNull(userDataDir)
         Objects.requireNonNull(profileDirectoryName)
-        /* FIXME: should I check this?
-        if (!Files.exists(userDataDir)) {
-            throw new IllegalStateException("${userDataDir} is not found")
-        }
-         */
         ChromeOptionsModifier com = new Base(
-                ChromeOptionsModifier.Type.withUserProfile,
+                ChromeOptionsModifier.Type.withProfileDirectoryName,
                 { ChromeOptions chromeOptions ->
                     chromeOptions.addArguments("user-data-dir=${userDataDir.toString()}")
-                    chromeOptions.addArguments("profile-directory=${profileDirectoryName}")
+                    chromeOptions.addArguments("profile-directory=${profileDirectoryName.getName()}")
                     return chromeOptions
                 })
         return com

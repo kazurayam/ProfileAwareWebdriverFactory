@@ -1,4 +1,4 @@
-package com.kazurayam.webdriverfactory.chrome
+package com.kazurayam.webdriverfactory
 
 import com.kazurayam.webdriverfactory.ProfileDirectoryName
 import org.junit.Test
