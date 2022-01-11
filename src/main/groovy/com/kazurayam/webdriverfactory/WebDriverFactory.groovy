@@ -2,8 +2,6 @@ package com.kazurayam.webdriverfactory
 
 import com.kazurayam.webdriverfactory.chrome.ChromeDriverFactory.UserDataAccess
 import com.kazurayam.webdriverfactory.chrome.ChromeOptionsModifier
-import com.kazurayam.webdriverfactory.chrome.ChromePreferencesModifier
-
 import org.openqa.selenium.WebDriver
 
 
@@ -20,7 +18,7 @@ interface WebDriverFactory {
 		protected DriverTypeName driverTypeName
 		protected UserProfile userProfile = UserProfile.NULL
 		protected UserDataAccess userDataAccess = UserDataAccess.TO_GO
-		protected List<ChromePreferencesModifier> chromePreferencesModifierList = new ArrayList<>()
+		protected List<PreferencesModifier> chromePreferencesModifierList = new ArrayList<>()
 		protected List<ChromeOptionsModifier> chromeOptionsModifierList = new ArrayList<>()
 		protected Boolean requireDefaultSettings = true
 		Builder() {
@@ -41,7 +39,7 @@ interface WebDriverFactory {
 			this.userDataAccess = instruction
 			return this
 		}
-		Builder addChromePreferencesModifier(ChromePreferencesModifier modifier) {
+		Builder addChromePreferencesModifier(PreferencesModifier modifier) {
 			this.chromePreferencesModifierList.add(modifier)
 			return this
 		}

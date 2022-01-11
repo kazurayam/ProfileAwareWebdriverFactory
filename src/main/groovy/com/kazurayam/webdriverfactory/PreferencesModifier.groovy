@@ -1,6 +1,6 @@
-package com.kazurayam.webdriverfactory.chrome
+package com.kazurayam.webdriverfactory
 
-interface ChromePreferencesModifier {
+interface PreferencesModifier {
 
 	enum Type {
 		disableViewersOfFlashAndPdf,
