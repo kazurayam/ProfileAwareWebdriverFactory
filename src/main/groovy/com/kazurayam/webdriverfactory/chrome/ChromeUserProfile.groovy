@@ -1,5 +1,6 @@
 package com.kazurayam.webdriverfactory.chrome
 
+import com.kazurayam.webdriverfactory.ProfileDirectoryName
 import com.kazurayam.webdriverfactory.UserProfile
 
 import java.nio.file.Files

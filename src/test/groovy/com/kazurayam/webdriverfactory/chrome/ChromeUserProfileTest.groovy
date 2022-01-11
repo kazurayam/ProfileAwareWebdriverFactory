@@ -1,5 +1,6 @@
 package com.kazurayam.webdriverfactory.chrome
 
+import com.kazurayam.webdriverfactory.ProfileDirectoryName
 import groovy.json.JsonSlurper
 
 import static org.junit.Assert.*

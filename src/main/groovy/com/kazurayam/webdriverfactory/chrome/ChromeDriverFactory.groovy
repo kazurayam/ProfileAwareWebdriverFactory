@@ -1,5 +1,7 @@
 package com.kazurayam.webdriverfactory.chrome
 
+import com.kazurayam.webdriverfactory.PreferencesModifier
+import com.kazurayam.webdriverfactory.ProfileDirectoryName
 import com.kazurayam.webdriverfactory.UserProfile
 
 import java.nio.file.Path
@@ -27,10 +29,10 @@ abstract class ChromeDriverFactory {
 	}
 
 	abstract void addChromePreferencesModifier(
-			ChromePreferencesModifier chromePreferencesModifier)
+			PreferencesModifier chromePreferencesModifier)
 
 	abstract void addAllChromePreferencesModifiers(
-			List<ChromePreferencesModifier> chromePreferencesModifierList)
+			List<PreferencesModifier> chromePreferencesModifierList)
 
 	abstract void addChromeOptionsModifier(
 			ChromeOptionsModifier chromeOptionsModifier)

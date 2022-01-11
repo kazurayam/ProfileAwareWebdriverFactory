@@ -1,5 +1,7 @@
 package com.kazurayam.webdriverfactory.chrome
 
+import com.kazurayam.webdriverfactory.PreferencesModifier
+import com.kazurayam.webdriverfactory.ProfileDirectoryName
 import com.kazurayam.webdriverfactory.UserProfile
 import com.kazurayam.webdriverfactory.WebDriverFactoryException
 
@@ -21,7 +23,7 @@ class ChromeDriverFactoryImpl extends ChromeDriverFactory {
 
 	static Logger logger_ = LoggerFactory.getLogger(ChromeDriverFactoryImpl.class)
 
-	private final Set<ChromePreferencesModifier> chromePreferencesModifiers
+	private final Set<PreferencesModifier> chromePreferencesModifiers
 	private final Set<ChromeOptionsModifier> chromeOptionsModifiers
 
 	private Integer pageLoadTimeoutSeconds
@@ -54,7 +56,7 @@ class ChromeDriverFactoryImpl extends ChromeDriverFactory {
 	}
 
 	@Override
-	void addChromePreferencesModifier(ChromePreferencesModifier cpm) {
+	void addChromePreferencesModifier(PreferencesModifier cpm) {
 		if (this.chromePreferencesModifiers.contains(cpm)) {
 			// The late comer wins
 			this.chromePreferencesModifiers.remove(cpm)
@@ -63,8 +65,8 @@ class ChromeDriverFactoryImpl extends ChromeDriverFactory {
 	}
 
 	@Override
-	void addAllChromePreferencesModifiers(List<ChromePreferencesModifier> list) {
-		list.each ({ ChromePreferencesModifier cpm ->
+	void addAllChromePreferencesModifiers(List<PreferencesModifier> list) {
+		list.each ({ PreferencesModifier cpm ->
 			this.chromePreferencesModifiers.add(cpm)
 		})
 	}
@@ -280,7 +282,7 @@ class ChromeDriverFactoryImpl extends ChromeDriverFactory {
 	 * while modifying each containers with specified Modifiers
 	 */
 	private ChromeOptions buildOptions(
-			Set<ChromePreferencesModifier> chromePreferencesModifiers,
+			Set<PreferencesModifier> chromePreferencesModifiers,
 			Set<ChromeOptionsModifier> chromeOptionsModifiers)
 	{
 		// create a Chrome Preferences object as the seed
@@ -302,9 +304,9 @@ class ChromeDriverFactoryImpl extends ChromeDriverFactory {
 
 	static Map<String, Object> applyChromePreferencesModifiers(
 			Map<String, Object> chromePreferences,
-			Set<ChromePreferencesModifier> modifiers) {
+			Set<PreferencesModifier> modifiers) {
 		Map<String, Object> cp = chromePreferences
-		for (ChromePreferencesModifier cpm in modifiers) {
+		for (PreferencesModifier cpm in modifiers) {
 			cp = cpm.modify(cp)
 		}
 		return cp

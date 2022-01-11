@@ -1,6 +1,6 @@
 package com.kazurayam.webdriverfactory.chrome
 
-
+import com.kazurayam.webdriverfactory.ProfileDirectoryName
 import io.github.bonigarcia.wdm.WebDriverManager
 import org.junit.After
 import org.junit.BeforeClass

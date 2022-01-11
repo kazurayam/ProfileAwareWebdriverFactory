@@ -4,7 +4,6 @@ import com.kazurayam.webdriverfactory.chrome.ChromeDriverFactory
 import com.kazurayam.webdriverfactory.chrome.ChromeDriverFactory.UserDataAccess
 import com.kazurayam.webdriverfactory.chrome.ChromeOptionsModifier
 import com.kazurayam.webdriverfactory.chrome.ChromeOptionsModifiers
-import com.kazurayam.webdriverfactory.chrome.ChromePreferencesModifier
 import com.kazurayam.webdriverfactory.chrome.LaunchedChromeDriver
 
 import org.openqa.selenium.WebDriver
@@ -15,7 +14,7 @@ class WebDriverFactoryImpl implements WebDriverFactory {
 	private DriverTypeName driverTypeName
 	private UserProfile userProfile
 	private UserDataAccess userDataAccess
-	private List<ChromePreferencesModifier> chromePreferencesModifierList
+	private List<PreferencesModifier> chromePreferencesModifierList
 	private List<ChromeOptionsModifier> chromeOptionsModifierList
 	private boolean requireDefaultSettings
 

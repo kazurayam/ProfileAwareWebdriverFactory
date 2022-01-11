@@ -1,5 +1,6 @@
 package com.kazurayam.webdriverfactory.chrome
 
+import com.kazurayam.webdriverfactory.ProfileDirectoryName
 import com.kazurayam.webdriverfactory.UserProfile
 
 import java.nio.file.Files
@@ -119,7 +120,7 @@ final class ChromeProfileUtils {
 				profileDirectoryName)
 	}
 	static UserProfile findUserProfileByProfileDirectoryName(
-			Path userDataDir, ProfileDirectoryName profileDirectoryName) {
+            Path userDataDir, ProfileDirectoryName profileDirectoryName) {
 		return findChromeUserProfileByProfileDirectoryName(
 				userDataDir, profileDirectoryName).getUserProfile()
 	}
