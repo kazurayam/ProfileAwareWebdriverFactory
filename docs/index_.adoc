@@ -32,29 +32,11 @@ include::../src/test/groovy/examples/LaunchChromeWithUserProfile.groovy[]
 include::../src/test/groovy/examples/LaunchChromeWithProfileDirectory.groovy[]
 ----
 
-=== Launch Multiple Chrome windows in Tiling layout
-
-[source, groovy]
-----
-include::../src/test/groovy/examples/LaunchMultipleChromeWindowsInTilingLayout.groovy[]
-----
-
-Here is a https://drive.google.com/file/d/1sx57ywf4yVqNO4sCHZ8FWsBcHTz9jo9G/view?usp=sharing[demonstration movie].
-
-image:images/10_LaunchMultipleChromeWindowsInTilingLayout.png[]
-
-=== Launch Multiple Chrome windows in Stacking layout
-
-[source, groovy]
-----
-include::../src/test/groovy/examples/LaunchMultipleChromeWindowsInStackingLayout.groovy[]
-----
-
 === print the DesiredCapabilities employed to open a Chrome
 
 [source, groovy]
 ----
-include::../src/test/groovy/examples/PrintEmployedDesiredCapabilities.groovy[]
+include::../src/test/groovy/examples/PrintEmployedOptions.groovy[]
 ----
 
 This emits:

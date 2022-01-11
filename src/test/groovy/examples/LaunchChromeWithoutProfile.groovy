@@ -1,6 +1,5 @@
 package examples
 
-import com.kazurayam.browserwindowlayout.BrowserWindowLayoutManager
 import com.kazurayam.webdriverfactory.chrome.ChromeDriverFactory
 import com.kazurayam.webdriverfactory.chrome.LaunchedChromeDriver
 import io.github.bonigarcia.wdm.WebDriverManager
@@ -9,8 +8,6 @@ import org.junit.After
 import org.junit.Before
 import org.junit.BeforeClass
 import org.junit.Test
-import org.openqa.selenium.Dimension
-import org.openqa.selenium.Point
 
 class LaunchChromeWithoutProfile {
 
@@ -28,17 +25,6 @@ class LaunchChromeWithoutProfile {
     void test_launch_headless_browser() {
         ChromeDriverFactory factory = ChromeDriverFactory.newHeadlessChromeDriverFactory()
         launched = factory.newChromeDriver()
-        launched.getDriver().navigate().to("http://example.com")
-        Thread.sleep(1000)
-    }
-
-    @Test
-    void test_launch_and_layout_browser() {
-        ChromeDriverFactory factory = ChromeDriverFactory.newChromeDriverFactory()
-        launched = factory.newChromeDriver()
-        Point position = new Point(100, 100)
-        Dimension dimension = new Dimension(800, 600)
-        BrowserWindowLayoutManager.layout(launched.getDriver(), position, dimension)
         launched.getDriver().navigate().to("http://example.com")
         Thread.sleep(1000)
     }
