@@ -333,7 +333,7 @@ class ChromeDriverFactoryTest {
 	@Test
 	void test_waitForPageLoad_works() {
 		ChromeDriverFactory cdFactory = ChromeDriverFactory.newChromeDriverFactory()
-		cdFactory.pageLoadTimeout(10)
+		cdFactory.setPageLoadTimeout(10)
 		launched = cdFactory.newChromeDriver()
 		assertNotNull(launched)
 		launched.getDriver().navigate().to("http://example.com")

@@ -190,7 +190,7 @@ class ChromeDriverFactoryImpl extends ChromeDriverFactory {
 		if (!Files.exists(outputDirectory)) {
 			Files.createDirectories(outputDirectory)
 		}
-		ChromeDriverUtils.enableChromeDriverLog ( outputDirectory)
+		ChromeDriverUtils.enableChromeDriverLog(outputDirectory)
 	}
 
 
@@ -210,9 +210,11 @@ class ChromeDriverFactoryImpl extends ChromeDriverFactory {
 	 * @param instruction
 	 * @return
 	 */
-	private LaunchedChromeDriver launchChrome(Path userDataDir,
-									  ProfileDirectoryName profileDirectoryName,
-									  UserDataAccess instruction) {
+	private LaunchedChromeDriver launchChrome(
+			Path userDataDir,
+			ProfileDirectoryName profileDirectoryName,
+			UserDataAccess instruction
+	) {
 		Objects.requireNonNull(userDataDir)
 		Objects.requireNonNull(profileDirectoryName)
 		Objects.requireNonNull(instruction)
