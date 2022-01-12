@@ -45,18 +45,9 @@ abstract class FirefoxDriverFactory {
 
 	abstract LaunchedFirefoxDriver newFirefoxDriver(UserProfile userProfile)
 
-	abstract LaunchedFirefoxDriver newFirefoxDriver(UserProfile userProfile, UserDataAccess instruction)
-
 	abstract LaunchedFirefoxDriver newFirefoxDriver(ProfileDirectoryName profileDirectoryName)
 
-	abstract LaunchedFirefoxDriver newFirefoxDriver(ProfileDirectoryName profileDirectoryName, UserDataAccess instruction)
-
 	abstract void enableFirefoxDriverLog(Path outputDirectory)
-
-	enum UserDataAccess {
-		FOR_HERE,
-		TO_GO
-	}
 
 	static void setPathToFirefoxDriverExecutable(String geckoDriverPath) {
 		Objects.requireNonNull(geckoDriverPath)

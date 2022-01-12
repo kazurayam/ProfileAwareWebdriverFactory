@@ -114,14 +114,7 @@ class FirefoxDriverFactoryImpl extends FirefoxDriverFactory {
 
 	@Override
 	LaunchedFirefoxDriver newFirefoxDriver(UserProfile userProfile) {
-		return newFirefoxDriver(userProfile, UserDataAccess.TO_GO)
-	}
-
-	@Override
-	LaunchedFirefoxDriver newFirefoxDriver(UserProfile userProfile,
-										   UserDataAccess instruction) {
 		Objects.requireNonNull(userProfile, "userProfile must not be null")
-		Objects.requireNonNull(instruction, "instruction must not be null")
 		Optional<FirefoxUserProfile> opt =
 				FirefoxProfileUtils.findFirefoxUserProfileOf(userProfile)
 		assert opt.isPresent()
@@ -136,21 +129,15 @@ class FirefoxDriverFactoryImpl extends FirefoxDriverFactory {
 		}
 		Path userDataDir = FirefoxProfileUtils.getDefaultUserDataDir()
 		ProfileDirectoryName profileDirectoryName = firefoxUserProfile.getProfileDirectoryName()
-		return launchFirefox(userDataDir, profileDirectoryName, instruction)
+		return launchFirefox(userDataDir, profileDirectoryName)
 	}
 
 	@Override
 	LaunchedFirefoxDriver newFirefoxDriver(ProfileDirectoryName profileDirectoryName) {
-		return this.newFirefoxDriver(profileDirectoryName, UserDataAccess.TO_GO)
-	}
-
-	@Override
-	LaunchedFirefoxDriver newFirefoxDriver(ProfileDirectoryName profileDirectoryName,
-										   UserDataAccess instruction) {
 		Objects.requireNonNull(profileDirectoryName, "profileDirectoryName must not be null")
 		Objects.requireNonNull(instruction, "instruction must not be null")
 		Path userDataDir = FirefoxProfileUtils.getDefaultUserDataDir()
-		return launchFirefox(userDataDir, profileDirectoryName, instruction)
+		return launchFirefox(userDataDir, profileDirectoryName)
 	}
 
 	@Override
@@ -167,29 +154,16 @@ class FirefoxDriverFactoryImpl extends FirefoxDriverFactory {
 	 */
 	private LaunchedFirefoxDriver launchFirefox(
 			Path userDataDir,
-			ProfileDirectoryName profileDirectoryName,
-			UserDataAccess instruction
-	) {
+			ProfileDirectoryName profileDirectoryName)
+	{
 		Objects.requireNonNull(userDataDir)
 		Objects.requireNonNull(profileDirectoryName)
-		Objects.requireNonNull(instruction)
 		if (! Files.exists(userDataDir)) {
 			throw new IllegalArgumentException("${userDataDir} is not present")
 		}
 		Path sourceProfileDirectory = userDataDir.resolve(profileDirectoryName.toString())
 		assert Files.exists(sourceProfileDirectory)
 		Path targetUserDataDir = userDataDir
-		if (instruction == UserDataAccess.TO_GO) {
-			targetUserDataDir = Files.createTempDirectory("__user-data-dir__")
-			Path targetProfileDirectory = targetUserDataDir.resolve(profileDirectoryName.getName())
-			PathUtils.copyDirectoryRecursively(
-					sourceProfileDirectory,
-					targetProfileDirectory)
-			int numCopied = PathUtils.listDirectoryRecursively(targetProfileDirectory).size()
-			logger_.info("copied ${numCopied} files from ${sourceProfileDirectory} into ${targetProfileDirectory} ")
-		} else {
-			logger_.debug("will use ${sourceProfileDirectory} ")
-		}
 
 		// use the specified UserProfile to launch Firefox browser
 		this.addFirefoxOptionsModifier(
@@ -208,7 +182,6 @@ class FirefoxDriverFactoryImpl extends FirefoxDriverFactory {
 			setPageLoadTimeout(driver, this.pageLoadTimeoutSeconds)
 			LaunchedFirefoxDriver launched = new LaunchedFirefoxDriver(driver)
 					.setFirefoxUserProfile(new FirefoxUserProfile(targetUserDataDir, profileDirectoryName))
-					.setInstruction(instruction)
 					.setEmployedOptions(options)
 			return launched
 		} catch (InvalidArgumentException iae) {

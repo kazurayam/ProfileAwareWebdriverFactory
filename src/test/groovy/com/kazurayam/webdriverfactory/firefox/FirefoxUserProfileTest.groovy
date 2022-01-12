@@ -1,9 +1,6 @@
 package com.kazurayam.webdriverfactory.firefox
 
-import com.kazurayam.webdriverfactory.ProfileDirectoryName
 import com.kazurayam.webdriverfactory.UserProfile
-import com.kazurayam.webdriverfactory.chrome.ChromeProfileUtils
-import com.kazurayam.webdriverfactory.chrome.ChromeUserProfile
 import groovy.json.JsonSlurper
 import org.junit.Before
 import org.junit.Test
@@ -13,7 +10,6 @@ import java.nio.file.Path
 
 import static org.junit.Assert.assertEquals
 import static org.junit.Assert.assertNotNull
-import static org.junit.Assert.assertTrue
 
 class FirefoxUserProfileTest {
 

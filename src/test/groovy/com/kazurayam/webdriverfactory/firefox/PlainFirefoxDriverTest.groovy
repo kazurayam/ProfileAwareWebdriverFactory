@@ -22,7 +22,7 @@ class PlainFirefoxDriverTest {
     @After
     void teardown() {
         if (driver != null) {
-            //driver.quit()
+            driver.quit()
             driver = null
         }
     }

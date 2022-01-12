@@ -18,10 +18,6 @@ import groovy.json.*
 
 import static org.junit.Assert.*
 
-import java.time.ZoneId
-import java.time.ZonedDateTime
-import java.time.format.DateTimeFormatter
-
 class CarryingCookieOverSessionsViaProfile {
 
     /**

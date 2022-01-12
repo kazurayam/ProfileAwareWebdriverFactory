@@ -44,19 +44,13 @@ class LaunchedFirefoxDriverTest {
         assert opt.isPresent()
         FirefoxUserProfile firefoxUserProfile
         opt.ifPresent({it ->
-            firefoxUserProfile = it
+            launched.setFirefoxUserProfile(it)
         })
-        launched.setFirefoxUserProfile(firefoxUserProfile)
-                .setInstruction(FirefoxDriverFactory.UserDataAccess.TO_GO)
         //
         assert launched.getFirefoxUserProfile().isPresent()
         launched.getFirefoxUserProfile().ifPresent(
                 { it ->
                     println "FirefoxUserProfile => " + it.toString()})
-        assert launched.getInstruction().isPresent()
-        launched.getInstruction().ifPresent({ it ->
-            println "UserDataAccess =>" + it.toString()
-        })
         //assert launched.getEmployedOptions().isPresent()
         //launched.getEmployedOptions().ifPresent({ it ->
         //    println "options => " + it.toString()

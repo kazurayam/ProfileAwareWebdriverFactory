@@ -74,5 +74,6 @@ class LaunchedChromeDriverTest {
             println json
             assert json.contains("incognito")
         }
+        launched.getDriver().quit()
     }
 }

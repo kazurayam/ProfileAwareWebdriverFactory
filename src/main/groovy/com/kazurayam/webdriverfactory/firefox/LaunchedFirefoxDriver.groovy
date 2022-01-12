@@ -8,14 +8,12 @@ class LaunchedFirefoxDriver {
 
     private final FirefoxDriver driver
     private Optional<FirefoxUserProfile> firefoxUserProfile
-    private Optional<FirefoxDriverFactory.UserDataAccess> instruction
     private Optional<FirefoxOptions> employedOptions
 
     LaunchedFirefoxDriver(FirefoxDriver driver) {
         Objects.requireNonNull(driver)
         this.driver = driver
         this.firefoxUserProfile = Optional.empty()
-        this.instruction = Optional.empty()
         this.employedOptions = Optional.empty()
     }
 
@@ -31,16 +29,6 @@ class LaunchedFirefoxDriver {
 
     Optional<FirefoxUserProfile> getFirefoxUserProfile() {
         return this.firefoxUserProfile
-    }
-
-    LaunchedFirefoxDriver setInstruction(FirefoxDriverFactory.UserDataAccess instruction) {
-        Objects.requireNonNull(instruction)
-        this.instruction = Optional.of(instruction)
-        return this
-    }
-
-    Optional<FirefoxDriverFactory.UserDataAccess> getInstruction() {
-        return this.instruction
     }
 
     LaunchedFirefoxDriver setEmployedOptions(FirefoxOptions options) {
