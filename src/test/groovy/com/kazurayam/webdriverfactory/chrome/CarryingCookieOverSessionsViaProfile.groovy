@@ -1,5 +1,6 @@
 package com.kazurayam.webdriverfactory.chrome
 
+import com.kazurayam.webdriverfactory.CookieUtils
 import com.kazurayam.webdriverfactory.UserProfile
 import io.github.bonigarcia.wdm.WebDriverManager
 import org.junit.BeforeClass
@@ -64,6 +65,9 @@ class CarryingCookieOverSessionsViaProfile {
         Cookie timestamp2 = observeCookie(launched)
         launched.getDriver().quit()
         //
+        println "timestamp1 => " + CookieUtils.stringifyCookie(timestamp1)
+        println "timestamp2 => " + CookieUtils.stringifyCookie(timestamp2)
+
         assertEquals(timestamp1.getValue(), timestamp2.getValue())
         assertNotEquals(timestamp1.getExpiry(), timestamp2.getExpiry())
     }
@@ -132,37 +136,6 @@ class CarryingCookieOverSessionsViaProfile {
         String pp = JsonOutput.prettyPrint(json)
         return pp
     }
-
-
-    /**
-     * @returns "timestamp=Sat, 08 Jan 2022 05:13:04 GMT; expires=Sat, 08 Jan 2022 05:13:34 GMT; path=/; domain=127.0.0.1"
-     */
-    private static String stringifyCookie(Cookie cookie) {
-        StringBuilder sb = new StringBuilder()
-        sb.append(cookie.getName())
-        sb.append("=")
-        sb.append(cookie.getValue())
-        sb.append("; ")
-        sb.append("expires=")
-        sb.append(formatDateInRFC7231(cookie.getExpiry()))
-        sb.append("; path=")
-        sb.append(cookie.getPath())
-        sb.append("; domain=")
-        sb.append(cookie.getDomain())
-        return sb.toString()
-    }
-
-    private static String formatDateInRFC7231(Date date) {
-        ZoneId zid = ZoneId.systemDefault()
-        ZonedDateTime zdt = ZonedDateTime.ofInstant(date.toInstant(), zid)
-        String formatted = rfc7231.format(zdt)
-        return formatted
-    }
-
-    private static final DateTimeFormatter rfc7231 = DateTimeFormatter
-            .ofPattern("EEE, dd MMM yyyy HH:mm:ss z", Locale.ENGLISH)
-            .withZone(ZoneId.of("GMT"))
-
 
     @BeforeClass
     static void beforeClass() {
