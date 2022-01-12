@@ -1,8 +1,10 @@
 package com.kazurayam.webdriverfactory.firefox
 
 import com.kazurayam.webdriverfactory.UserProfile
+import org.junit.Ignore
 import org.junit.Test
 
+@Ignore
 class FirefoxProfileUtilsTest {
 
     @Test

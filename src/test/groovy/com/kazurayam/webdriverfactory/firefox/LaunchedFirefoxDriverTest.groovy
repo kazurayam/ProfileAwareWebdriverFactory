@@ -4,6 +4,7 @@ import com.kazurayam.webdriverfactory.UserProfile
 import io.github.bonigarcia.wdm.WebDriverManager
 import org.junit.After
 import org.junit.BeforeClass
+import org.junit.Ignore
 import org.junit.Test
 import org.openqa.selenium.firefox.FirefoxDriver
 
@@ -13,6 +14,7 @@ import java.nio.file.Paths
 
 import static org.junit.Assert.*
 
+@Ignore
 class LaunchedFirefoxDriverTest {
 
     static Path outputFolder

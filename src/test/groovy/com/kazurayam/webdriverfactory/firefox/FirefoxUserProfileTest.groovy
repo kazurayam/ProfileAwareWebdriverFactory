@@ -3,6 +3,7 @@ package com.kazurayam.webdriverfactory.firefox
 import com.kazurayam.webdriverfactory.UserProfile
 import groovy.json.JsonSlurper
 import org.junit.Before
+import org.junit.Ignore
 import org.junit.Test
 
 import java.nio.file.Files
@@ -11,6 +12,7 @@ import java.nio.file.Path
 import static org.junit.Assert.assertEquals
 import static org.junit.Assert.assertNotNull
 
+@Ignore
 class FirefoxUserProfileTest {
 
     private FirefoxUserProfile profile

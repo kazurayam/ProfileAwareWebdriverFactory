@@ -17,6 +17,7 @@ import org.junit.Test
 
 import io.github.bonigarcia.wdm.WebDriverManager
 
+@Ignore
 class FirefoxDriverFactoryTest {
 
 	LaunchedFirefoxDriver launched
