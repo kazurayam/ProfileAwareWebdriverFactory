@@ -52,7 +52,7 @@ class FirefoxDriverFactoryTest {
 	void teardown() {
 		if (launched != null) {
 			if (launched.getDriver() != null) {
-				launched.getDriver().quit()
+				//launched.getDriver().quit()
 			}
 			launched = null
 		}

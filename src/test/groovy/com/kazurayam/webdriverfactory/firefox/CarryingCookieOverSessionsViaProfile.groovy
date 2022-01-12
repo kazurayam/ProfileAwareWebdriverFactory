@@ -2,12 +2,12 @@ package com.kazurayam.webdriverfactory.firefox
 
 import com.kazurayam.webdriverfactory.CookieUtils
 import com.kazurayam.webdriverfactory.UserProfile
-import groovy.json.JsonOutput
 import io.github.bonigarcia.wdm.WebDriverManager
 import org.junit.BeforeClass
 import org.junit.Test
 import org.openqa.selenium.Cookie
 import org.openqa.selenium.firefox.FirefoxDriver
+/*
 import org.openqa.selenium.devtools.DevTools
 import org.openqa.selenium.devtools.v96.network.Network
 import org.openqa.selenium.devtools.v96.network.model.ResponseReceived
@@ -15,11 +15,7 @@ import org.openqa.selenium.devtools.v96.network.model.ResponseReceivedExtraInfo
 import org.openqa.selenium.devtools.v96.network.model.RequestWillBeSent
 import org.openqa.selenium.devtools.v96.network.model.Headers
 import org.openqa.selenium.devtools.v96.network.model.RequestWillBeSentExtraInfo
-
-import java.time.ZoneId
-import java.time.ZonedDateTime
-import java.time.format.DateTimeFormatter
-
+*/
 import static org.junit.Assert.assertEquals
 import static org.junit.Assert.assertNotEquals
 
@@ -60,7 +56,7 @@ class CarryingCookieOverSessionsViaProfile {
         launched.getDriver().quit()   // at .quit(), the Cookies will be stored into disk
 
         // 2nd session
-        launched = factory.newFirefoxDriver(new UserProfile("Picasso"),  // or new ProfileDirectoryName("Profile 6")
+        launched = factory.newFirefoxDriver(new UserProfile("Picasso"),
                 FirefoxDriverFactory.UserDataAccess.TO_GO)  // the Cookies file will be copied into the temp dir
         Cookie timestamp2 = observeCookie(launched)
         launched.getDriver().quit()
@@ -135,12 +131,6 @@ class CarryingCookieOverSessionsViaProfile {
         }
         Cookie timestamp = launched.getDriver().manage().getCookieNamed(cookieName)
         return timestamp
-    }
-
-    private static String stringifyHeaders(Headers headers) {
-        String json = JsonOutput.toJson(headers)
-        String pp = JsonOutput.prettyPrint(json)
-        return pp
     }
 
     @BeforeClass

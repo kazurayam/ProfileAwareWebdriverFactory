@@ -49,6 +49,7 @@ enum FirefoxOptionsModifiers {
                 FirefoxOptionsModifier.Type.withProfileDirectoryName,
                 { FirefoxOptions firefoxOptions ->
                     Path profileDir = userDataDir.resolve(profileDirectoryName.getName())
+                    // http://kb.mozillazine.org/Command_line_arguments
                     firefoxOptions.addPreference("-profile", profileDir.toString())
                     return firefoxOptions
                 })
