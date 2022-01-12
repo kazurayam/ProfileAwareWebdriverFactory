@@ -5,6 +5,8 @@ import org.junit.Before
 import org.junit.BeforeClass
 import org.openqa.selenium.firefox.FirefoxDriver
 import org.openqa.selenium.firefox.FirefoxOptions
+import com.kazurayam.subprocessj.Subprocess
+import com.kazurayam.subprocessj.Subprocess.CompletedProcess
 
 import static org.hamcrest.CoreMatchers.*
 import static org.junit.Assert.*
@@ -21,7 +23,15 @@ class FirefoxDriverFactoryTest {
 
 	@BeforeClass
 	static void beforeClass() {
-		WebDriverManager.firefoxdriver().setup()
+		// GitHub Personal Access Token
+		Subprocess subprocess = new Subprocess()
+		CompletedProcess cp = subprocess.run(Arrays.asList(
+				"security", "find-internet-password",
+				"-s", "github.com", "-a", "kazurayam",
+				"-w"))
+		assert cp.returncode() == 0
+		String GHT = cp.stdout().get(0).trim()
+		WebDriverManager.firefoxdriver().gitHubToken(GHT).setup()
 	}
 
 	@Before

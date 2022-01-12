@@ -7,6 +7,7 @@ interface FirefoxOptionsModifier {
 	enum Type {
 		headless,
 		windowSize,
+		windowSize1024x768,
 		withProfileDirectoryName,
 	}
 

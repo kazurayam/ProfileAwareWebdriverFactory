@@ -44,7 +44,7 @@ class FirefoxDriverFactoryImpl extends FirefoxDriverFactory {
 		this.addFirefoxPreferencesModifier(FirefoxPreferencesModifiers.downloadWithoutPrompt())
 		this.addFirefoxPreferencesModifier(FirefoxPreferencesModifiers.downloadIntoUserHomeDownloadsDirectory())
 
-		this.addFirefoxOptionsModifier(FirefoxOptionsModifier.windowSize1024x768)
+		this.addFirefoxOptionsModifier(FirefoxOptionsModifiers.windowSize1024_768())
 	}
 
 	@Override
@@ -69,7 +69,7 @@ class FirefoxDriverFactoryImpl extends FirefoxDriverFactory {
 			// The late comer wins
 			this.firefoxOptionsModifiers.remove(fom)
 		}
-		firefoxPreferencesModifiers.add(fom)
+		firefoxOptionsModifiers.add(fom)
 	}
 
 	@Override
@@ -151,7 +151,7 @@ class FirefoxDriverFactoryImpl extends FirefoxDriverFactory {
 		Objects.requireNonNull(profileDirectoryName, "profileDirectoryName must not be null")
 		Objects.requireNonNull(instruction, "instruction must not be null")
 		Path userDataDir = FirefoxProfileUtils.getDefaultUserDataDir()
-		return launchFirefox(userDataDir, profileDirectoryName)
+		return launchFirefox(userDataDir, profileDirectoryName, instruction)
 	}
 
 	@Override
@@ -229,7 +229,7 @@ class FirefoxDriverFactoryImpl extends FirefoxDriverFactory {
 		}
 	}
 
-	private FirefoxOptions buildOptions(
+	private static FirefoxOptions buildOptions(
 			Set<PreferencesModifier> firefoxPreferencesModifiers,
 			Set<FirefoxOptionsModifier> firefoxOptionsModifiers
 	) {
@@ -242,7 +242,7 @@ class FirefoxDriverFactoryImpl extends FirefoxDriverFactory {
 				FirefoxOptionsBuilder.newInstance(preferences).build()
 
 		firefoxOptions = applyFirefoxOptionsModifiers(firefoxOptions,
-				firefoxPreferencesModifiers)
+				firefoxOptionsModifiers)
 
 		return firefoxOptions
 	}
@@ -250,7 +250,7 @@ class FirefoxDriverFactoryImpl extends FirefoxDriverFactory {
 	static Map<String, Object> applyFirefoxPreferencesModifiers(
 			Map<String, Object> firefoxPreferences,
 			Set<PreferencesModifier> modifiers) {
-		Map<String, Object> fp = firefoxPreferences
+		Map<String, Object> fp = new HashMap<>(firefoxPreferences)
 		for (PreferencesModifier fpm in modifiers) {
 			fp = fpm.modify(fp)
 		}
@@ -260,7 +260,7 @@ class FirefoxDriverFactoryImpl extends FirefoxDriverFactory {
 	static FirefoxOptions applyFirefoxOptionsModifiers(
 			FirefoxOptions firefoxOptions,
 			Set<FirefoxOptionsModifier> modifiers) {
-		FirefoxOptions fp = firefoxOptions
+		FirefoxOptions fp = new FirefoxOptions(firefoxOptions)
 		for (FirefoxOptionsModifier fom in modifiers) {
 			fp = fom.modify(fp)
 		}

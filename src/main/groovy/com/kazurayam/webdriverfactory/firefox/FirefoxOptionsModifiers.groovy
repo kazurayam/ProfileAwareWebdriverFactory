@@ -1,7 +1,6 @@
 package com.kazurayam.webdriverfactory.firefox
 
 import com.kazurayam.webdriverfactory.ProfileDirectoryName
-import org.openqa.selenium.chrome.ChromeOptions
 import org.openqa.selenium.firefox.FirefoxOptions
 
 import java.nio.file.Path
@@ -19,8 +18,8 @@ enum FirefoxOptionsModifiers {
         return fom
     }
 
-    static FirefoxOptionsModifier windowSize1280_1024() {
-        return windowSize(1280, 1024)
+    static FirefoxOptionsModifier windowSize1024_768() {
+        return windowSize(1024, 768)
     }
 
     static FirefoxOptionsModifier windowSize(int width, int height) {
@@ -70,7 +69,7 @@ enum FirefoxOptionsModifiers {
         @Override
         FirefoxOptions modify(FirefoxOptions chromeOptions) {
             Objects.requireNonNull(chromeOptions)
-            return (ChromeOptions)closure.call(chromeOptions)
+            return (FirefoxOptions)closure.call(chromeOptions)
         }
         @Override
         Type getType() {
