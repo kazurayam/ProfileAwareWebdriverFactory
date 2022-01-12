@@ -1,1 +1,1 @@
-see https://kazurayam.github.io/webdriverfactory/
+see https://kazurayam.github.io/chromedriverfactory/

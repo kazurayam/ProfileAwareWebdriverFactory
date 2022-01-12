@@ -1,16 +1,16 @@
-= webdriverfactory
+= ChromeDriverFactory
 :toc:
 
->can go back to https://github.com/kazurayam/webdriverfactory
+>can go back to https://github.com/kazurayam/chromedriverfactory
 
-webdriverfactory is a Java/Groovy library that wraps `org.openqa.selenium.webdriver.chrome.ChromeDriver`.
-It enables you to launch Chrome browser while specifying a "User Profile", for example "Picasso". And also you can lauch Chrome browser while specifying a "Profile Directory Name", for example "Default" or "Profile 1".
+chromedriverfactory is a Java/Groovy library that wraps `org.openqa.selenium.webdriver.chrome.ChromeDriver`.
+It enables you to launch Chrome browser while specifying a "User Profile", for example "Picasso". And also you can launch Chrome browser while specifying a "Profile Directory Name", for example "Default" or "Profile 1".
 
 == Sample codes
 
 === Launch Chrome browser without profile specified
 
-Basic case where we launch Chrome browser without profile specified. The example includes how to launch Headless brower. Also includes how to position and resize the browser window.
+Basic case where we launch Chrome browser without profile specified. The example includes how to launch Headless browser. Also includes how to position and resize the browser window.
 
 [source, groovy]
 ----
