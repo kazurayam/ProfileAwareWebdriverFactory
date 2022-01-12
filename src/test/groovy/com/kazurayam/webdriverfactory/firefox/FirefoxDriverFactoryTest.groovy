@@ -1,5 +1,6 @@
 package com.kazurayam.webdriverfactory.firefox
 
+import com.kazurayam.webdriverfactory.UserProfile
 import org.junit.After
 import org.junit.Before
 import org.junit.BeforeClass
@@ -54,25 +55,39 @@ class FirefoxDriverFactoryTest {
 		FirefoxDriverFactory factory = FirefoxDriverFactory.newFirefoxDriverFactory()
 		launched = factory.newFirefoxDriver()
 		assert launched != null
+		launched.getDriver().navigate().to("http://example.com")
+		Thread.sleep(1000)
 	}
 
 	/**
 	 * Instantiate a FirefoxDriver to open a Firefox browser specifying a user profile "Picasso"
 	 *
 	 */
-	@Ignore
 	@Test
 	void test_newFirefoxDriverWithProfile() {
-		FirefoxDriverFactory factory = FirefoxDriverFactory.newInstance()
-		WebDriver driver = factory.newFirefoxDriverWithProfile('Picasso')
-		assertThat(driver, is(notNullValue()))
-
-		FirefoxOptions options = factory.getEmployedOptions()
-		assertNotNull(options)
-		println("options: ${options.toString()}")
-
-		println("ChromeDriver has been instantiated with profile Picasso")
-		driver.navigate().to('http://example.com/')
-		driver.quit()
+		FirefoxDriverFactory factory = FirefoxDriverFactory.newFirefoxDriverFactory()
+		launched = factory.newFirefoxDriver(new UserProfile("Picasso"))
+		assert launched != null
+		//
+		launched.getDriver().navigate().to("http://example.com")
+		Thread.sleep(1000)
+		//
+		Optional<FirefoxUserProfile> firefoxUserProfile = launched.getFirefoxUserProfile()
+		assert firefoxUserProfile.isPresent()
+		firefoxUserProfile.ifPresent({it ->
+			println("firefoxUserProfile => ${it}")
+		})
+		//
+		Optional<FirefoxDriverFactory.UserDataAccess> instruction = launched.getInstruction()
+		assert instruction.isPresent()
+		instruction.ifPresent({ it ->
+			println("instruction => ${it}")
+		})
+		//
+		Optional<FirefoxOptions> options = launched.getEmployedOptions()
+		assert options.isPresent()
+		launched.getEmployedOptionsAsJSON().ifPresent({it ->
+			println("options => ${it}")
+		})
 	}
 }

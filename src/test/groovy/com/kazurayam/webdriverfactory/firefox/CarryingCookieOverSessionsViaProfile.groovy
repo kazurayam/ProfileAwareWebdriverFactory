@@ -1,25 +1,26 @@
-package com.kazurayam.webdriverfactory.chrome
+package com.kazurayam.webdriverfactory.firefox
 
 import com.kazurayam.webdriverfactory.UserProfile
+import groovy.json.JsonOutput
 import io.github.bonigarcia.wdm.WebDriverManager
 import org.junit.BeforeClass
 import org.junit.Test
 import org.openqa.selenium.Cookie
-import org.openqa.selenium.chrome.ChromeDriver
+import org.openqa.selenium.firefox.FirefoxDriver
 import org.openqa.selenium.devtools.DevTools
+import org.openqa.selenium.devtools.v96.network.Network
 import org.openqa.selenium.devtools.v96.network.model.ResponseReceived
 import org.openqa.selenium.devtools.v96.network.model.ResponseReceivedExtraInfo
 import org.openqa.selenium.devtools.v96.network.model.RequestWillBeSent
-import org.openqa.selenium.devtools.v96.network.Network
 import org.openqa.selenium.devtools.v96.network.model.Headers
 import org.openqa.selenium.devtools.v96.network.model.RequestWillBeSentExtraInfo
-import groovy.json.*
-
-import static org.junit.Assert.*
 
 import java.time.ZoneId
 import java.time.ZonedDateTime
 import java.time.format.DateTimeFormatter
+
+import static org.junit.Assert.assertEquals
+import static org.junit.Assert.assertNotEquals
 
 class CarryingCookieOverSessionsViaProfile {
 
@@ -27,20 +28,20 @@ class CarryingCookieOverSessionsViaProfile {
      * This code requires the URL "http://127.0.0.1" is up and running.
      * To make it up, execute "> ./startup-server.sh".
      *
-     * This code will open Chrome browser and navigate to the URL "http://127.0.0.1" twice.
+     * This code will open Firefox browser and navigate to the URL "http://127.0.0.1" twice.
      * The http server will send a cookie named "timestamp" with value of
      * 1. if the HTTP Request has no "timestamp" cookie, will create a new cookie with current timestamp
      * 2. if the HTTP Request sent a "timestamp" cookie, will echo it
      * The cookie has a expiry that lasts only 60 seconds.
      *
-     * At the 1st time, Chrome is opened with UserDataAccess option of "FOR_HERE".
+     * At the 1st time, the browser will be iopened with UserDataAccess option of "FOR_HERE".
      * Then the "timestamp" cookie will be persisted in the profile storage.
      *
-     * At the 2nd time, Chrome is opened with UserDataAccess option of "TO_GO".
+     * At the 2nd time, the browser will be opened with UserDataAccess option of "TO_GO".
      * TO_GO means that the files in the profile directory will be copied from the genuine location
      * to the temporary location. Therefore I expect the cookies are carried over to
      * the second session. In the second session,
-     * I expect the "timestamp" cookie should be sent from Chrome to the server again.
+     * I expect the "timestamp" cookie should be sent from the browser to the server again.
      *
      * This code makes assertion if the values of "timestamp" cookie of the 1st session
      * and the 2nd session are equal.
@@ -48,19 +49,18 @@ class CarryingCookieOverSessionsViaProfile {
      */
     @Test
     void test_carrying_cookie_over_sessions_via_profile() {
-        //ChromeDriverFactory factory = ChromeDriverFactory.newHeadlessChromeDriverFactory()
-        ChromeDriverFactory factory = ChromeDriverFactory.newChromeDriverFactory()
-        LaunchedChromeDriver launched
+        FirefoxDriverFactory factory = FirefoxDriverFactory.newFirefoxDriverFactory()
+        LaunchedFirefoxDriver launched
 
         // 1st session
-        launched = factory.newChromeDriver(new UserProfile("Picasso"),
-                ChromeDriverFactory.UserDataAccess.FOR_HERE)
+        launched = factory.newFirefoxDriver(new UserProfile("Picasso"),
+                FirefoxDriverFactory.UserDataAccess.FOR_HERE)
         Cookie timestamp1 = observeCookie(launched)
         launched.getDriver().quit()   // at .quit(), the Cookies will be stored into disk
 
         // 2nd session
-        launched = factory.newChromeDriver(new UserProfile("Picasso"),  // or new ProfileDirectoryName("Profile 6")
-                ChromeDriverFactory.UserDataAccess.TO_GO)  // the Cookies file will be copied into the temp dir
+        launched = factory.newFirefoxDriver(new UserProfile("Picasso"),  // or new ProfileDirectoryName("Profile 6")
+                FirefoxDriverFactory.UserDataAccess.TO_GO)  // the Cookies file will be copied into the temp dir
         Cookie timestamp2 = observeCookie(launched)
         launched.getDriver().quit()
         //
@@ -68,15 +68,20 @@ class CarryingCookieOverSessionsViaProfile {
         assertNotEquals(timestamp1.getExpiry(), timestamp2.getExpiry())
     }
 
-    private static Cookie observeCookie(LaunchedChromeDriver launched, String cookieName = "timestamp") {
+    private static Cookie observeCookie(LaunchedFirefoxDriver launched, String cookieName = "timestamp") {
         launched.getEmployedOptions()ifPresent({ options ->
             println "options => " + options.toString() })
-        launched.getChromeUserProfile().ifPresent({ up ->
+        launched.getFirefoxUserProfile().ifPresent({ up ->
             println "userProfile => " + up.toString() })
         launched.getInstruction().ifPresent({ uda ->
             println "userDataAccess => " + uda.toString() })
         println "-------------------------------------------------"
-        ChromeDriver driver = launched.getDriver()
+
+        // FirefoxDriver in Selenium 4 does not support CDP,
+        // so I have to comment out the following lines
+
+        /*
+        FirefoxDriver driver = launched.getDriver()
         DevTools devTool = driver.getDevTools()
         devTool.createSession()
         devTool.send(Network.enable(Optional.empty(), Optional.empty(), Optional.empty()))
@@ -116,6 +121,7 @@ class CarryingCookieOverSessionsViaProfile {
                     println "-------------------------------------------------"
                 }
         )
+         */
         //
         URL url = new URL("http://127.0.0.1")
         try {

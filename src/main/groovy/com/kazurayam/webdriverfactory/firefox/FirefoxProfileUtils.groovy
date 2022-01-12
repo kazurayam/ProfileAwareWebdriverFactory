@@ -34,7 +34,7 @@ class FirefoxProfileUtils {
 
     static Optional<FirefoxUserProfile> findFirefoxUserProfileOf(UserProfile userProfile) {
         List<FirefoxUserProfile> list = getFirefoxUserProfileList()
-        println "list.size is ${list.size()}"
+        // println "list.size is ${list.size()}"
         for (int i = 0; i < list.size(); i++) {
             FirefoxUserProfile fup = list.get(i)
             if (fup.getProfileDirectoryName().getName().endsWith(userProfile.getName())) {
