@@ -8,6 +8,7 @@ interface FirefoxOptionsModifier {
 		headless,
 		windowSize,
 		windowSize1024x768,
+		withProfile,
 		withProfileDirectoryName,
 	}
 

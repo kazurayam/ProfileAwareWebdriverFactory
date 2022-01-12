@@ -2,6 +2,8 @@ package com.kazurayam.webdriverfactory.firefox
 
 import com.kazurayam.webdriverfactory.ProfileDirectoryName
 import org.openqa.selenium.firefox.FirefoxOptions
+import org.openqa.selenium.firefox.FirefoxProfile
+import org.openqa.selenium.firefox.ProfilesIni
 
 import java.nio.file.Path
 
@@ -11,7 +13,7 @@ enum FirefoxOptionsModifiers {
         FirefoxOptionsModifier fom = new Base(
                 FirefoxOptionsModifier.Type.headless,
                 { FirefoxOptions firefoxOptions ->
-                    firefoxOptions.addArguments("-headless")
+                    firefoxOptions.setHeadless(true)
                     return firefoxOptions
                 }
         )
@@ -32,16 +34,26 @@ enum FirefoxOptionsModifiers {
         FirefoxOptionsModifier fom = new Base(
                 FirefoxOptionsModifier.Type.windowSize,
                 { FirefoxOptions firefoxOptions ->
-                    firefoxOptions.addArguments("--window-size=${width},${height}")
+                    firefoxOptions.addArguments("--width=${width}")
+                    firefoxOptions.addArguments("--height=${height}")
                     return firefoxOptions
                 }
         )
         return fom
     }
 
-    /**
-     *
-     */
+    static FirefoxOptionsModifier withProfile(String profileName) {
+        Objects.requireNonNull(profileName)
+        FirefoxOptionsModifier fom = new Base(
+                FirefoxOptionsModifier.Type.withProfile,
+                { FirefoxOptions firefoxOptions ->
+                    FirefoxProfile profile = new ProfilesIni().getProfile(profileName)
+                    firefoxOptions.setProfile(profile)
+                    return firefoxOptions
+                })
+        return fom
+    }
+
     static FirefoxOptionsModifier withProfileDirectoryName(Path userDataDir, ProfileDirectoryName profileDirectoryName) {
         Objects.requireNonNull(userDataDir)
         Objects.requireNonNull(profileDirectoryName)
@@ -50,11 +62,11 @@ enum FirefoxOptionsModifiers {
                 { FirefoxOptions firefoxOptions ->
                     Path profileDir = userDataDir.resolve(profileDirectoryName.getName())
                     // http://kb.mozillazine.org/Command_line_arguments
-                    firefoxOptions.addPreference("-profile", profileDir.toString())
+                    FirefoxProfile profile = new FirefoxProfile(profileDir.toFile())
+                    firefoxOptions.setProfile(profile)
                     return firefoxOptions
                 })
         return fom
-
     }
 
     /**

@@ -43,7 +43,6 @@ class FirefoxDriverFactoryImpl extends FirefoxDriverFactory {
 	private void prepareDefaultSettings() {
 		this.addFirefoxPreferencesModifier(FirefoxPreferencesModifiers.downloadWithoutPrompt())
 		this.addFirefoxPreferencesModifier(FirefoxPreferencesModifiers.downloadIntoUserHomeDownloadsDirectory())
-
 		this.addFirefoxOptionsModifier(FirefoxOptionsModifiers.windowSize1024_768())
 	}
 
@@ -192,12 +191,11 @@ class FirefoxDriverFactoryImpl extends FirefoxDriverFactory {
 			logger_.debug("will use ${sourceProfileDirectory} ")
 		}
 
-		// use the specified UserProfile with which Firefox browser is launched
-		FirefoxOptionsModifier fom =
+		// use the specified UserProfile to launch Firefox browser
+		this.addFirefoxOptionsModifier(
 				FirefoxOptionsModifiers.withProfileDirectoryName(
-						targetUserDataDir,
-						profileDirectoryName)
-		this.addFirefoxOptionsModifier(fom)
+						userDataDir, profileDirectoryName)
+		)
 
 		// launch the Firefox driver
 		FirefoxDriver driver = null
@@ -208,9 +206,8 @@ class FirefoxDriverFactoryImpl extends FirefoxDriverFactory {
 			)
 			driver = new FirefoxDriver(options)
 			setPageLoadTimeout(driver, this.pageLoadTimeoutSeconds)
-			FirefoxUserProfile fup = new FirefoxUserProfile(targetUserDataDir, profileDirectoryName)
 			LaunchedFirefoxDriver launched = new LaunchedFirefoxDriver(driver)
-					.setFirefoxUserProfile(fup)
+					.setFirefoxUserProfile(new FirefoxUserProfile(targetUserDataDir, profileDirectoryName))
 					.setInstruction(instruction)
 					.setEmployedOptions(options)
 			return launched

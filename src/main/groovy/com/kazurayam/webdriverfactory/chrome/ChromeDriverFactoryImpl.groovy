@@ -240,11 +240,9 @@ class ChromeDriverFactoryImpl extends ChromeDriverFactory {
 		}
 
 		// use the specified UserProfile with which Chrome browser is launched
-		ChromeOptionsModifier com =
+		this.addChromeOptionsModifier(
 				ChromeOptionsModifiers.withProfileDirectoryName(
-						targetUserDataDir,
-						profileDirectoryName)
-		this.addChromeOptionsModifier(com)
+						targetUserDataDir, profileDirectoryName))
 
 		// launch the Chrome driver
 		ChromeDriver driver = null
@@ -255,9 +253,8 @@ class ChromeDriverFactoryImpl extends ChromeDriverFactory {
 			)
 			driver = new ChromeDriver(options)
 			setPageLoadTimeout(driver, this.pageLoadTimeoutSeconds)
-			ChromeUserProfile cup = new ChromeUserProfile(targetUserDataDir, profileDirectoryName)
 			LaunchedChromeDriver launched = new LaunchedChromeDriver(driver)
-					.setChromeUserProfile(cup)
+					.setChromeUserProfile(new ChromeUserProfile(targetUserDataDir, profileDirectoryName))
 					.setInstruction(instruction)
 					.setEmployedOptions(options)
 			return launched
