@@ -87,7 +87,7 @@ class Handler implements HttpHandler {
       // if the request doesn't have "timestamp" cookie, add it
       Headers reqHeaders = exchange.getRequestHeaders()
       List<String> cookies = reqHeaders.get("Cookie")
-      this.debugLog {"request: cookies=${cookies}"}
+      this.debugLog {"request:  cookies=${cookies}"}
       List<String> values = new ArrayList<>()
       long maxAgeSeconds = 60L;
       boolean foundTimestamp = false

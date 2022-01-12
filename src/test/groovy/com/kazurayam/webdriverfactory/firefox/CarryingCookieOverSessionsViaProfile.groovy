@@ -1,25 +1,36 @@
 package com.kazurayam.webdriverfactory.firefox
 
 import com.kazurayam.webdriverfactory.CookieUtils
+import com.kazurayam.webdriverfactory.TestUtils
 import com.kazurayam.webdriverfactory.UserProfile
 import io.github.bonigarcia.wdm.WebDriverManager
 import org.junit.BeforeClass
 import org.junit.Test
+import org.junit.Ignore
 import org.openqa.selenium.Cookie
-import org.openqa.selenium.firefox.FirefoxDriver
-/*
 import org.openqa.selenium.devtools.DevTools
+import org.openqa.selenium.devtools.v96.network.model.RequestWillBeSentExtraInfo
 import org.openqa.selenium.devtools.v96.network.Network
+import org.openqa.selenium.devtools.v96.network.model.RequestWillBeSent
 import org.openqa.selenium.devtools.v96.network.model.ResponseReceived
 import org.openqa.selenium.devtools.v96.network.model.ResponseReceivedExtraInfo
-import org.openqa.selenium.devtools.v96.network.model.RequestWillBeSent
-import org.openqa.selenium.devtools.v96.network.model.Headers
-import org.openqa.selenium.devtools.v96.network.model.RequestWillBeSentExtraInfo
-*/
+import org.openqa.selenium.firefox.FirefoxDriver
 import static org.junit.Assert.assertEquals
 import static org.junit.Assert.assertNotEquals
 
+/**
+ * This test will never pass.
+ * Why?
+ * See https://github.com/kazurayam/webdriverfactory/issues/33
+ */
+@Ignore
 class CarryingCookieOverSessionsViaProfile {
+
+    @BeforeClass
+    static void beforeClass() {
+        String GHT = TestUtils.getGitHubPersonalAccessToken()
+        WebDriverManager.firefoxdriver().gitHubToken(GHT).setup()
+    }
 
     /**
      * This code requires the URL "http://127.0.0.1" is up and running.
@@ -64,6 +75,8 @@ class CarryingCookieOverSessionsViaProfile {
         println "timestamp1 => " + CookieUtils.stringifyCookie(timestamp1)
         println "timestamp2 => " + CookieUtils.stringifyCookie(timestamp2)
 
+        // The following assertion will NEVER pass.
+        // See https://github.com/kazurayam/webdriverfactory/issues/33 for the reason why NEVER pass.
         assertEquals(timestamp1.getValue(), timestamp2.getValue())
         assertNotEquals(timestamp1.getExpiry(), timestamp2.getExpiry())
     }
@@ -77,10 +90,9 @@ class CarryingCookieOverSessionsViaProfile {
             println "userDataAccess => " + uda.toString() })
         println "-------------------------------------------------"
 
-        // FirefoxDriver in Selenium 4 does not support CDP,
+        // Selenium 4 support of CDP does not work well for Firefox,
         // so I have to comment out the following lines
-
-        /*
+/*
         FirefoxDriver driver = launched.getDriver()
         DevTools devTool = driver.getDevTools()
         devTool.createSession()
@@ -121,7 +133,9 @@ class CarryingCookieOverSessionsViaProfile {
                     println "-------------------------------------------------"
                 }
         )
-         */
+
+ */
+
         //
         URL url = new URL("http://127.0.0.1")
         try {
@@ -133,9 +147,5 @@ class CarryingCookieOverSessionsViaProfile {
         return timestamp
     }
 
-    @BeforeClass
-    static void beforeClass() {
-        // setup the ChromeDriver binary
-        WebDriverManager.chromedriver().setup()
-    }
+
 }

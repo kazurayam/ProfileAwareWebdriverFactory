@@ -30,15 +30,6 @@ class FirefoxDriverFactoryTest {
 
 	@BeforeClass
 	static void beforeClass() {
-		// GitHub Personal Access Token
-		/*
-		Subprocess subprocess = new Subprocess()
-		CompletedProcess cp = subprocess.run(Arrays.asList(
-				"security", "find-internet-password",
-				"-s", "github.com", "-a", "kazurayam",
-				"-w"))
-		assert cp.returncode() == 0
-		*/
 		String GHT = TestUtils.getGitHubPersonalAccessToken()
 		WebDriverManager.firefoxdriver().gitHubToken(GHT).setup()
 	}
