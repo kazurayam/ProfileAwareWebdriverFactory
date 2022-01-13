@@ -3,6 +3,7 @@ package com.kazurayam.webdriverfactory.firefox
 import com.kazurayam.webdriverfactory.UserProfile
 import org.junit.After
 import org.junit.Before
+import org.junit.Ignore
 import org.junit.Test
 import org.openqa.selenium.firefox.FirefoxDriver
 import org.openqa.selenium.firefox.FirefoxOptions
@@ -11,6 +12,7 @@ import org.openqa.selenium.firefox.ProfilesIni
 
 import java.nio.file.Path
 
+@Ignore
 class PlainFirefoxDriverTest {
 
     FirefoxDriver driver
