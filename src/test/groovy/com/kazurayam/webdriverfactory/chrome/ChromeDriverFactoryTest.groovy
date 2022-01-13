@@ -10,7 +10,6 @@ import com.kazurayam.webdriverfactory.chrome.ChromeDriverFactory.UserDataAccess
 import org.junit.After
 import org.junit.BeforeClass
 
-import java.security.MessageDigest
 import java.time.LocalDateTime
 
 import static org.junit.Assert.*
@@ -232,7 +231,7 @@ class ChromeDriverFactoryTest {
 	void test_addChromeOptionsModifier_incognito() {
 		ChromeDriverFactory cdFactory = ChromeDriverFactory.newChromeDriverFactory()
 		//
-		cdFactory.addChromeOptionsModifier(ChromeOptionsModifiers.incognito())
+		cdFactory.addChromeOptionsModifier(ChromeOptionsModifier.incognito())
 		//
 		launched = cdFactory.newChromeDriver()
 		assertNotNull(launched)

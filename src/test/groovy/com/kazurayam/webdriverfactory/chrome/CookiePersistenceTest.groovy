@@ -1,7 +1,7 @@
 package com.kazurayam.webdriverfactory.chrome
 
 import com.kazurayam.webdriverfactory.UserProfile
-import com.kazurayam.webdriverfactory.utils.CookieClassHelper
+
 import org.junit.After
 import org.junit.Before
 import org.junit.BeforeClass
@@ -120,7 +120,6 @@ class CookiePersistenceTest {
 
     @BeforeClass
     static void setupClass() {
-        CookieClassHelper.overrideToString()
     }
 
     @Before

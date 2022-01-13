@@ -2,7 +2,7 @@ package examples
 
 
 import com.kazurayam.webdriverfactory.chrome.ChromeDriverFactory
-import com.kazurayam.webdriverfactory.chrome.ChromeOptionsModifiers
+import com.kazurayam.webdriverfactory.chrome.ChromeOptionsModifier
 import com.kazurayam.webdriverfactory.chrome.LaunchedChromeDriver
 import io.github.bonigarcia.wdm.WebDriverManager
 import org.junit.After
@@ -18,7 +18,7 @@ class PrintEmployedOptions {
     @Test
     void test_getEmployedOptions() {
         ChromeDriverFactory factory = ChromeDriverFactory.newHeadlessChromeDriverFactory()
-        factory.addChromeOptionsModifier(ChromeOptionsModifiers.incognito())
+        factory.addChromeOptionsModifier(ChromeOptionsModifier.incognito())
         launched = factory.newChromeDriver()
         launched.getEmployedOptions().ifPresent { ChromeOptions options ->
             println options

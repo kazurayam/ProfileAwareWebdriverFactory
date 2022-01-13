@@ -2,7 +2,7 @@ package examples
 
 
 import com.kazurayam.webdriverfactory.chrome.ChromeDriverFactory
-import com.kazurayam.webdriverfactory.chrome.ChromeOptionsModifiers
+import com.kazurayam.webdriverfactory.chrome.ChromeOptionsModifier
 import com.kazurayam.webdriverfactory.chrome.ChromeUserProfile
 import com.kazurayam.webdriverfactory.chrome.LaunchedChromeDriver
 import com.kazurayam.webdriverfactory.ProfileDirectoryName
@@ -21,7 +21,7 @@ class PrintWebDriverMetadata {
     @Test
     void test_printUserProfile() {
         ChromeDriverFactory factory = ChromeDriverFactory.newChromeDriverFactory()
-        factory.addChromeOptionsModifier(ChromeOptionsModifiers.incognito())
+        factory.addChromeOptionsModifier(ChromeOptionsModifier.incognito())
         launched = factory.newChromeDriver(new ProfileDirectoryName("Default"),
                 ChromeDriverFactory.UserDataAccess.TO_GO)
         assertTrue(launched.getChromeUserProfile().isPresent())
