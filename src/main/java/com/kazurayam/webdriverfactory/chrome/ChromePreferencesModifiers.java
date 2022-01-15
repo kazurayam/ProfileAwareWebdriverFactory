@@ -1,69 +1,127 @@
 package com.kazurayam.webdriverfactory.chrome;
 
-import com.kazurayam.webdriverfactory.PreferencesModifier;
-import com.kazurayam.webdriverfactory.PreferencesModifierBase;
-import groovy.lang.Closure;
-import org.codehaus.groovy.runtime.DefaultGroovyMethods;
-
-import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.function.BiFunction;
 
-public enum ChromePreferencesModifiers {
-    ;
+public class ChromePreferencesModifiers {
 
-    public static PreferencesModifier downloadWithoutPrompt() {
-        PreferencesModifier pm = new PreferencesModifierBase(PreferencesModifier.Type.CHROME_downloadWithoutPrompt, new Closure<Map<String, Object>>(null, null) {
-            public Map<String, Object> doCall(Map<String, Object> preferences) {
-                // Below two preference settings will disable popup dialog when download file
-                preferences.put("profile.default_content_settings.popups", 0);
-                preferences.put("download.prompt_for_download", false);
-                return preferences;
-            }
-
-        });
-        return pm;
+    enum Type {
+        downloadWithoutPrompt,
+        downloadIntoUserHomeDownloadsDirectory,
+        downloadIntoDirectory,
+        disableViewersOfFlashAndPdf,
     }
 
-    public static PreferencesModifier downloadIntoUserHomeDownloadsDirectory()
-            throws IOException
-    {
+    static ChromePreferencesModifier downloadWithoutPrompt() {
+        List<Object> arguments = Collections.emptyList();
+        BiFunction<Map<String,Object>, List<Object>, Map<String,Object>> modifier = (prefs, args) -> {
+            prefs.put("profile.default_content_settings.popups", 0);
+            prefs.put("download.prompt_for_download", false);
+            return prefs;
+        };
+        return new Base(Type.downloadIntoDirectory, modifier, arguments);
+    }
+
+    static ChromePreferencesModifier downloadIntoUserHomeDownloadsDirectory() {
         Path p = Paths.get(System.getProperty("user.home"), "Downloads");
         return downloadIntoDirectory(p);
     }
 
-    public static PreferencesModifier downloadIntoDirectory(final Path directory)
-            throws IOException
-    {
+    static ChromePreferencesModifier downloadIntoDirectory(Path directory) {
         Objects.requireNonNull(directory);
-        if (!Files.exists(directory)) {
-            Files.createDirectories(directory);
+        List<Object> arguments = Collections.singletonList(directory);
+        BiFunction<Map<String,Object>, List<Object>, Map<String,Object>> modifier = (prefs, args) -> {
+            if (args.size() < 1) {
+                throw new IllegalArgumentException("Path directory argument is required");
+            }
+            Path dir = (Path) args.get(0);
+            prefs.put("download.default_directory", dir.toString());
+            return prefs;
+        };
+        return new Base(Type.downloadIntoDirectory, modifier, arguments);
+    }
+
+    static ChromePreferencesModifier disableViewersOfFlashAndPdf() {
+        List<Object> arguments = Collections.emptyList();
+        BiFunction<Map<String,Object>, List<Object>, Map<String,Object>> modifier = (prefs, args) -> {
+            prefs.put("plugins.plugins_disabled",
+                    Arrays.asList("Adobe Flash Player", "Chrome PDF Viewer"));
+            return prefs;
+        };
+        return new Base(Type.disableViewersOfFlashAndPdf, modifier, arguments);
+    }
+
+
+
+    /**
+     *
+     */
+    static class Base implements ChromePreferencesModifier {
+
+        private final Type type;
+        private final BiFunction<Map<String, Object>, List<Object>, Map<String, Object>> fn;
+        private final List<Object> arguments;
+
+        Base(Type type, BiFunction<Map<String, Object>, List<Object>, Map<String, Object>> fn, List<Object> arguments) {
+            this.type = type;
+            this.fn = fn;
+            this.arguments = arguments;
         }
 
-        PreferencesModifier pm = new PreferencesModifierBase(PreferencesModifier.Type.CHROME_downloadIntoDirectory, new Closure<Map<String, Object>>(null, null) {
-            public Map<String, Object> doCall(Map<String, Object> preferences) {
-                preferences.put("download.default_directory", directory.toString());
-                return preferences;
+        @Override
+        public Type getType() {
+            return type;
+        }
+
+        @Override
+        public Map<String, Object> modify(Map<String, Object> chromePreferences) {
+            return fn.apply(chromePreferences, arguments);
+        }
+
+        /**
+         * if this.getType() == other.getType(), this equals other
+         * @param obj
+         * @return
+         */
+        @Override
+        public boolean equals(Object obj) {
+            if (!(obj instanceof ChromePreferencesModifiers.Base)) {
+                return false;
             }
+            ChromePreferencesModifiers.Base other = (ChromePreferencesModifiers.Base)obj;
+            return this.getType() == other.getType();
+        }
 
-        });
-        return pm;
-    }
+        @Override
+        public int hashCode() {
+            return this.getType().hashCode();
+        }
 
-    public static PreferencesModifier disableViewersOfFlashAndPdf() {
-        PreferencesModifier pm = new PreferencesModifierBase(PreferencesModifier.Type.CHROME_disableViewersOfFlashAndPdf, new Closure<Map<String, Object>>(null, null) {
-            public Map<String, Object> doCall(Map<String, Object> preferences) {
-                preferences.put("plugins.plugins_disabled", new ArrayList<String>(Arrays.asList("Adobe Flash Player", "Chrome PDF Viewer")));
-                return preferences;
+        @Override
+        public String toString() {
+            StringBuilder sb = new StringBuilder();
+            sb.append("{");
+            sb.append("\"type\":\"");
+            sb.append(getType().toString());
+            sb.append("\",\"argument\":[");
+            for (int i = 0; i < arguments.size(); i++) {
+                if (i > 0) {
+                    sb.append(",");
+                }
+                Object obj = arguments.get(i);
+                sb.append("\"");
+                sb.append(obj.toString());
+                sb.append("\"");
             }
-
-        });
-        return pm;
+            sb.append("]");
+            sb.append("}");
+            return sb.toString();
+        }
     }
-
 }

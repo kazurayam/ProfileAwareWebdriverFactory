@@ -2,12 +2,12 @@ package com.kazurayam.webdriverfactory.firefox;
 
 import org.openqa.selenium.firefox.FirefoxOptions;
 
+import com.kazurayam.webdriverfactory.firefox.FirefoxOptionsModifiers.Type;
+
 public interface FirefoxOptionsModifier {
-    public abstract Type getType();
 
-    public abstract FirefoxOptions modify(FirefoxOptions firefoxOptions);
+    Type getType();
 
-    public static enum Type {
-        headless, windowSize, windowSize1024x768, withProfile, withProfileDirectoryName;
-    }
+    FirefoxOptions modify(FirefoxOptions firefoxOptions);
+
 }

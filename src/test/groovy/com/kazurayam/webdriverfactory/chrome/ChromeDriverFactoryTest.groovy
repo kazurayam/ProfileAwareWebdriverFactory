@@ -231,7 +231,7 @@ class ChromeDriverFactoryTest {
 	void test_addChromeOptionsModifier_incognito() {
 		ChromeDriverFactory cdFactory = ChromeDriverFactory.newChromeDriverFactory()
 		//
-		cdFactory.addChromeOptionsModifier(ChromeOptionsModifier.incognito())
+		cdFactory.addChromeOptionsModifier(ChromeOptionsModifiers.incognito())
 		//
 		launched = cdFactory.newChromeDriver()
 		assertNotNull(launched)

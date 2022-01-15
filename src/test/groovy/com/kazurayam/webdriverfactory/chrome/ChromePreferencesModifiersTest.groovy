@@ -1,6 +1,5 @@
 package com.kazurayam.webdriverfactory.chrome
 
-import com.kazurayam.webdriverfactory.PreferencesModifier
 
 import java.nio.file.Path
 import java.nio.file.Paths

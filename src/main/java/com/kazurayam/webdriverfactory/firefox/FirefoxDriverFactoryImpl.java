@@ -1,6 +1,5 @@
 package com.kazurayam.webdriverfactory.firefox;
 
-import com.kazurayam.webdriverfactory.PreferencesModifier;
 import com.kazurayam.webdriverfactory.ProfileDirectoryName;
 import com.kazurayam.webdriverfactory.UserProfile;
 import com.kazurayam.webdriverfactory.WebDriverFactoryException;
@@ -28,7 +27,7 @@ public class FirefoxDriverFactoryImpl extends FirefoxDriverFactory {
         this(true);
     }
 
-    public FirefoxDriverFactoryImpl(boolean requireDefaultSettings) {
+    public FirefoxDriverFactoryImpl(boolean requireDefaultSettings) throws IOException {
         this.firefoxPreferencesModifiers = new HashSet<>();
         this.firefoxOptionsModifiers = new HashSet<>();
         if (requireDefaultSettings) {
@@ -38,10 +37,10 @@ public class FirefoxDriverFactoryImpl extends FirefoxDriverFactory {
         pageLoadTimeoutSeconds = 60;
     }
 
-    private void prepareDefaultSettings() {
-        this.addFirefoxPreferencesModifier(FirefoxPreferencesModifiers.downloadWithoutPrompt());
-        this.addFirefoxPreferencesModifier(FirefoxPreferencesModifiers.downloadIntoUserHomeDownloadsDirectory());
-        this.addFirefoxOptionsModifier(FirefoxOptionsModifiers.windowSize1024_768());
+    private void prepareDefaultSettings() throws IOException {
+        this.addFirefoxPreferencesModifier(FirefoxPreferencesModifiers.downloadWithoutPrompt);
+        this.addFirefoxPreferencesModifier(FirefoxPreferencesModifiers.downloadIntoUserHomeDownloadsDirectory);
+        this.addFirefoxOptionsModifier(FirefoxOptionsModifiers.windowSize1024_768);
     }
 
     @Override
@@ -181,7 +180,7 @@ public class FirefoxDriverFactoryImpl extends FirefoxDriverFactory {
     }
 
     private static FirefoxOptions buildOptions(Set<PreferencesModifier> firefoxPreferencesModifiers, Set<FirefoxOptionsModifier> firefoxOptionsModifiers) {
-        Map<String, Object> preferences = new HashMap<String, Object>();
+        Map<String, String> preferences = new HashMap<String, String>();
 
         preferences = applyFirefoxPreferencesModifiers(preferences, firefoxPreferencesModifiers);
 
@@ -192,8 +191,8 @@ public class FirefoxDriverFactoryImpl extends FirefoxDriverFactory {
         return firefoxOptions;
     }
 
-    public static Map<String, Object> applyFirefoxPreferencesModifiers(Map<String, Object> firefoxPreferences, Set<PreferencesModifier> modifiers) {
-        Map<String, Object> fp = new HashMap<String, Object>(firefoxPreferences);
+    public static Map<String, String> applyFirefoxPreferencesModifiers(Map<String, String> firefoxPreferences, Set<PreferencesModifier> modifiers) {
+        Map<String, Object> fp = new HashMap<>(firefoxPreferences);
         for (PreferencesModifier fpm : modifiers) {
             fp = fpm.modify(fp);
         }

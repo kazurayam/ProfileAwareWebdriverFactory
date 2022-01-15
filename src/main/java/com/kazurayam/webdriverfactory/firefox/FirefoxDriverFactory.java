@@ -1,6 +1,5 @@
 package com.kazurayam.webdriverfactory.firefox;
 
-import com.kazurayam.webdriverfactory.PreferencesModifier;
 import com.kazurayam.webdriverfactory.ProfileDirectoryName;
 import com.kazurayam.webdriverfactory.UserProfile;
 import com.kazurayam.webdriverfactory.WebDriverFactoryException;
@@ -15,7 +14,8 @@ public abstract class FirefoxDriverFactory {
         return new FirefoxDriverFactoryImpl();
     }
 
-    public static FirefoxDriverFactory newFirefoxDriverFactory(boolean requireDefaultSettings) {
+    public static FirefoxDriverFactory newFirefoxDriverFactory(boolean requireDefaultSettings)
+            throws IOException {
         return new FirefoxDriverFactoryImpl(requireDefaultSettings);
     }
 
@@ -25,7 +25,7 @@ public abstract class FirefoxDriverFactory {
         return fdfi;
     }
 
-    public static FirefoxDriverFactory newHeadlessFirefoxDriverFactory(boolean requireDefaultSettings) {
+    public static FirefoxDriverFactory newHeadlessFirefoxDriverFactory(boolean requireDefaultSettings) throws IOException {
         FirefoxDriverFactoryImpl fdfi = new FirefoxDriverFactoryImpl(requireDefaultSettings);
         fdfi.addFirefoxOptionsModifier(FirefoxOptionsModifiers.headless());
         return fdfi;
