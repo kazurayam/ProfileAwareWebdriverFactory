@@ -1,37 +1,41 @@
 package com.kazurayam.webdriverfactory.firefox;
 
-import com.kazurayam.webdriverfactory.chrome.ChromePreferencesModifiers;
-
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.BiFunction;
 
 public class FirefoxPreferencesModifiers {
 
     enum Type {
-        downloadIntoUserHomeDownloadsDirectory,
         downloadIntoDirectory,
         downloadWithoutPrompt,
     }
 
-    downloadIntoUserHomeDownloadsDirectory((preferences, arguments) -> {
-        Path p = Paths.get(System.getProperty("user.home"), "Downloads");
-        Map<String, Object> r = downloadIntoDirectory.apply(
-                preferences, Collections.singletonList(p));
-        return r;
-    }),
+    static FirefoxPreferencesModifier downloadIntoDirectory(Path directory) {
+        Objects.requireNonNull(directory);
+        List<Object> arguments = Collections.singletonList(directory);
+        BiFunction<Map<String, Object>, List<Object>, Map<String, Object>> modifier = (prefs, args) -> {
+            assert args.size() >= 0;
+            assert args.get(0) instanceof Path;
+            Path d = (Path)args.get(0);
+            prefs.put("browser.download.useDownloadDir", true);
+            prefs.put("browser.download.folderList", 2);
+            prefs.put("browser.download.dir", d.toString());
+            return prefs;
+        };
+        return new Base(FirefoxPreferencesModifiers.Type.downloadIntoDirectory,
+                modifier, arguments);
+    }
 
-    static FirefoxPreferencesModifier downloadIntoDirectory((preferences, arguments) -> {
-        preferences.put("browser.download.useDownloadDir", true);
-        preferences.put("browser.download.folderList", 2);
+    static FirefoxPreferencesModifier downloadIntoUserHomeDownloadsDirectory() {
         Path downloads = Paths.get(System.getProperty("user.home"), "Downloads");
-        preferences.put("browser.download.dir", downloads.toString());
-        return preferences;
-    }),
+        return downloadIntoDirectory(downloads);
+    }
 
     /**
      * Don't show the dialong to confirm if you really want to download a file
@@ -42,7 +46,7 @@ public class FirefoxPreferencesModifiers {
             prefs.put("browser.helperApps.neverAsk.saveToDisk", getAllMimeTypesAsString());
             prefs.put("browser.helperApps.neverAsk.openFile", getAllMimeTypesAsString());
             return prefs;
-        }
+        };
         return new Base(FirefoxPreferencesModifiers.Type.downloadWithoutPrompt, modifier, arguments);
     }
 

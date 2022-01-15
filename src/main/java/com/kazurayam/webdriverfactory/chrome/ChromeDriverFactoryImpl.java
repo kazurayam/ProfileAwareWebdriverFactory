@@ -26,8 +26,8 @@ public class ChromeDriverFactoryImpl extends ChromeDriverFactory {
 
 	private static Logger logger_ = LoggerFactory.getLogger(ChromeDriverFactoryImpl.class);
 
-	private final Set<ChromePreferencesModifiers> chromePreferencesModifiers;
-	private final Set<ChromeOptionsModifiers> chromeOptionsModifiers;
+	private final Set<ChromePreferencesModifier> chromePreferencesModifiers;
+	private final Set<ChromeOptionsModifier> chromeOptionsModifiers;
 	private Integer pageLoadTimeoutSeconds;
 
 	public ChromeDriverFactoryImpl() throws IOException {
@@ -43,22 +43,22 @@ public class ChromeDriverFactoryImpl extends ChromeDriverFactory {
 		pageLoadTimeoutSeconds = 60;// wait for page load for 60 seconds as default
 	}
 
-	private void prepareDefaultSettings() throws IOException {
-		this.addChromePreferencesModifier(ChromePreferencesModifiers.downloadWithoutPrompt);
-		this.addChromePreferencesModifier(ChromePreferencesModifiers.downloadIntoUserHomeDownloadsDirectory);
-		this.addChromePreferencesModifier(ChromePreferencesModifiers.disableViewersOfFlashAndPdf);
+	private void prepareDefaultSettings() {
+		this.addChromePreferencesModifier(ChromePreferencesModifiers.downloadWithoutPrompt());
+		this.addChromePreferencesModifier(ChromePreferencesModifiers.downloadIntoUserHomeDownloadsDirectory());
+		this.addChromePreferencesModifier(ChromePreferencesModifiers.disableViewersOfFlashAndPdf());
 		//
-		this.addChromeOptionsModifier(ChromeOptionsModifiers.windowSize1024_768);
-		this.addChromeOptionsModifier(ChromeOptionsModifiers.noSandbox);
-		//this.addChromeOptionsModifier(ChromeOptionsModifiers.singleProcess)
-		this.addChromeOptionsModifier(ChromeOptionsModifiers.disableInfobars);
-		this.addChromeOptionsModifier(ChromeOptionsModifiers.disableExtensions);
-		this.addChromeOptionsModifier(ChromeOptionsModifiers.disableGpu);
-		this.addChromeOptionsModifier(ChromeOptionsModifiers.disableDevShmUsage);
+		this.addChromeOptionsModifier(ChromeOptionsModifiers.windowSize1024_768());
+		this.addChromeOptionsModifier(ChromeOptionsModifiers.noSandbox());
+		//this.addChromeOptionsModifier(ChromeOptionsModifiers.singleProcess())
+		this.addChromeOptionsModifier(ChromeOptionsModifiers.disableInfobars());
+		this.addChromeOptionsModifier(ChromeOptionsModifiers.disableExtensions());
+		this.addChromeOptionsModifier(ChromeOptionsModifiers.disableGpu());
+		this.addChromeOptionsModifier(ChromeOptionsModifiers.disableDevShmUsage());
 	}
 
 	@Override
-	public void addChromePreferencesModifier(ChromePreferencesModifiers cpm) {
+	public void addChromePreferencesModifier(ChromePreferencesModifier cpm) {
 		if (this.chromePreferencesModifiers.contains(cpm)) {
 			// The late comer wins
 			this.chromePreferencesModifiers.remove(cpm);
@@ -67,7 +67,7 @@ public class ChromeDriverFactoryImpl extends ChromeDriverFactory {
 	}
 
 	@Override
-	public void addAllChromePreferencesModifiers(List<ChromePreferencesModifiers> list) {
+	public void addAllChromePreferencesModifiers(List<ChromePreferencesModifier> list) {
 		list.forEach(this::addChromePreferencesModifier);
 	}
 
@@ -81,7 +81,7 @@ public class ChromeDriverFactoryImpl extends ChromeDriverFactory {
 	}
 
 	@Override
-	public void addAllChromeOptionsModifiers(List<ChromeOptionsModifiers> list) {
+	public void addAllChromeOptionsModifiers(List<ChromeOptionsModifier> list) {
 		list.forEach(this::addChromeOptionsModifier);
 	}
 
@@ -89,7 +89,7 @@ public class ChromeDriverFactoryImpl extends ChromeDriverFactory {
 	public void pageLoadTimeout(final Integer waitSeconds) {
 		Objects.requireNonNull(waitSeconds);
 		if (waitSeconds <= 0) {
-			throw new IllegalArgumentException("waitSeconds=" + String.valueOf(waitSeconds) + " must not be <=0");
+			throw new IllegalArgumentException(String.format("waitSeconds=%d must not be <= 0", waitSeconds));
 		}
 
 		if (waitSeconds > 999) {
@@ -115,8 +115,7 @@ public class ChromeDriverFactoryImpl extends ChromeDriverFactory {
 				this.chromeOptionsModifiers);
 		ChromeDriver driver = new ChromeDriver(options);
 		setPageLoadTimeout(driver, this.pageLoadTimeoutSeconds);
-		LaunchedChromeDriver launched = new LaunchedChromeDriver(driver).setEmployedOptions(options);
-		return launched;
+		return new LaunchedChromeDriver(driver).setEmployedOptions(options);
 	}
 
 	/**
@@ -158,7 +157,7 @@ public class ChromeDriverFactoryImpl extends ChromeDriverFactory {
 			throw new WebDriverFactoryException(
 					String.format(
 							"ChromeUserProfile of \"%s\" is not found in :\n%s",
-							userProfile.toString(),
+							userProfile,
 							ChromeProfileUtils.allChromeUserProfilesAsString()
 					)
 			);
@@ -248,14 +247,13 @@ public class ChromeDriverFactoryImpl extends ChromeDriverFactory {
 			driver = new ChromeDriver(options);
 			setPageLoadTimeout(driver, this.pageLoadTimeoutSeconds);
 			return new LaunchedChromeDriver(driver)
-					.setChromeUserProfile(new ChromeUserProfile(targetUserDataDir.get(), profileDirectoryName))
+					.setChromeUserProfile(new ChromeUserProfile(targetUserDataDir, profileDirectoryName))
 					.setInstruction(instruction).setEmployedOptions(options);
 		} catch (InvalidArgumentException iae) {
 			if (driver != null) {
 				driver.quit();
 				logger_.info("forcibly closed the browser");
 			}
-
 			StringBuilder sb = new StringBuilder();
 			sb.append(String.format("targetUserDataDir=\"%s\"\n", targetUserDataDir));
 			sb.append(String.format("profileDirectoryName=\"%s\"\n", profileDirectoryName));
@@ -273,8 +271,8 @@ public class ChromeDriverFactoryImpl extends ChromeDriverFactory {
 	 * Chrome Preferences => Chrome Options
 	 * while modifying each containers with specified Modifiers
 	 */
-	private ChromeOptions buildOptions(Set<ChromePreferencesModifiers> chromePreferencesModifiers,
-									   Set<ChromeOptionsModifiers> chromeOptionsModifiers) {
+	private ChromeOptions buildOptions(Set<ChromePreferencesModifier> chromePreferencesModifiers,
+									   Set<ChromeOptionsModifier> chromeOptionsModifiers) {
 		// create a Chrome Preferences object as the seed
 		Map<String, Object> preferences = new HashMap<>();
 
@@ -289,10 +287,10 @@ public class ChromeDriverFactoryImpl extends ChromeDriverFactory {
 		return chromeOptions;
 	}
 
-	public static Map<String, String> applyChromePreferencesModifiers(
-			Map<String, String> chromePreferences, Set<ChromePreferencesModifiers> modifiers) {
-		Map<String, String> cp = chromePreferences;
-		for (ChromePreferencesModifiers cpm : modifiers) {
+	public static Map<String, Object> applyChromePreferencesModifiers(
+			Map<String, Object> chromePreferences, Set<ChromePreferencesModifier> modifiers) {
+		Map<String, Object> cp = chromePreferences;
+		for (ChromePreferencesModifier cpm : modifiers) {
 			cp = cpm.modify(cp);
 		}
 		return cp;
@@ -300,10 +298,10 @@ public class ChromeDriverFactoryImpl extends ChromeDriverFactory {
 
 	public static ChromeOptions applyChromeOptionsModifiers(
 			ChromeOptions chromeOptions,
-			Set<ChromeOptionsModifiers> modifiers) {
+			Set<ChromeOptionsModifier> modifiers) {
 		ChromeOptions cp = chromeOptions;
-		for (ChromeOptionsModifiers com : modifiers) {
-			cp = com.apply(cp);
+		for (ChromeOptionsModifier com : modifiers) {
+			cp = com.modify(cp);
 		}
 		return cp;
 	}

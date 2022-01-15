@@ -6,12 +6,12 @@ import java.util.Map;
 
 public class FirefoxOptionsBuilderImpl implements FirefoxOptionsBuilder {
 
-    private Map<String, String> preferences;
+    private Map<String, Object> preferences;
 
     public FirefoxOptionsBuilderImpl() {
     }
 
-    public FirefoxOptionsBuilderImpl(Map<String, String> preferences) {
+    public FirefoxOptionsBuilderImpl(Map<String, Object> preferences) {
         this.preferences = preferences;
     }
 
@@ -26,7 +26,11 @@ public class FirefoxOptionsBuilderImpl implements FirefoxOptionsBuilder {
         options.setBinary(FirefoxDriverUtils.getFirefoxBinaryPath().toString());
 
         // set my preferences
-        preferences.forEach(options::addPreference);
+        preferences.forEach((k,v) -> {
+            // FIXME: this line doesn't compile.
+            // I dont know why.
+            //options.addPreference(k,v);
+        });
 
         // The following lines are copy&pasted from
         // https://github.com/SeleniumHQ/selenium/issues/4961

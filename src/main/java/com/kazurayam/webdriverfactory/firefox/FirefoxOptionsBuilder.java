@@ -9,7 +9,7 @@ public interface FirefoxOptionsBuilder {
         return new FirefoxOptionsBuilderImpl();
     }
 
-    public static FirefoxOptionsBuilder newInstance(Map<String, String> preferences) {
+    public static FirefoxOptionsBuilder newInstance(Map<String, Object> preferences) {
         return new FirefoxOptionsBuilderImpl(preferences);
     }
 

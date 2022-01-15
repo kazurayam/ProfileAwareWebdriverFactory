@@ -23,7 +23,21 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 public class FirefoxDriverFactoryImpl extends FirefoxDriverFactory {
-    public FirefoxDriverFactoryImpl() {
+
+    public static Logger getLogger_() {
+        return logger_;
+    }
+
+    public static void setLogger_(Logger logger_) {
+        FirefoxDriverFactoryImpl.logger_ = logger_;
+    }
+
+    private static Logger logger_ = LoggerFactory.getLogger(FirefoxDriverFactoryImpl.class);
+    private final Set<FirefoxPreferencesModifier> firefoxPreferencesModifiers;
+    private final Set<FirefoxOptionsModifier> firefoxOptionsModifiers;
+    private Integer pageLoadTimeoutSeconds;
+
+    public FirefoxDriverFactoryImpl() throws IOException {
         this(true);
     }
 
@@ -33,18 +47,17 @@ public class FirefoxDriverFactoryImpl extends FirefoxDriverFactory {
         if (requireDefaultSettings) {
             this.prepareDefaultSettings();
         }
-
         pageLoadTimeoutSeconds = 60;
     }
 
-    private void prepareDefaultSettings() throws IOException {
-        this.addFirefoxPreferencesModifier(FirefoxPreferencesModifiers.downloadWithoutPrompt);
-        this.addFirefoxPreferencesModifier(FirefoxPreferencesModifiers.downloadIntoUserHomeDownloadsDirectory);
-        this.addFirefoxOptionsModifier(FirefoxOptionsModifiers.windowSize1024_768);
+    private void prepareDefaultSettings() {
+        this.addFirefoxPreferencesModifier(FirefoxPreferencesModifiers.downloadWithoutPrompt());
+        this.addFirefoxPreferencesModifier(FirefoxPreferencesModifiers.downloadIntoUserHomeDownloadsDirectory());
+        this.addFirefoxOptionsModifier(FirefoxOptionsModifiers.windowSize1024_768());
     }
 
     @Override
-    public void addFirefoxPreferencesModifier(PreferencesModifier fpm) {
+    public void addFirefoxPreferencesModifier(FirefoxPreferencesModifier fpm) {
         if (this.firefoxPreferencesModifiers.contains(fpm)) {
             // The late comer wins
             this.firefoxPreferencesModifiers.remove(fpm);
@@ -53,7 +66,7 @@ public class FirefoxDriverFactoryImpl extends FirefoxDriverFactory {
     }
 
     @Override
-    public void addAllFirefoxPreferencesModifier(List<PreferencesModifier> list) {
+    public void addAllFirefoxPreferencesModifier(List<FirefoxPreferencesModifier> list) {
         list.forEach(this::addFirefoxPreferencesModifier);
     }
 
@@ -179,8 +192,11 @@ public class FirefoxDriverFactoryImpl extends FirefoxDriverFactory {
 
     }
 
-    private static FirefoxOptions buildOptions(Set<PreferencesModifier> firefoxPreferencesModifiers, Set<FirefoxOptionsModifier> firefoxOptionsModifiers) {
-        Map<String, String> preferences = new HashMap<String, String>();
+    private static FirefoxOptions buildOptions(
+            Set<FirefoxPreferencesModifier> firefoxPreferencesModifiers,
+            Set<FirefoxOptionsModifier> firefoxOptionsModifiers)
+    {
+        Map<String, Object> preferences = new HashMap<>();
 
         preferences = applyFirefoxPreferencesModifiers(preferences, firefoxPreferencesModifiers);
 
@@ -191,12 +207,13 @@ public class FirefoxDriverFactoryImpl extends FirefoxDriverFactory {
         return firefoxOptions;
     }
 
-    public static Map<String, String> applyFirefoxPreferencesModifiers(Map<String, String> firefoxPreferences, Set<PreferencesModifier> modifiers) {
+    public static Map<String, Object> applyFirefoxPreferencesModifiers(
+            Map<String, Object> firefoxPreferences,
+            Set<FirefoxPreferencesModifier> modifiers) {
         Map<String, Object> fp = new HashMap<>(firefoxPreferences);
-        for (PreferencesModifier fpm : modifiers) {
+        for (FirefoxPreferencesModifier fpm : modifiers) {
             fp = fpm.modify(fp);
         }
-
         return fp;
     }
 
@@ -209,17 +226,5 @@ public class FirefoxDriverFactoryImpl extends FirefoxDriverFactory {
         return fp;
     }
 
-    public static Logger getLogger_() {
-        return logger_;
-    }
-
-    public static void setLogger_(Logger logger_) {
-        FirefoxDriverFactoryImpl.logger_ = logger_;
-    }
-
-    private static Logger logger_ = LoggerFactory.getLogger(FirefoxDriverFactoryImpl.class);
-    private final Set<PreferencesModifier> firefoxPreferencesModifiers;
-    private final Set<FirefoxOptionsModifier> firefoxOptionsModifiers;
-    private Integer pageLoadTimeoutSeconds;
 
 }

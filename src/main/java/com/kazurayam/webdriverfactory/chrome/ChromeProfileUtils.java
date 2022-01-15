@@ -53,7 +53,7 @@ public final class ChromeProfileUtils {
             throw new IllegalArgumentException(String.valueOf(userDataDir) + " is not present");
         }
         List<ChromeUserProfile> userProfiles = new ArrayList<ChromeUserProfile>();
-        List<Path> dirs = Files.list(userDataDir).collect((Collector<? super Path, ?, List<Path>>) Collectors.toList());
+        List<Path> dirs = Files.list(userDataDir).collect(Collectors.toList());
         for (Path dir : dirs) {
             if (Files.exists(dir.resolve("Preferences"))) {
                 ChromeUserProfile cp = new ChromeUserProfile(userDataDir, new ProfileDirectoryName(dir.getFileName().toString()));
@@ -94,22 +94,22 @@ public final class ChromeProfileUtils {
     /**
      * if a Profile of the name is defined, return true, otherwise false
      */
-    public static boolean hasChromeUserProfile(UserProfile userProfile) {
+    public static boolean hasChromeUserProfile(UserProfile userProfile) throws IOException {
         return hasChromeUserProfile(getDefaultUserDataDir(), userProfile);
     }
 
-    public static boolean hasChromeUserProfile(Path userDataDir, UserProfile userProfile) {
+    public static boolean hasChromeUserProfile(Path userDataDir, UserProfile userProfile) throws IOException {
         return findChromeUserProfile(userDataDir, userProfile) != null;
     }
 
     /**
      *
      */
-    public static ChromeUserProfile findChromeUserProfileByProfileDirectoryName(ProfileDirectoryName profileDirectoryName) {
+    public static ChromeUserProfile findChromeUserProfileByProfileDirectoryName(ProfileDirectoryName profileDirectoryName) throws IOException {
         return findChromeUserProfileByProfileDirectoryName(getDefaultUserDataDir(), profileDirectoryName);
     }
 
-    public static ChromeUserProfile findChromeUserProfileByProfileDirectoryName(Path userDataDir, ProfileDirectoryName profileDirectoryName) {
+    public static ChromeUserProfile findChromeUserProfileByProfileDirectoryName(Path userDataDir, ProfileDirectoryName profileDirectoryName) throws IOException {
         List<ChromeUserProfile> chromeUserProfiles = getChromeUserProfileList(userDataDir);
         for (ChromeUserProfile chromeUserProfile : chromeUserProfiles) {
             if (chromeUserProfile.getProfileDirectoryName().equals(profileDirectoryName)) {
@@ -124,18 +124,18 @@ public final class ChromeProfileUtils {
     /**
      *
      */
-    public static UserProfile findUserProfileByProfileDirectoryName(ProfileDirectoryName profileDirectoryName) {
+    public static UserProfile findUserProfileByProfileDirectoryName(ProfileDirectoryName profileDirectoryName) throws IOException {
         return findUserProfileByProfileDirectoryName(getDefaultUserDataDir(), profileDirectoryName);
     }
 
-    public static UserProfile findUserProfileByProfileDirectoryName(Path userDataDir, ProfileDirectoryName profileDirectoryName) {
+    public static UserProfile findUserProfileByProfileDirectoryName(Path userDataDir, ProfileDirectoryName profileDirectoryName) throws IOException {
         return findChromeUserProfileByProfileDirectoryName(userDataDir, profileDirectoryName).getUserProfile();
     }
 
     /**
      * @return
      */
-    public static String allChromeUserProfilesAsString() {
+    public static String allChromeUserProfilesAsString() throws IOException {
         List<ChromeUserProfile> userProfiles = getChromeUserProfileList();
         Collections.sort(userProfiles);
         StringBuilder sb = new StringBuilder();

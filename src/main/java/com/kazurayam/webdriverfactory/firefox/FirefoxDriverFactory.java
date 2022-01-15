@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Objects;
 
 public abstract class FirefoxDriverFactory {
-    public static FirefoxDriverFactory newFirefoxDriverFactory() {
+    public static FirefoxDriverFactory newFirefoxDriverFactory() throws IOException {
         return new FirefoxDriverFactoryImpl();
     }
 
@@ -19,7 +19,7 @@ public abstract class FirefoxDriverFactory {
         return new FirefoxDriverFactoryImpl(requireDefaultSettings);
     }
 
-    public static FirefoxDriverFactory newHeadlessFirefoxDriverFactory() {
+    public static FirefoxDriverFactory newHeadlessFirefoxDriverFactory() throws IOException {
         FirefoxDriverFactoryImpl fdfi = new FirefoxDriverFactoryImpl();
         fdfi.addFirefoxOptionsModifier(FirefoxOptionsModifiers.headless());
         return fdfi;
@@ -31,9 +31,9 @@ public abstract class FirefoxDriverFactory {
         return fdfi;
     }
 
-    public abstract void addFirefoxPreferencesModifier(PreferencesModifier firefoxPreferencesModifier);
+    public abstract void addFirefoxPreferencesModifier(FirefoxPreferencesModifier firefoxPreferencesModifier);
 
-    public abstract void addAllFirefoxPreferencesModifier(List<PreferencesModifier> firefoxPreferencesModifierList);
+    public abstract void addAllFirefoxPreferencesModifier(List<FirefoxPreferencesModifier> firefoxPreferencesModifierList);
 
     public abstract void addFirefoxOptionsModifier(FirefoxOptionsModifier firefoxOptionsModifier);
 
