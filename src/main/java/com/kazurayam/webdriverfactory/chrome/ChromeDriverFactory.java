@@ -3,7 +3,9 @@ package com.kazurayam.webdriverfactory.chrome;
 import com.kazurayam.webdriverfactory.PreferencesModifier;
 import com.kazurayam.webdriverfactory.ProfileDirectoryName;
 import com.kazurayam.webdriverfactory.UserProfile;
+import com.kazurayam.webdriverfactory.WebDriverFactoryException;
 
+import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Objects;
@@ -41,15 +43,15 @@ public abstract class ChromeDriverFactory {
 
 	public abstract LaunchedChromeDriver newChromeDriver();
 
-	public abstract LaunchedChromeDriver newChromeDriver(UserProfile userProfile);
+	public abstract LaunchedChromeDriver newChromeDriver(UserProfile userProfile) throws IOException, WebDriverFactoryException;
 
-	public abstract LaunchedChromeDriver newChromeDriver(UserProfile userProfile, UserDataAccess instruction);
+	public abstract LaunchedChromeDriver newChromeDriver(UserProfile userProfile, UserDataAccess instruction) throws IOException, WebDriverFactoryException;
 
-	public abstract LaunchedChromeDriver newChromeDriver(ProfileDirectoryName profileDirectoryName);
+	public abstract LaunchedChromeDriver newChromeDriver(ProfileDirectoryName profileDirectoryName) throws IOException, WebDriverFactoryException;
 
-	public abstract LaunchedChromeDriver newChromeDriver(ProfileDirectoryName profileDirectoryName, UserDataAccess instruction);
+	public abstract LaunchedChromeDriver newChromeDriver(ProfileDirectoryName profileDirectoryName, UserDataAccess instruction) throws IOException, WebDriverFactoryException;
 
-	public abstract void enableChromeDriverLog(Path outputDirectory);
+	public abstract void enableChromeDriverLog(Path outputDirectory) throws IOException;
 
 	/**
 	 *

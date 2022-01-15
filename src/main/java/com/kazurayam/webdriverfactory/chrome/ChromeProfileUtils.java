@@ -4,6 +4,7 @@ import com.kazurayam.webdriverfactory.ProfileDirectoryName;
 import com.kazurayam.webdriverfactory.UserProfile;
 import com.kazurayam.webdriverfactory.utils.OSIdentifier;
 
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -38,16 +39,19 @@ public final class ChromeProfileUtils {
     /**
      *
      */
-    public static List<ChromeUserProfile> getChromeUserProfileList() {
+    public static List<ChromeUserProfile> getChromeUserProfileList()
+            throws IOException
+    {
         return getChromeUserProfileList(getDefaultUserDataDir());
     }
 
-    public static List<ChromeUserProfile> getChromeUserProfileList(final Path userDataDir) {
+    public static List<ChromeUserProfile> getChromeUserProfileList(final Path userDataDir)
+            throws IOException
+    {
         Objects.requireNonNull(userDataDir);
         if (!Files.exists(userDataDir)) {
             throw new IllegalArgumentException(String.valueOf(userDataDir) + " is not present");
         }
-
         List<ChromeUserProfile> userProfiles = new ArrayList<ChromeUserProfile>();
         List<Path> dirs = Files.list(userDataDir).collect((Collector<? super Path, ?, List<Path>>) Collectors.toList());
         for (Path dir : dirs) {
@@ -65,11 +69,15 @@ public final class ChromeProfileUtils {
      * @param name name of a Chrome Profile. e.g, new UserProfile("Russ Thomas")
      * @return ChromeUserProfile object of the userProfile specified
      */
-    public static ChromeUserProfile findChromeUserProfile(UserProfile userProfile) {
+    public static ChromeUserProfile findChromeUserProfile(UserProfile userProfile)
+            throws IOException
+    {
         return findChromeUserProfile(getDefaultUserDataDir(), userProfile);
     }
 
-    public static ChromeUserProfile findChromeUserProfile(Path userDataDir, UserProfile userProfile) {
+    public static ChromeUserProfile findChromeUserProfile(Path userDataDir, UserProfile userProfile)
+            throws IOException
+    {
         Objects.requireNonNull(userProfile);
         List<ChromeUserProfile> userProfiles = getChromeUserProfileList(userDataDir);
         for (ChromeUserProfile cUP : userProfiles) {

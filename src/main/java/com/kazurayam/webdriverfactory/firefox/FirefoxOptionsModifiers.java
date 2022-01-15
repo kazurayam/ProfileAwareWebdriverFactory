@@ -99,7 +99,7 @@ public enum FirefoxOptionsModifiers {
 
         @Override
         public boolean equals(Object obj) {
-            if (!DefaultGroovyMethods.asBoolean(obj) instanceof Base) {
+            if (! (obj instanceof Base)) {
                 return false;
             }
 

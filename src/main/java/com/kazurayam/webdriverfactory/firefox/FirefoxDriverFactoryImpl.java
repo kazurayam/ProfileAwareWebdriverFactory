@@ -4,15 +4,13 @@ import com.kazurayam.webdriverfactory.PreferencesModifier;
 import com.kazurayam.webdriverfactory.ProfileDirectoryName;
 import com.kazurayam.webdriverfactory.UserProfile;
 import com.kazurayam.webdriverfactory.WebDriverFactoryException;
-import groovy.lang.Closure;
-import groovy.lang.Reference;
-import org.codehaus.groovy.runtime.DefaultGroovyMethods;
 import org.openqa.selenium.InvalidArgumentException;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxOptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Duration;
@@ -31,8 +29,8 @@ public class FirefoxDriverFactoryImpl extends FirefoxDriverFactory {
     }
 
     public FirefoxDriverFactoryImpl(boolean requireDefaultSettings) {
-        this.firefoxPreferencesModifiers = new HashSet<PreferencesModifier>();
-        this.firefoxOptionsModifiers = new HashSet<FirefoxOptionsModifier>();
+        this.firefoxPreferencesModifiers = new HashSet<>();
+        this.firefoxOptionsModifiers = new HashSet<>();
         if (requireDefaultSettings) {
             this.prepareDefaultSettings();
         }
@@ -52,18 +50,12 @@ public class FirefoxDriverFactoryImpl extends FirefoxDriverFactory {
             // The late comer wins
             this.firefoxPreferencesModifiers.remove(fpm);
         }
-
         firefoxPreferencesModifiers.add(fpm);
     }
 
     @Override
     public void addAllFirefoxPreferencesModifier(List<PreferencesModifier> list) {
-        DefaultGroovyMethods.each(list, new Closure<Boolean>(this, this) {
-            public Boolean doCall(PreferencesModifier fpm) {
-                return FirefoxDriverFactoryImpl.this.firefoxPreferencesModifiers.add(fpm);
-            }
-
-        });
+        list.forEach(this::addFirefoxPreferencesModifier);
     }
 
     @Override
@@ -72,29 +64,23 @@ public class FirefoxDriverFactoryImpl extends FirefoxDriverFactory {
             // The late comer wins
             this.firefoxOptionsModifiers.remove(fom);
         }
-
         firefoxOptionsModifiers.add(fom);
     }
 
     @Override
     public void addAllFirefoxOptionsModifier(List<FirefoxOptionsModifier> list) {
-        DefaultGroovyMethods.each(list, new Closure<Boolean>(this, this) {
-            public Boolean doCall(FirefoxOptionsModifier fom) {
-                return FirefoxDriverFactoryImpl.this.firefoxOptionsModifiers.add(fom);
-            }
-
-        });
+        list.forEach(this::addFirefoxOptionsModifier);
     }
 
     @Override
     public void pageLoadTimeout(final Integer waitSeconds) {
         Objects.requireNonNull(waitSeconds);
         if (waitSeconds <= 0) {
-            throw new IllegalArgumentException("waitSeconds=" + String.valueOf(waitSeconds) + " must not be <=0");
+            throw new IllegalArgumentException("waitSeconds=" + waitSeconds + " must not be <=0");
         }
 
         if (waitSeconds > 999) {
-            throw new IllegalArgumentException("waitSeconds=" + String.valueOf(waitSeconds) + " must not be > 999");
+            throw new IllegalArgumentException("waitSeconds=" + waitSeconds + " must not be > 999");
         }
 
         this.pageLoadTimeoutSeconds = waitSeconds;
@@ -119,36 +105,29 @@ public class FirefoxDriverFactoryImpl extends FirefoxDriverFactory {
     }
 
     @Override
-    public LaunchedFirefoxDriver newFirefoxDriver(final UserProfile userProfile) {
+    public LaunchedFirefoxDriver newFirefoxDriver(final UserProfile userProfile)
+            throws IOException, WebDriverFactoryException
+    {
         Objects.requireNonNull(userProfile, "userProfile must not be null");
         Optional<FirefoxUserProfile> opt = FirefoxProfileUtils.findFirefoxUserProfileOf(userProfile);
         assert opt.isPresent();
-        final Reference<FirefoxUserProfile> firefoxUserProfile;
-        opt.ifPresent(new Closure<FirefoxUserProfile>(this, this) {
-            public FirefoxUserProfile doCall(Object it) {
-                return setGroovyRef(firefoxUserProfile, it);
-            }
-
-        });
-        if (firefoxUserProfile.get() == null) {
-            throw new WebDriverFactoryException("FirefoxUserProfile of \"" + String.valueOf(userProfile) + "\" is not found in :".plus("\n").plus(FirefoxProfileUtils.allFirefoxUserProfilesAsString()));
-        }
-
+        FirefoxUserProfile firefoxUserProfile = opt.get();
+        ProfileDirectoryName profileDirectoryName = firefoxUserProfile.getProfileDirectoryName();
         Path userDataDir = FirefoxProfileUtils.getDefaultUserDataDir();
-        ProfileDirectoryName profileDirectoryName = firefoxUserProfile.get().getProfileDirectoryName();
         return launchFirefox(userDataDir, profileDirectoryName);
     }
 
     @Override
-    public LaunchedFirefoxDriver newFirefoxDriver(ProfileDirectoryName profileDirectoryName) {
+    public LaunchedFirefoxDriver newFirefoxDriver(ProfileDirectoryName profileDirectoryName)
+            throws WebDriverFactoryException
+    {
         Objects.requireNonNull(profileDirectoryName, "profileDirectoryName must not be null");
-        Objects.requireNonNull(getProperty("instruction"), "instruction must not be null");
         Path userDataDir = FirefoxProfileUtils.getDefaultUserDataDir();
         return launchFirefox(userDataDir, profileDirectoryName);
     }
 
     @Override
-    public void enableFirefoxDriverLog(Path outputDirectory) {
+    public void enableFirefoxDriverLog(Path outputDirectory) throws IOException {
         Objects.requireNonNull(outputDirectory);
         if (!Files.exists(outputDirectory)) {
             Files.createDirectories(outputDirectory);
@@ -160,7 +139,9 @@ public class FirefoxDriverFactoryImpl extends FirefoxDriverFactory {
     /**
      * Launch a Firefox browser.
      */
-    private LaunchedFirefoxDriver launchFirefox(final Path userDataDir, final ProfileDirectoryName profileDirectoryName) {
+    private LaunchedFirefoxDriver launchFirefox(final Path userDataDir, final ProfileDirectoryName profileDirectoryName)
+            throws WebDriverFactoryException
+    {
         Objects.requireNonNull(userDataDir);
         Objects.requireNonNull(profileDirectoryName);
         if (!Files.exists(userDataDir)) {
@@ -242,8 +223,4 @@ public class FirefoxDriverFactoryImpl extends FirefoxDriverFactory {
     private final Set<FirefoxOptionsModifier> firefoxOptionsModifiers;
     private Integer pageLoadTimeoutSeconds;
 
-    private static <T> T setGroovyRef(Reference<T> ref, T newValue) {
-        ref.set(newValue);
-        return newValue;
-    }
 }

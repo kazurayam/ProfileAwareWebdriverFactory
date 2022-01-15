@@ -5,6 +5,7 @@ import com.kazurayam.webdriverfactory.PreferencesModifierBase;
 import groovy.lang.Closure;
 import org.codehaus.groovy.runtime.DefaultGroovyMethods;
 
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -16,15 +17,18 @@ import java.util.Objects;
 public enum FirefoxPreferencesModifiers {
     ;
 
-    public static PreferencesModifier downloadIntoUserHomeDownloadsDirectory() {
+    public static PreferencesModifier downloadIntoUserHomeDownloadsDirectory()
+            throws IOException
+    {
         Path p = Paths.get(System.getProperty("user.home"), "Downloads");
         return downloadIntoDirectory(p);
     }
 
-    public static PreferencesModifier downloadIntoDirectory(final Path directory) {
+    public static PreferencesModifier downloadIntoDirectory(final Path directory)
+            throws IOException
+    {
         Objects.requireNonNull(directory);
         if (!Files.exists(directory)) {
-            DefaultGroovyMethods.println(this, "created " + String.valueOf(directory));
             Files.createDirectories(directory);
         }
 

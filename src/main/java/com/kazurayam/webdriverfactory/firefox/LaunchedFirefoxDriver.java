@@ -1,5 +1,7 @@
 package com.kazurayam.webdriverfactory.firefox;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import groovy.json.JsonOutput;
 import groovy.lang.Closure;
 import groovy.lang.Reference;
@@ -42,14 +44,12 @@ public class LaunchedFirefoxDriver {
     }
 
     public Optional<String> getEmployedOptionsAsJSON() {
-        final Reference<String> json = new Reference<String>("");
-        this.getEmployedOptions().ifPresent(new Closure<String>(this, this) {
-            public String doCall(FirefoxOptions options) {
-                return setGroovyRef(json, JsonOutput.prettyPrint(JsonOutput.toJson(options.toJson())));
-            }
-
+        String json = "";
+        this.getEmployedOptions().ifPresent(options -> {
+            Gson gson = new GsonBuilder().setPrettyPrinting().create();
+            gson.toJson(options);
         });
-        return Optional.of(json.get());
+        return Optional.of(json);
     }
 
     private final FirefoxDriver driver;

@@ -1,8 +1,7 @@
 package com.kazurayam.webdriverfactory.chrome;
 
-import groovy.json.JsonOutput;
-import groovy.lang.Closure;
-import groovy.lang.Reference;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 
@@ -53,14 +52,13 @@ public class LaunchedChromeDriver {
     }
 
     public Optional<String> getEmployedOptionsAsJSON() {
-        final Reference<String> json = new Reference<String>("");
-        this.getEmployedOptions().ifPresent(new Closure<String>(this, this) {
-            public String doCall(ChromeOptions options) {
-                return setGroovyRef(json, JsonOutput.prettyPrint(JsonOutput.toJson(options.toJson())));
-            }
-
-        });
-        return Optional.of(json.get());
+        Optional<ChromeOptions> options = getEmployedOptions();
+        if (options.isPresent()) {
+            Gson gson = new GsonBuilder().setPrettyPrinting().create();
+            return Optional.of(gson.toJson(options.get()));
+        } else {
+            return Optional.empty();
+        }
     }
 
     private final ChromeDriver driver;
@@ -68,8 +66,4 @@ public class LaunchedChromeDriver {
     private Optional<ChromeDriverFactory.UserDataAccess> instruction;
     private Optional<ChromeOptions> employedOptions;
 
-    private static <T> T setGroovyRef(Reference<T> ref, T newValue) {
-        ref.set(newValue);
-        return newValue;
-    }
 }

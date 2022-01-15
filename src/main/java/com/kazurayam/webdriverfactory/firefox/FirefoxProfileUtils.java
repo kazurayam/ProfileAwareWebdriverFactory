@@ -4,6 +4,7 @@ import com.kazurayam.webdriverfactory.ProfileDirectoryName;
 import com.kazurayam.webdriverfactory.UserProfile;
 import com.kazurayam.webdriverfactory.utils.OSIdentifier;
 
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -33,21 +34,19 @@ public class FirefoxProfileUtils {
 
     }
 
-    public static Optional<FirefoxUserProfile> findFirefoxUserProfileOf(UserProfile userProfile) {
+    public static Optional<FirefoxUserProfile> findFirefoxUserProfileOf(UserProfile userProfile)
+            throws IOException {
         List<FirefoxUserProfile> list = getFirefoxUserProfileList();
         // println "list.size is ${list.size()}"
-        for (int i = 0; ; i < list.size() ;){
-            FirefoxUserProfile fup = list.get(i);
+        for (FirefoxUserProfile fup : list) {
             if (fup.getProfileDirectoryName().getName().endsWith(userProfile.getName())) {
-                return Optional.of(list.get(i));
+                return Optional.of(fup);
             }
-
         }
-
         return Optional.empty();
     }
 
-    public static List<FirefoxUserProfile> getFirefoxUserProfileList() {
+    public static List<FirefoxUserProfile> getFirefoxUserProfileList() throws IOException {
         return getFirefoxUserProfileList(getDefaultUserDataDir());
     }
 
@@ -66,17 +65,19 @@ public class FirefoxProfileUtils {
      * cookies.sqlite
      * cookies.sqlite-wal
      */
-    public static List<FirefoxUserProfile> getFirefoxUserProfileList(final Path userDataDir) {
+    public static List<FirefoxUserProfile> getFirefoxUserProfileList(final Path userDataDir)
+            throws IOException {
         Objects.requireNonNull(userDataDir);
         if (!Files.exists(userDataDir)) {
             throw new IllegalArgumentException(String.valueOf(userDataDir) + " is not present");
         }
 
-        List<FirefoxUserProfile> userProfiles = new ArrayList<FirefoxUserProfile>();
-        List<Path> dirs = Files.list(userDataDir).collect((Collector<? super Path, ?, List<Path>>) Collectors.toList());
+        List<FirefoxUserProfile> userProfiles = new ArrayList<>();
+        List<Path> dirs = Files.list(userDataDir).collect(Collectors.toList());
         for (Path dir : dirs) {
             String dirName = dir.getFileName().toString();
-            FirefoxUserProfile fup = new FirefoxUserProfile(userDataDir, new ProfileDirectoryName(dirName));
+            FirefoxUserProfile fup = new FirefoxUserProfile(userDataDir,
+                    new ProfileDirectoryName(dirName));
             userProfiles.add(fup);
         }
 
@@ -84,9 +85,9 @@ public class FirefoxProfileUtils {
     }
 
     /**
-     * @return
+     *
      */
-    public static String allFirefoxUserProfilesAsString() {
+    public static String allFirefoxUserProfilesAsString() throws IOException {
         List<FirefoxUserProfile> userProfiles = getFirefoxUserProfileList();
         Collections.sort(userProfiles);
         StringBuilder sb = new StringBuilder();

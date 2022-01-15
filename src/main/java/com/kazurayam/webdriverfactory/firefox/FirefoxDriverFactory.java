@@ -3,7 +3,9 @@ package com.kazurayam.webdriverfactory.firefox;
 import com.kazurayam.webdriverfactory.PreferencesModifier;
 import com.kazurayam.webdriverfactory.ProfileDirectoryName;
 import com.kazurayam.webdriverfactory.UserProfile;
+import com.kazurayam.webdriverfactory.WebDriverFactoryException;
 
+import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Objects;
@@ -41,11 +43,11 @@ public abstract class FirefoxDriverFactory {
 
     public abstract LaunchedFirefoxDriver newFirefoxDriver();
 
-    public abstract LaunchedFirefoxDriver newFirefoxDriver(UserProfile userProfile);
+    public abstract LaunchedFirefoxDriver newFirefoxDriver(UserProfile userProfile) throws IOException, WebDriverFactoryException;
 
-    public abstract LaunchedFirefoxDriver newFirefoxDriver(ProfileDirectoryName profileDirectoryName);
+    public abstract LaunchedFirefoxDriver newFirefoxDriver(ProfileDirectoryName profileDirectoryName) throws WebDriverFactoryException;
 
-    public abstract void enableFirefoxDriverLog(Path outputDirectory);
+    public abstract void enableFirefoxDriverLog(Path outputDirectory) throws IOException;
 
     public static void setPathToFirefoxDriverExecutable(String geckoDriverPath) {
         Objects.requireNonNull(geckoDriverPath);

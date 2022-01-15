@@ -21,18 +21,20 @@ import java.util.Objects;
 public class ChromeUserProfile implements Comparable<ChromeUserProfile> {
     /**
      * @param userDataDir "~/Library/Application Support/Google/Chrome/"
-     * @param profileName "Default", "Profile 1", "Profile 2", "Profile 3", ...
+     * @param profileDirectoryName "Default", "Profile 1", "Profile 2", "Profile 3", ...
      */
-    public ChromeUserProfile(final Path userDataDir, ProfileDirectoryName profileDirectoryName) {
+    public ChromeUserProfile(final Path userDataDir, ProfileDirectoryName profileDirectoryName) throws IOException {
         Objects.requireNonNull(userDataDir);
         Objects.requireNonNull(profileDirectoryName);
         if (!Files.exists(userDataDir)) {
-            throw new IllegalArgumentException(String.valueOf(userDataDir) + " is not found");
+            throw new IllegalArgumentException(
+                    String.format("%s is not found", userDataDir.toString()));
         }
 
         Path profilePath = userDataDir.resolve(profileDirectoryName.toString());
         if (!Files.exists(profilePath)) {
-            throw new IllegalArgumentException(DefaultGroovyMethods.invokeMethod(String.class, "valueOf", new Object[]{getProperty("p")}) + " is not found");
+            throw new IllegalArgumentException(
+                    String.format("%s is not found", profilePath.toString()));
         }
 
         this.userDataDir = userDataDir;
@@ -60,13 +62,13 @@ public class ChromeUserProfile implements Comparable<ChromeUserProfile> {
         return this.userProfile;
     }
 
-    public String getPreferences() {
+    public String getPreferences() throws IOException {
         Path profilePath = userDataDir.resolve(profileDirectoryName.toString());
         final Path preferencesPath = profilePath.resolve(PREFERENCES_FILE_NAME);
         if (!Files.exists(preferencesPath)) {
-            throw new IOException(String.valueOf(preferencesPath) + " is not found");
+            throw new IOException(
+                    String.format("%s is not found", preferencesPath.toString()));
         }
-
         return JsonOutput.prettyPrint(ResourceGroovyMethods.getText(preferencesPath.toFile()));
     }
 
@@ -83,7 +85,7 @@ public class ChromeUserProfile implements Comparable<ChromeUserProfile> {
 
     @Override
     public boolean equals(Object obj) {
-        if (!DefaultGroovyMethods.asBoolean(obj) instanceof ChromeUserProfile) {
+        if (!(obj instanceof ChromeUserProfile)) {
             return false;
         }
 

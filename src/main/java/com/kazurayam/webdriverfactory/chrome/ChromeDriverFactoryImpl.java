@@ -14,6 +14,7 @@ import org.openqa.selenium.chrome.ChromeOptions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Duration;
@@ -26,11 +27,11 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 public class ChromeDriverFactoryImpl extends ChromeDriverFactory {
-	public ChromeDriverFactoryImpl() {
+	public ChromeDriverFactoryImpl() throws IOException {
 		this(true);
 	}
 
-	public ChromeDriverFactoryImpl(boolean requireDefaultSettings) {
+	public ChromeDriverFactoryImpl(boolean requireDefaultSettings) throws IOException {
 		this.chromePreferencesModifiers = new HashSet<PreferencesModifier>();
 		this.chromeOptionsModifiers = new HashSet<ChromeOptionsModifyFunction>();
 		if (requireDefaultSettings) {
@@ -40,7 +41,7 @@ public class ChromeDriverFactoryImpl extends ChromeDriverFactory {
 		pageLoadTimeoutSeconds = 60;// wait for page load for 60 seconds as default
 	}
 
-	private void prepareDefaultSettings() {
+	private void prepareDefaultSettings() throws IOException {
 		this.addChromePreferencesModifier(ChromePreferencesModifiers.downloadWithoutPrompt());
 		this.addChromePreferencesModifier(ChromePreferencesModifiers.downloadIntoUserHomeDownloadsDirectory());
 		this.addChromePreferencesModifier(ChromePreferencesModifiers.disableViewersOfFlashAndPdf());
@@ -131,7 +132,7 @@ public class ChromeDriverFactoryImpl extends ChromeDriverFactory {
 	 *
 	 */
 	@Override
-	public LaunchedChromeDriver newChromeDriver(UserProfile userProfile) {
+	public LaunchedChromeDriver newChromeDriver(UserProfile userProfile) throws IOException, WebDriverFactoryException {
 		return newChromeDriver(userProfile, UserDataAccess.TO_GO);
 	}
 
@@ -158,12 +159,18 @@ public class ChromeDriverFactoryImpl extends ChromeDriverFactory {
 	 * @return a ChromeDriver object; Chrome browser will be opened.
 	 */
 	@Override
-	public LaunchedChromeDriver newChromeDriver(final UserProfile userProfile, UserDataAccess instruction) {
+	public LaunchedChromeDriver newChromeDriver(final UserProfile userProfile, UserDataAccess instruction) throws IOException, WebDriverFactoryException {
 		Objects.requireNonNull(userProfile, "userProfile must not be null");
 		Objects.requireNonNull(instruction, "instruction must not be null");
 		ChromeUserProfile chromeUserProfile = ChromeProfileUtils.findChromeUserProfile(userProfile);
 		if (chromeUserProfile == null) {
-			throw new WebDriverFactoryException("ChromeUserProfile of \"" + String.valueOf(userProfile) + "\" is not found in :".plus("\n").plus(ChromeProfileUtils.allChromeUserProfilesAsString()));
+			throw new WebDriverFactoryException(
+					String.format(
+							"ChromeUserProfile of \"%s\" is not found in :\n%s",
+							userProfile.toString(),
+							ChromeProfileUtils.allChromeUserProfilesAsString()
+					)
+			);
 		}
 
 		Path userDataDir = ChromeProfileUtils.getDefaultUserDataDir();
@@ -172,17 +179,19 @@ public class ChromeDriverFactoryImpl extends ChromeDriverFactory {
 	}
 
 	@Override
-	public LaunchedChromeDriver newChromeDriver(ProfileDirectoryName profileDirectoryName) {
+	public LaunchedChromeDriver newChromeDriver(ProfileDirectoryName profileDirectoryName)
+			throws IOException, WebDriverFactoryException {
 		return this.newChromeDriver(profileDirectoryName, UserDataAccess.TO_GO);
 	}
 
 	/**
-	 * @param profileFolder e.g. "Default", "Profile 1", "Profile 2"
+	 * @param profileDirectoryName e.g. "Default", "Profile 1", "Profile 2"
 	 * @param instruction   FOR_HERE or TO_GO
 	 * @return
 	 */
 	@Override
-	public LaunchedChromeDriver newChromeDriver(ProfileDirectoryName profileDirectoryName, UserDataAccess instruction) {
+	public LaunchedChromeDriver newChromeDriver(ProfileDirectoryName profileDirectoryName, UserDataAccess instruction)
+			throws IOException, WebDriverFactoryException {
 		Objects.requireNonNull(profileDirectoryName, "profileDirectoryName must not be null");
 		Objects.requireNonNull(instruction, "instruction must not be null");
 		Path userDataDir = ChromeProfileUtils.getDefaultUserDataDir();
@@ -190,7 +199,7 @@ public class ChromeDriverFactoryImpl extends ChromeDriverFactory {
 	}
 
 	@Override
-	public void enableChromeDriverLog(Path outputDirectory) {
+	public void enableChromeDriverLog(Path outputDirectory) throws IOException {
 		Objects.requireNonNull(outputDirectory);
 		if (!Files.exists(outputDirectory)) {
 			Files.createDirectories(outputDirectory);
@@ -213,30 +222,32 @@ public class ChromeDriverFactoryImpl extends ChromeDriverFactory {
 	 * @param instruction
 	 * @return
 	 */
-	private LaunchedChromeDriver launchChrome(final Path userDataDir, final ProfileDirectoryName profileDirectoryName, UserDataAccess instruction) {
+	private LaunchedChromeDriver launchChrome(final Path userDataDir, final ProfileDirectoryName profileDirectoryName, UserDataAccess instruction) throws IOException, WebDriverFactoryException {
 		Objects.requireNonNull(userDataDir);
 		Objects.requireNonNull(profileDirectoryName);
 		Objects.requireNonNull(instruction);
 		if (!Files.exists(userDataDir)) {
-			throw new IllegalArgumentException(String.valueOf(userDataDir) + " is not present");
+			throw new IllegalArgumentException(String.format("%s is not present", userDataDir));
 		}
 
 		final Path sourceProfileDirectory = userDataDir.resolve(profileDirectoryName.toString());
 		assert Files.exists(sourceProfileDirectory);
-		final Reference<Path> targetUserDataDir = new Reference<Path>(userDataDir);
+		final Reference<Path> targetUserDataDir = new Reference<>(userDataDir);
 		if (instruction.equals(UserDataAccess.TO_GO)) {
 			targetUserDataDir.set(Files.createTempDirectory("__user-data-dir__"));
 			final Path targetProfileDirectory = targetUserDataDir.get().resolve(profileDirectoryName.getName());
 			PathUtils.copyDirectoryRecursively(sourceProfileDirectory, targetProfileDirectory);
 			final int numCopied = PathUtils.listDirectoryRecursively(targetProfileDirectory).size();
-			logger_.info("copied " + String.valueOf(numCopied) + " files from " + String.valueOf(sourceProfileDirectory) + " into " + String.valueOf(targetProfileDirectory) + " ");
+			logger_.info(String.format("copied %d files from %s into %s",
+					numCopied, sourceProfileDirectory, targetProfileDirectory));
 		} else {
-			logger_.debug("will use " + String.valueOf(sourceProfileDirectory) + " ");
+			logger_.debug(String.format("%s will be used", sourceProfileDirectory));
 		}
 
 
 		// use the specified UserProfile with which Chrome browser is launched
-		this.addChromeOptionsModifier((ChromeOptionsModifyFunction) ChromeOptionsModifier.withProfileDirectoryName.call(targetUserDataDir.get(), profileDirectoryName));
+		this.addChromeOptionsModifier(
+				(ChromeOptionsModifyFunction) ChromeOptionsModifier.withProfileDirectoryName.call(targetUserDataDir.get(), profileDirectoryName));
 
 		// launch the Chrome driver
 		ChromeDriver driver = null;
@@ -244,8 +255,9 @@ public class ChromeDriverFactoryImpl extends ChromeDriverFactory {
 			ChromeOptions options = buildOptions(this.chromePreferencesModifiers, this.chromeOptionsModifiers);
 			driver = new ChromeDriver(options);
 			setPageLoadTimeout(driver, this.pageLoadTimeoutSeconds);
-			LaunchedChromeDriver launched = new LaunchedChromeDriver(driver).setChromeUserProfile(new ChromeUserProfile(targetUserDataDir.get(), profileDirectoryName)).setInstruction(instruction).setEmployedOptions(options);
-			return launched;
+			return new LaunchedChromeDriver(driver)
+					.setChromeUserProfile(new ChromeUserProfile(targetUserDataDir.get(), profileDirectoryName))
+					.setInstruction(instruction).setEmployedOptions(options);
 		} catch (InvalidArgumentException iae) {
 			if (driver != null) {
 				driver.quit();

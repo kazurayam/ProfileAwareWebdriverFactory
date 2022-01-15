@@ -54,10 +54,9 @@ public class FirefoxUserProfile implements Comparable<FirefoxUserProfile> {
 
     @Override
     public boolean equals(Object obj) {
-        if (!DefaultGroovyMethods.asBoolean(obj) instanceof FirefoxUserProfile) {
+        if (! (obj instanceof FirefoxUserProfile)) {
             return false;
         }
-
         FirefoxUserProfile other = (FirefoxUserProfile) obj;
         return this.getUserDataDir().equals(other.getUserDataDir()) && this.getProfileDirectoryName().equals(other.getProfileDirectoryName());
     }

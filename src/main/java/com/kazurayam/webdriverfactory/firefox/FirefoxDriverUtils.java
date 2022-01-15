@@ -2,6 +2,7 @@ package com.kazurayam.webdriverfactory.firefox;
 
 import com.kazurayam.webdriverfactory.utils.OSIdentifier;
 
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -10,7 +11,7 @@ public class FirefoxDriverUtils {
     /**
      * @param logsDir
      */
-    public static void enableFirefoxDriverLog(Path logsDir) {
+    public static void enableFirefoxDriverLog(Path logsDir) throws IOException {
         Files.createDirectories(logsDir);
         Path firefoxDriverLog = logsDir.resolve("firefoxdriver.log");
         System.setProperty("webdriver.gecko.logfile", firefoxDriverLog.toString());

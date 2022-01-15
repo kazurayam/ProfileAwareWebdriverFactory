@@ -28,6 +28,7 @@ ext {
     webdrivermanagerVersion = '5.0.3'
     junitVersion = '4.12'
     subprocessjVersion = '0.1.0'
+    gsonVersion = '2.8.2'
 }
 
 configurations {
@@ -45,6 +46,7 @@ dependencies {
     implementation "org.slf4j:slf4j-api:${slf4jVersion}"
     implementation group: 'org.slf4j', name: 'slf4j-simple', version: "${slf4jVersion}"
     implementation group: 'org.seleniumhq.selenium', name: 'selenium-java', version: "${selenium3Version}"
+    implementation group: 'com.google.code.gson', name: 'gson', version: "${gsonVersion}"
     testImplementation group: 'org.seleniumhq.selenium', name: 'selenium-java', version: "${selenium4Version}"
     testImplementation group: 'io.github.bonigarcia', name: 'webdrivermanager', version: "${webdrivermanagerVersion}"
     testImplementation group: 'junit', name: 'junit', version: "${junitVersion}"
