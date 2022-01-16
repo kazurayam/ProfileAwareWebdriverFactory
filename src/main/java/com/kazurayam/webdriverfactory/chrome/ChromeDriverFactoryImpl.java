@@ -281,6 +281,7 @@ public class ChromeDriverFactoryImpl extends ChromeDriverFactory {
 
 		// create Chrome Options taking over the Chrome Preferences
 		ChromeOptions chromeOptions = ChromeOptionsBuilder.newInstance(preferences).build();
+
 		// modify the Chrome Options
 		chromeOptions = applyChromeOptionsModifiers(chromeOptions, chromeOptionsModifiers);
 

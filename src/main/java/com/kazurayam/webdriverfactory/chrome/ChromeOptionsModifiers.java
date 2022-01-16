@@ -22,8 +22,7 @@ public class ChromeOptionsModifiers {
         noSandbox,
         singleProcess,
         windowSize,
-        windowSize1024_768,
-        withProfileDirectoryName
+        withProfileDirectoryName,
     }
 
     public static ChromeOptionsModifier disableDevShmUsage() {
@@ -32,7 +31,7 @@ public class ChromeOptionsModifiers {
             opts.addArguments("disable-dev-shm-usage");
             return opts;
         };
-        return new Base(Type.headless, modifier, arguments);
+        return new Base(Type.disableDevShmUsage, modifier, arguments);
     }
 
     public static ChromeOptionsModifier disableExtensions() {
@@ -41,7 +40,7 @@ public class ChromeOptionsModifiers {
             opts.addArguments("disableExtensions");
             return opts;
         };
-        return new Base(Type.headless, modifier, arguments);
+        return new Base(Type.disableExtensions, modifier, arguments);
     }
 
     public static ChromeOptionsModifier disableGpu() {
@@ -50,7 +49,7 @@ public class ChromeOptionsModifiers {
             opts.addArguments("disable-gpu");
             return opts;
         };
-        return new Base(Type.headless, modifier, arguments);
+        return new Base(Type.disableGpu, modifier, arguments);
     }
 
     public static ChromeOptionsModifier disableInfobars() {
@@ -59,7 +58,7 @@ public class ChromeOptionsModifiers {
             opts.addArguments("disable-infobars");
             return opts;
         };
-        return new Base(Type.headless, modifier, arguments);
+        return new Base(Type.disableInfobars, modifier, arguments);
     }
 
     public static ChromeOptionsModifier headless() {
@@ -86,7 +85,7 @@ public class ChromeOptionsModifiers {
             opts.addArguments("--no-sandbox");
             return opts;
         };
-        return new Base(Type.windowSize, modifier, arguments);
+        return new Base(Type.noSandbox, modifier, arguments);
     }
 
     public static ChromeOptionsModifier singleProcess() {
@@ -95,7 +94,7 @@ public class ChromeOptionsModifiers {
             opts.addArguments("--single-process");
             return opts;
         };
-        return new Base(Type.windowSize, modifier, arguments);
+        return new Base(Type.singleProcess, modifier, arguments);
     }
 
     public static ChromeOptionsModifier windowSize1024_768() {

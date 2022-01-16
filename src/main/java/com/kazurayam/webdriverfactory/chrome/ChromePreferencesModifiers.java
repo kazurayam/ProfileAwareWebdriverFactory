@@ -9,11 +9,20 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.function.BiFunction;
 
+/**
+ * FIXME
+ * I can move the capability of setting "download.prompt_for_download => false" etc
+ * from ChromePreferencesModifiers to ChromeOptionsModifiers
+ * and remove ChromePreferencesModifiers.
+ * This makes me safely work around the incompatibility between Selenium 3 vs Selenium 4
+ * I should remove ChromePreferencesModifier so that I can use
+ * this library in both Selenium3 and Selenium4
+ * https://stackoverflow.com/questions/36901891/chromeoptions-to-not-prompt-for-download-when-running-remotedriver
+ */
 public class ChromePreferencesModifiers {
 
     enum Type {
         downloadWithoutPrompt,
-        downloadIntoUserHomeDownloadsDirectory,
         downloadIntoDirectory,
         disableViewersOfFlashAndPdf,
     }
@@ -25,7 +34,7 @@ public class ChromePreferencesModifiers {
             prefs.put("download.prompt_for_download", false);
             return prefs;
         };
-        return new Base(Type.downloadIntoDirectory, modifier, arguments);
+        return new Base(Type.downloadWithoutPrompt, modifier, arguments);
     }
 
     static ChromePreferencesModifier downloadIntoUserHomeDownloadsDirectory() {

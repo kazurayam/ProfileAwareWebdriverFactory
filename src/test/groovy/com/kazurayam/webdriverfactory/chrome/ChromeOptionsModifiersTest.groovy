@@ -11,7 +11,7 @@ import static org.junit.Assert.assertNotNull
 import static org.junit.Assert.assertTrue
 import groovy.json.*
 
-class ChromeOptionsModifierTest {
+class ChromeOptionsModifiersTest {
 
     private ChromeOptions options
     private List<Object> arguments
@@ -25,55 +25,55 @@ class ChromeOptionsModifierTest {
     @Test
     void test_disableDevShmUsage() {
         ChromeOptions modified =
-                ChromeOptionsModifiers.disableDevShmUsage.apply(options, arguments)
+                ChromeOptionsModifiers.disableDevShmUsage().modify(options)
         verifyContainsArgument(modified, 'disable-dev-shm-usage')
     }
 
     @Test
     void test_disableExtensions() {
-        ChromeOptions modified = ChromeOptionsModifiers.disableExtensions.apply(options, arguments)
+        ChromeOptions modified = ChromeOptionsModifiers.disableExtensions().modify(options)
         verifyContainsArgument(modified, 'disableExtensions')
     }
 
     @Test
     void test_disableGpu() {
         ChromeOptions modified =
-                ChromeOptionsModifiers.disableGpu.apply(options, arguments)
+                ChromeOptionsModifiers.disableGpu().modify(options)
         verifyContainsArgument(modified, 'disable-gpu')
     }
 
     @Test
     void test_disableInfobars() {
         ChromeOptions modified =
-                ChromeOptionsModifiers.disableInfobars.apply(options, arguments)
+                ChromeOptionsModifiers.disableInfobars().modify(options)
         verifyContainsArgument(modified, 'disable-infobars')
     }
 
     @Test
     void test_headless() {
         ChromeOptions modified =
-                ChromeOptionsModifiers.headless.apply(options, arguments)
+                ChromeOptionsModifiers.headless().modify(options)
         verifyContainsArgument(modified, '--headless')
     }
 
     @Test
     void test_incognito() {
         ChromeOptions modified =
-                ChromeOptionsModifiers.incognito.apply(options, arguments)
+                ChromeOptionsModifiers.incognito().modify(options)
         verifyContainsArgument(modified, '--incognito')
     }
 
     @Test
     void test_noSandbox() {
         ChromeOptions modified =
-                ChromeOptionsModifiers.noSandbox.apply(options, arguments)
+                ChromeOptionsModifiers.noSandbox().modify(options)
         verifyContainsArgument(modified, '--no-sandbox')
     }
 
     @Test
     void test_singleProcess() {
         ChromeOptions modified =
-                ChromeOptionsModifiers.singleProcess.apply(options, arguments)
+                ChromeOptionsModifiers.singleProcess().modify(options)
         verifyContainsArgument(modified, '--single-process')
     }
 
@@ -81,26 +81,25 @@ class ChromeOptionsModifierTest {
     @Test
     void test_windowSize1024_768() {
         ChromeOptions modified =
-                ChromeOptionsModifiers.windowSize1024_768.apply(options, arguments)
+                ChromeOptionsModifiers.windowSize1024_768().modify(options)
         verifyContainsArgument(modified, 'window-size=1024,768')
     }
 
     @Test
     void test_windowSize() {
-        arguments = Arrays.asList(800, 600)
         ChromeOptions modified =
-                ChromeOptionsModifiers.windowSize.apply(options, arguments)
+                ChromeOptionsModifiers.windowSize(800, 600).modify(options)
         verifyContainsArgument(modified, 'window-size=800,600')
     }
 
     @Test
     void test_withProfileDirectoryName() {
-        Path userDataDir = ChromeProfileUtils.getDefaultUserDataDir();
-        ProfileDirectoryName profileDirectoryName = new ProfileDirectoryName("Default");
-        arguments = Arrays.asList(userDataDir, profileDirectoryName)
+        Path userDataDir = ChromeProfileUtils.getDefaultUserDataDir()
+        ProfileDirectoryName profileDirectoryName = new ProfileDirectoryName("Default")
         ChromeOptions modified =
-                ChromeOptionsModifiers.withProfileDirectoryName(options, arguments)
-        verifyContainsArgument(modified, 'Default')
+                ChromeOptionsModifiers.withProfileDirectoryName(userDataDir, profileDirectoryName)
+                        .modify(options)
+        verifyContainsArgument(/**/modified, 'Default')
     }
 
     /**
@@ -117,7 +116,9 @@ class ChromeOptionsModifierTest {
             "browserName": "chrome",
             "goog:chromeOptions": {
                 "args": [
-                    "--headless"
+                    "--headless",
+                    "user-data-dir=/Users/kazuakiurayama/Library/Application Support/Google/Chrome",
+                    "profile-directory=Default"
                 ],
                 "extensions": [
                 ]
@@ -131,6 +132,16 @@ class ChromeOptionsModifierTest {
         assertTrue(map2.containsKey('args'))
         List<String> args = (List)map2.get('args')
         assertNotNull(args)
-        assertTrue(args.contains(arg))
+        //
+        boolean t = false
+        for (String a in args) {
+            if (a.contains(arg)) {
+                t = true
+                break
+            }
+        }
+        assertTrue(
+                String.format("arg=\"%s\" is not contained in the args=%s", arg, args.toString()),
+                t)
     }
 }

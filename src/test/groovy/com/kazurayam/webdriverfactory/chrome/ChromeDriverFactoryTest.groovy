@@ -71,7 +71,6 @@ class ChromeDriverFactoryTest {
 		launched.getDriver().navigate().to('http://example.com/')
 		//
 		launched.getEmployedOptionsAsJSON().ifPresent({ String json ->
-			def jsonObject = new JsonSlurper().parseText(json)
 			/* in case "with default setting" you will see
 		{
 			"acceptSslCerts": true,
@@ -82,7 +81,7 @@ class ChromeDriverFactoryTest {
 						...
 		 */
 			assertFalse("window-size option should not be there when no default setting",
-					jsonObject["goog:chromeOptions"]["args"].contains("window-size=1024,768")
+					json.contains("window-size=1024,768")
 			)
 		})
 	}
@@ -241,9 +240,8 @@ class ChromeDriverFactoryTest {
 		launched.getDriver().navigate().to('http://example.com/')
 		//
 		launched.getEmployedOptionsAsJSON().ifPresent({ String json ->
-			println json
-			def jo = new JsonSlurper().parseText(json)
-			/*
+			println "employed options as json: " + json
+			/* Selenium 3
             {
     "browserName": "chrome",
     "goog:chromeOptions": {
@@ -271,7 +269,32 @@ class ChromeDriverFactoryTest {
     }
 }
              */
-			assertTrue(jo["goog:chromeOptions"]["args"].contains("--incognito"))
+			/* Selenium 4
+{
+  "args": [
+    "plugins.plugins_disabled\u003d[Adobe Flash Player, Chrome PDF Viewer]",
+    "profile.default_content_settings.popups\u003d0",
+    "download.prompt_for_download\u003dfalse",
+    "download.default_directory\u003d/Users/kazuakiurayama/Downloads",
+    "disable-infobars",
+    "disable-dev-shm-usage",
+    "--no-sandbox",
+    "disable-gpu",
+    "window-size\u003d1024,768",
+    "disableExtensions",
+    "--incognito"
+  ],
+  "extensionFiles": [],
+  "extensions": [],
+  "experimentalOptions": {},
+  "androidOptions": {},
+  "capabilityName": "goog:chromeOptions",
+  "caps": {
+    "browserName": "chrome"
+  }
+}
+			 */
+			assertTrue(json.contains("--incognito"))
 		})
 
 	}

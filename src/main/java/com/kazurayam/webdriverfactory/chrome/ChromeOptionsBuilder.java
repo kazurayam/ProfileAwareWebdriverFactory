@@ -5,6 +5,7 @@ import org.openqa.selenium.chrome.ChromeOptions;
 import java.util.Map;
 
 public abstract class ChromeOptionsBuilder {
+
 	public static ChromeOptionsBuilder newInstance() {
 		return new ChromeOptionsBuilderImpl();
 	}

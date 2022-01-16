@@ -65,7 +65,7 @@ class LaunchedChromeDriverTest {
     @Test
     void test_getEmployedOptions() {
         ChromeDriverFactory factory = ChromeDriverFactory.newHeadlessChromeDriverFactory()
-        factory.addChromeOptionsModifier(ChromeOptionsModifiers.incognito)
+        factory.addChromeOptionsModifier(ChromeOptionsModifiers.incognito())
         LaunchedChromeDriver launched = factory.newChromeDriver()
         launched.getEmployedOptions().ifPresent { ChromeOptions options ->
             println options
