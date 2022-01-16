@@ -1,5 +1,7 @@
 package com.kazurayam.webdriverfactory;
 
+import com.beust.jcommander.JCommander;
+import com.beust.jcommander.Parameter;
 import com.sun.net.httpserver.Headers;
 import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
@@ -11,9 +13,12 @@ import java.io.InputStream;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
+import java.io.UnsupportedEncodingException;
 import java.net.InetSocketAddress;
 
 import java.net.URLDecoder;
+import java.net.URLEncoder;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.ZoneId;
@@ -36,19 +41,57 @@ public class SetCookieServer {
     static final String URL_ENCODING = "UTF-8";
     static final String RESPONSE_ENCODING = "UTF-8";
 
-    private Integer port;
+    @Parameter(
+            names = {"-p", "--port"},
+            description = "port number. default : 80.",
+            required = false,
+            arity = 1)
+    Integer port = 80;
 
-    SetCookieServer() {
+    @Parameter(
+            names = {"-b", "--base-dir"},
+            description = "base directory path. default : current directory.",
+            required = false,
+            arity = 1)
+    Path baseDir = Paths.get(".");
+
+    @Parameter(
+            names = {"-h", "--help"},
+            help = true)
+    boolean help;
+
+    @Parameter(names = { "--print-request"},
+            description = "display HTTP Request",
+            required = false
+    )
+    boolean isPrintingRequested = false;
+
+    @Parameter(names = { "--debug"},
+            description = "run with debug mode",
+            required = false
+    )
+    boolean isDebugMode = false;
+
+    SetCookieServer() {}
+
+    public static void main(String[] args) throws IOException {
+        SetCookieServer server = new SetCookieServer();
+        JCommander jc = JCommander.newBuilder().addObject(server).build();
+        jc.parse(args);
+        if (server.help) {
+            jc.usage();
+        } else {
+            server.startup();
+        }
     }
 
-    public void run() throws IOException {
+    public void startup() throws IOException {
         HttpServer server = HttpServer.create(
                 new InetSocketAddress(port), 0);
         server.createContext("/",
-                new Handler(80,
-                        Paths.get("."),
-                        true,
-                        true));
+                new Handler(this.baseDir,
+                        this.isDebugMode,
+                        this.isPrintingRequested));
         server.start();
     }
 
@@ -56,19 +99,14 @@ public class SetCookieServer {
         throw new RuntimeException("TODO");
     }
 
-    public static void main(String[] args) throws IOException {
-        SetCookieServer server = new SetCookieServer();
-        server.run();
-    }
 
     /**
      *
      */
     public static class Handler implements HttpHandler {
-        private Integer port;
-        private Path basePath;
-        private Boolean isDebugMode;
-        private Boolean isPrintingRequestRequired;
+        private final Path baseDir;
+        private final Boolean isDebugMode;
+        private final Boolean isPrintingRequestRequired;
 
         private static final Long MAX_AGE_SECONDS = 60L;
         private static final DateTimeFormatter RFC7231 =
@@ -76,11 +114,10 @@ public class SetCookieServer {
                         .ofPattern("EEE, dd MMM yyyy HH:mm:ss z", Locale.ENGLISH)
                         .withZone(ZoneId.of("GMT"));
 
-        Handler(Integer port, Path basePath, Boolean isDebugMode, Boolean isPrintingRequestRequired) {
-            this.port = port;
-            this.basePath = Paths.get(".");
-            this.isDebugMode = true;
-            this.isPrintingRequestRequired = true;
+        Handler(Path baseDir, Boolean isDebugMode, Boolean isPrintingRequestRequired) {
+            this.baseDir = baseDir;
+            this.isDebugMode = isDebugMode;
+            this.isPrintingRequestRequired = isPrintingRequestRequired;
         }
 
         @Override
@@ -95,22 +132,26 @@ public class SetCookieServer {
                 operateCookies(exchange);
 
                 // build the response and send it back
-                File file = new File(basePath.toFile(), decodedUri);
+                File file = new File(this.baseDir.toFile(), decodedUri);
                 if (file.exists()) {
                     if (file.isFile()) {
                         debugLog(String.format("%s is a file", file.getName()));
                         writeFile(exchange, file);
                     } else if (file.isDirectory()) {
-
+                        debugLog(String.format("%s is directory.", file.getName()));
+                        writeListOfFilesInDir(exchange, this.baseDir, file);
                     } else {
                         throw new IOException(String.format("%s is mysterious", file.toString()));
                     }
                 } else {
+                    debugLog(String.format("%s is not found.", file.getName()));
+                    writeResponse(exchange, 404,
+                            "<html><h1>Page Not Found</h1></html>");
 
                 }
             } catch (Exception e) {
                 e.printStackTrace();
-                this.sendResponse(exchange, 500,
+                writeResponse(exchange, 500,
                         "<html><h1>Internal Server Error</h1></html>");
             }
         }
@@ -156,7 +197,7 @@ public class SetCookieServer {
         }
 
 
-        private void sendResponse(HttpExchange exchange, Integer rCode, String message)
+        private void writeResponse(HttpExchange exchange, Integer rCode, String message)
                 throws IOException
         {
             exchange.sendResponseHeaders(rCode, 0);
@@ -174,6 +215,24 @@ public class SetCookieServer {
             OutputStream os = exchange.getResponseBody();
             copy(is, os);
             os.flush();
+        }
+
+        private void writeListOfFilesInDir(HttpExchange exchange, Path baseDir, File dir) throws IOException {
+            StringBuilder sb = new StringBuilder();
+            sb.append("<html><ul>\n");
+            Files.list(dir.toPath())
+                    .sorted(Path::compareTo)
+                    .forEach(file -> {
+                        Path path = basePath.relativize(file).toString().replace('\\', '/');
+                        try {
+                            String encodedPath = URLEncoder.encode(path.toString(), URL_ENCODING);
+                            sb.append("<li><a href=\"${encodedPath}\">${file.name}</a></li>\n");
+                        } catch (UnsupportedEncodingException e) {
+                            throw new RuntimeException(e)
+                        }
+                    });
+            sb.append("</ul></html>");
+            this.writeResponse(exchange, 200, sb.toString())
         }
 
         private static void copy(InputStream source, OutputStream target) throws IOException {

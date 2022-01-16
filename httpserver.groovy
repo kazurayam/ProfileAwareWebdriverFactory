@@ -14,7 +14,7 @@ cli.with {
     p longOpt: 'port', args: 1, argName: 'port', 'port number. default : 80.'
     b longOpt: 'base-dir', args: 1, argName: 'path', 'base directory path. default : current directory.'
     h longOpt: 'help', 'show this help.'
-    _ longOpt: 'print-request', 'display request infomation.'
+    _ longOpt: 'print-request', 'display request information.'
     _ longOpt: 'debug', 'run with debug mode.'
 }
 

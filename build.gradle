@@ -29,6 +29,7 @@ ext {
     junitVersion = '4.12'
     subprocessjVersion = '0.1.0'
     gsonVersion = '2.8.2'
+    jcommanderVersion = '1.82'
 }
 
 configurations {
@@ -47,6 +48,8 @@ dependencies {
     implementation group: 'org.slf4j', name: 'slf4j-simple', version: "${slf4jVersion}"
     implementation group: 'org.seleniumhq.selenium', name: 'selenium-java', version: "${selenium3Version}"
     implementation group: 'com.google.code.gson', name: 'gson', version: "${gsonVersion}"
+    implementation group: 'com.beust', name: 'jcommander', version: "${jcommanderVersion}"
+
     testImplementation group: 'org.seleniumhq.selenium', name: 'selenium-java', version: "${selenium3Version}"
     testImplementation group: 'io.github.bonigarcia', name: 'webdrivermanager', version: "${webdrivermanagerVersion}"
     testImplementation group: 'junit', name: 'junit', version: "${junitVersion}"
