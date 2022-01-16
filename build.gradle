@@ -8,7 +8,7 @@ plugins {
 }
 
 group 'com.kazurayam'
-version '0.6.0-SNAPSHOT'
+version '0.6.1-SNAPSHOT'
 
 ext.isReleaseVersion = ! version.endsWith("SNAPSHOT")
 
@@ -45,9 +45,9 @@ dependencies {
     generateDocs "org.codehaus.groovy:groovy-all:${groovyVersion}"
     implementation "org.slf4j:slf4j-api:${slf4jVersion}"
     implementation group: 'org.slf4j', name: 'slf4j-simple', version: "${slf4jVersion}"
-    implementation group: 'org.seleniumhq.selenium', name: 'selenium-java', version: "${selenium4Version}"
+    implementation group: 'org.seleniumhq.selenium', name: 'selenium-java', version: "${selenium3Version}"
     implementation group: 'com.google.code.gson', name: 'gson', version: "${gsonVersion}"
-    testImplementation group: 'org.seleniumhq.selenium', name: 'selenium-java', version: "${selenium4Version}"
+    testImplementation group: 'org.seleniumhq.selenium', name: 'selenium-java', version: "${selenium3Version}"
     testImplementation group: 'io.github.bonigarcia', name: 'webdrivermanager', version: "${webdrivermanagerVersion}"
     testImplementation group: 'junit', name: 'junit', version: "${junitVersion}"
     // https://mvnrepository.com/artifact/com.kazurayam/subprocessj

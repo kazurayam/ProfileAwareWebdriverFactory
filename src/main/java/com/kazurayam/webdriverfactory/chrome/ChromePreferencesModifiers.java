@@ -50,6 +50,7 @@ public class ChromePreferencesModifiers {
                 throw new IllegalArgumentException("Path directory argument is required");
             }
             Path dir = (Path) args.get(0);
+            prefs.put("profile.default_content_settings.popups", 0);
             prefs.put("download.default_directory", dir.toString());
             return prefs;
         };

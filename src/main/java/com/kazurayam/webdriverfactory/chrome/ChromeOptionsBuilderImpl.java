@@ -22,9 +22,6 @@ public class ChromeOptionsBuilderImpl extends ChromeOptionsBuilder {
 	public ChromeOptions build() {
 		ChromeOptions options = new ChromeOptions();
 
-		// set location of the Chrome Browser's binary
-		//options.setBinary(ChromeDriverUtils.getChromeBinaryPath().toString());
-
 		// set my chrome preferences
 		// Selenium3 and Selenium4 are different here.
 
@@ -36,9 +33,9 @@ public class ChromeOptionsBuilderImpl extends ChromeOptionsBuilder {
 
 		// code for Selenium 3
 		// https://www.javadoc.io/doc/org.seleniumhq.selenium/selenium-chrome-driver/3.141.59/org/openqa/selenium/chrome/ChromeOptions.html#ChromeOptions--
-		preferences.forEach((k,v) -> {
-			options.addArguments(String.format("%s=%s",k,v));
-		});
+		for (Map.Entry<String, Object> entry : preferences.entrySet()) {
+			options.addArguments(String.format("%s=%s", entry.getKey(), entry.getValue()));
+		}
 
 		// I should no longer use Preferences. Live with only ChromeOptions
 

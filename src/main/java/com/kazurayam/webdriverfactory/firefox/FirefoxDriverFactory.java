@@ -31,15 +31,15 @@ public abstract class FirefoxDriverFactory {
         return fdfi;
     }
 
-    public abstract void addFirefoxPreferencesModifier(FirefoxPreferencesModifier firefoxPreferencesModifier);
+    public abstract FirefoxDriverFactory addFirefoxPreferencesModifier(FirefoxPreferencesModifier firefoxPreferencesModifier);
 
-    public abstract void addAllFirefoxPreferencesModifier(List<FirefoxPreferencesModifier> firefoxPreferencesModifierList);
+    public abstract FirefoxDriverFactory addAllFirefoxPreferencesModifier(List<FirefoxPreferencesModifier> firefoxPreferencesModifierList);
 
-    public abstract void addFirefoxOptionsModifier(FirefoxOptionsModifier firefoxOptionsModifier);
+    public abstract FirefoxDriverFactory addFirefoxOptionsModifier(FirefoxOptionsModifier firefoxOptionsModifier);
 
-    public abstract void addAllFirefoxOptionsModifier(List<FirefoxOptionsModifier> firefoxOptionsModifierList);
+    public abstract FirefoxDriverFactory addAllFirefoxOptionsModifier(List<FirefoxOptionsModifier> firefoxOptionsModifierList);
 
-    public abstract void pageLoadTimeout(Integer waitSeconds);
+    public abstract FirefoxDriverFactory pageLoadTimeout(Integer waitSeconds);
 
     public abstract LaunchedFirefoxDriver newFirefoxDriver();
 

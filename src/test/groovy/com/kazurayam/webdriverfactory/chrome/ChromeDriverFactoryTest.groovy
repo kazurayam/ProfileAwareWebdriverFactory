@@ -60,173 +60,6 @@ class ChromeDriverFactoryTest {
 	}
 
 	@Test
-	void test_newChromeDriver_no_default_settings() {
-		ChromeDriverFactory cdFactory = ChromeDriverFactory.newChromeDriverFactory(false)
-		launched = cdFactory.newChromeDriver()
-		assertNotNull(launched)
-		launched.getEmployedOptionsAsJSON().ifPresent({ json ->
-			println("options is\n${json}")
-		})
-		//
-		launched.getDriver().navigate().to('http://example.com/')
-		//
-		launched.getEmployedOptionsAsJSON().ifPresent({ String json ->
-			/* in case "with default setting" you will see
-		{
-			"acceptSslCerts": true,
-			"browserName": "chrome",
-			"goog:chromeOptions": {
-				"args": [
-						"window-size=1024,768",
-						...
-		 */
-			assertFalse("window-size option should not be there when no default setting",
-					json.contains("window-size=1024,768")
-			)
-		})
-	}
-
-	/**
-	 * Basic case.
-	 * Instantiate a ChromeDriver to open a Chrome browser with the default profile.
-	 * 
-	 */
-	@Test
-	void test_newChromeDriver_noUserProfileSpecified() {
-		ChromeDriverFactory cdFactory = ChromeDriverFactory.newChromeDriverFactory()
-		launched = cdFactory.newChromeDriver()
-		assertNotNull(launched)
-		launched.getEmployedOptionsAsJSON().ifPresent({ json ->
-			println("options is\n${json}")
-		})
-		//
-		launched.getDriver().navigate().to('http://example.com/')
-	}
-
-	@Test
-	void test_enableChromeDriverLog() {
-		ChromeDriverFactory cdFactory = ChromeDriverFactory.newChromeDriverFactory()
-		cdFactory.enableChromeDriverLog(outputFolder)
-		launched = cdFactory.newChromeDriver()
-		assertNotNull(launched)
-		Path logFile = outputFolder.resolve(ChromeDriverUtils.LOG_FILE_NAME)
-		assertTrue(Files.exists(logFile))
-		assertTrue(logFile.size() > 0)
-	}
-
-	/**
-	 * Instantiate a ChromeDriver to open a Chrome browser specifying a user profile "Picasso"
-	 * while cloning the User Data directory to a temporary folder
-	 */
-	@Test
-	void test_if_cookie_file_is_cloned_TO_GO() {
-		ChromeDriverFactory cdFactory = ChromeDriverFactory.newChromeDriverFactory()
-		launched = cdFactory.newChromeDriver(
-				new UserProfile('Picasso'),
-				UserDataAccess.TO_GO)
-		assertNotNull(launched)
-
-		// check if the user-data-dir/ProfileDireName/Cookie file is properly copied
-		// from the genuine one into the temporary directory
-		launched.getChromeUserProfile().ifPresent({ ChromeUserProfile chromeUserProfile ->
-			Path originalCookieFile = ChromeProfileUtils.getDefaultUserDataDir()
-					.resolve(chromeUserProfile.getProfileDirectoryName().toString())
-					.resolve("Cookies")
-			Path clonedCookieFile = chromeUserProfile.getProfileDirectory().resolve("Cookies")
-			boolean identical = TestUtils.filesAreIdentical(originalCookieFile, clonedCookieFile)
-			assert identical: "${clonedCookieFile} (size=${clonedCookieFile.size()}) is not identical "+
-					"to ${originalCookieFile} (size=${originalCookieFile.size()})"
-		})
-
-		//println("ChromeDriver has been instantiated with profile Picasso")
-		launched.getDriver().navigate().to('http://example.com/')
-	}
-
-	@Test
-	void test_newChromeDriver_byProfileDirectoryName_TO_GO() {
-		ChromeDriverFactory cdFactory = ChromeDriverFactory.newChromeDriverFactory()
-		launched = cdFactory.newChromeDriver(
-				new ProfileDirectoryName('Profile 1'),
-				UserDataAccess.TO_GO)  // or 'Default'
-		assertNotNull(launched)
-
-		//println("ChromeDriver has been instantiated with profile directory Default")
-		launched.getDriver().navigate().to('http://example.com/')
-	}
-
-
-
-	// I ignore this as it tends to fail easily when a Chrome process is already in action
-	@Ignore
-	@Test
-	void test_newChromeDriver_byProfileDirectoryName_FOR_HERE() {
-		ChromeDriverFactory cdFactory = ChromeDriverFactory.newChromeDriverFactory()
-		launched = cdFactory.newChromeDriver(
-				new ProfileDirectoryName('Profile 1'),
-				UserDataAccess.FOR_HERE)
-		assertNotNull(launched)
-
-		//println("ChromeDriver has been instantiated with profile directory Default")
-		launched.getDriver().navigate().to('http://example.com/')
-	}
-
-
-	/**
-	 * Instantiate a ChromeDriver to open a Chrome browser specifying a user profile "Picasso"
-	 * while cloning the User Data directory to a temporary folder
-	 * You are likely to see an error:
-	 * > invalid argument: user data directory is already in use, please specify a unique value for --user-data-dir argument, or don't use --user-data-dir
-	 * when you have at least 1 Chrome browser already opened.
-	 */
-	@Ignore
-	// This test case is ignored because it tends to fail easily:
-	// when you have Chrome opened when you execute this test, it will certainly fail
-	@Test
-	void test_newChromeDriver_withUserProfile_FOR_HERE() {
-		ChromeDriverFactory cdFactory = ChromeDriverFactory.newChromeDriverFactory()
-		launched = cdFactory.newChromeDriver(
-				new UserProfile('Picasso'),
-				UserDataAccess.FOR_HERE)
-		assertNotNull(launched)
-
-		launched.getDriver().navigate().to('http://example.com/')
-	}
-
-	/**
-	 * open a session using a user profile Picasso and navigate too http://127.0.0.1, then close the session.
-	 * the session will create a cookie "timestamp".
-	 * open a second session using Picasso Profile again.
-	 * I expect the second session will use the same value of timestamp cookie. So I test it.
-	 * 
-	 */
-	@Ignore
-	@Test
-	void test_if_cookie_is_retained_in_profile_accross_2_sessions() {
-		// we want Headless
-		ChromeDriverFactory cdFactory = ChromeDriverFactory.newChromeDriverFactory()
-		//ChromeOptionsModifier com = new ChromeOptionsModifierHeadless()
-		//cdFactory.addChromeOptionsModifier(com)
-		//
-		String url = 'http://localhost/'
-		// 1st session
-		launched = cdFactory.newChromeDriver(new UserProfile('Picasso'))
-		launched.getDriver().navigate().to(url)
-		Set<Cookie> cookies = launched.getDriver().manage().getCookies()
-		println "1st session: " + cookies
-		String phpsessid1st = launched.getDriver().manage().getCookieNamed('timestamp')
-		launched.quit()
-
-		// 2nd session
-		launched = cdFactory.newChromeDriver(new UserProfile('Picasso'))
-		launched.getDriver().navigate().to(url)
-		cookies = launched.getDriver().manage().getCookies()
-		println "2nd session: " + cookies
-		String phpsessid2nd = launched.getDriver().manage().getCookieNamed('timestamp')
-		//
-		assert phpsessid1st == phpsessid2nd
-	}
-
-	@Test
 	void test_addChromeOptionsModifier_incognito() {
 		ChromeDriverFactory cdFactory = ChromeDriverFactory.newChromeDriverFactory()
 		//
@@ -296,15 +129,6 @@ class ChromeDriverFactoryTest {
 			 */
 			assertTrue(json.contains("--incognito"))
 		})
-
-	}
-
-	@Test
-	void test_ChromeDriver_metadata_empty() {
-		ChromeDriverFactory cdFactory = ChromeDriverFactory.newChromeDriverFactory()
-		launched = cdFactory.newChromeDriver()
-		assertEquals(Optional.empty(), launched.getChromeUserProfile())
-		assertEquals(Optional.empty(), launched.getInstruction())
 	}
 
 	@Test
@@ -322,6 +146,231 @@ class ChromeDriverFactoryTest {
 			// e.g, "/Users/kazurayam/Library/Application Support/Google/Chrome"
 		})
 	}
+
+	@Test
+	void test_ChromeDriver_metadata_empty() {
+		ChromeDriverFactory cdFactory = ChromeDriverFactory.newChromeDriverFactory()
+		launched = cdFactory.newChromeDriver()
+		assertEquals(Optional.empty(), launched.getChromeUserProfile())
+		assertEquals(Optional.empty(), launched.getInstruction())
+	}
+
+	@Test
+	void test_enableChromeDriverLog() {
+		ChromeDriverFactory cdFactory = ChromeDriverFactory.newChromeDriverFactory()
+		cdFactory.enableChromeDriverLog(outputFolder)
+		launched = cdFactory.newChromeDriver()
+		assertNotNull(launched)
+		Path logFile = outputFolder.resolve(ChromeDriverUtils.LOG_FILE_NAME)
+		assertTrue(Files.exists(logFile))
+		assertTrue(logFile.size() > 0)
+	}
+
+	/**
+	 * Instantiate a ChromeDriver to open a Chrome browser specifying a user profile "Picasso"
+	 * while cloning the User Data directory to a temporary folder
+	 */
+	@Test
+	void test_if_cookie_file_is_cloned_TO_GO() {
+		ChromeDriverFactory cdFactory = ChromeDriverFactory.newChromeDriverFactory()
+		launched = cdFactory.newChromeDriver(
+				new UserProfile('Picasso'),
+				UserDataAccess.TO_GO)
+		assertNotNull(launched)
+
+		// check if the user-data-dir/ProfileDireName/Cookie file is properly copied
+		// from the genuine one into the temporary directory
+		launched.getChromeUserProfile().ifPresent({ ChromeUserProfile chromeUserProfile ->
+			Path originalCookieFile = ChromeProfileUtils.getDefaultUserDataDir()
+					.resolve(chromeUserProfile.getProfileDirectoryName().toString())
+					.resolve("Cookies")
+			Path clonedCookieFile = chromeUserProfile.getProfileDirectory().resolve("Cookies")
+			boolean identical = TestUtils.filesAreIdentical(originalCookieFile, clonedCookieFile)
+			assert identical: "${clonedCookieFile} (size=${clonedCookieFile.size()}) is not identical "+
+					"to ${originalCookieFile} (size=${originalCookieFile.size()})"
+		})
+
+		//println("ChromeDriver has been instantiated with profile Picasso")
+		launched.getDriver().navigate().to('http://example.com/')
+	}
+
+	/**
+	 * open a session using a user profile Picasso and navigate too http://127.0.0.1, then close the session.
+	 * the session will create a cookie "timestamp".
+	 * open a second session using Picasso Profile again.
+	 * I expect the second session will use the same value of timestamp cookie. So I test it.
+	 *
+	 */
+	@Ignore
+	@Test
+	void test_if_cookie_is_retained_in_profile_accross_2_sessions() {
+		// we want Headless
+		ChromeDriverFactory cdFactory = ChromeDriverFactory.newChromeDriverFactory()
+		//ChromeOptionsModifier com = new ChromeOptionsModifierHeadless()
+		//cdFactory.addChromeOptionsModifier(com)
+		//
+		String url = 'http://localhost/'
+		// 1st session
+		launched = cdFactory.newChromeDriver(new UserProfile('Picasso'))
+		launched.getDriver().navigate().to(url)
+		Set<Cookie> cookies = launched.getDriver().manage().getCookies()
+		println "1st session: " + cookies
+		String phpsessid1st = launched.getDriver().manage().getCookieNamed('timestamp')
+		launched.quit()
+
+		// 2nd session
+		launched = cdFactory.newChromeDriver(new UserProfile('Picasso'))
+		launched.getDriver().navigate().to(url)
+		cookies = launched.getDriver().manage().getCookies()
+		println "2nd session: " + cookies
+		String phpsessid2nd = launched.getDriver().manage().getCookieNamed('timestamp')
+		//
+		assert phpsessid1st == phpsessid2nd
+	}
+
+	// I ignore this as it tends to fail easily when a Chrome process is already in action
+	@Ignore
+	@Test
+	void test_newChromeDriver_byProfileDirectoryName_FOR_HERE() {
+		ChromeDriverFactory cdFactory = ChromeDriverFactory.newChromeDriverFactory()
+		launched = cdFactory.newChromeDriver(
+				new ProfileDirectoryName('Profile 1'),
+				UserDataAccess.FOR_HERE)
+		assertNotNull(launched)
+
+		//println("ChromeDriver has been instantiated with profile directory Default")
+		launched.getDriver().navigate().to('http://example.com/')
+	}
+
+	@Test
+	void test_newChromeDriver_byProfileDirectoryName_TO_GO() {
+		ChromeDriverFactory cdFactory = ChromeDriverFactory.newChromeDriverFactory()
+		launched = cdFactory.newChromeDriver(
+				new ProfileDirectoryName('Profile 1'),
+				UserDataAccess.TO_GO)  // or 'Default'
+		assertNotNull(launched)
+
+		//println("ChromeDriver has been instantiated with profile directory Default")
+		launched.getDriver().navigate().to('http://example.com/')
+	}
+
+	@Test
+	void test_newChromeDriver_disableViewersOfFlashAndPdf() {
+		ChromeDriverFactory factory = ChromeDriverFactory.newChromeDriverFactory()
+		factory.addChromePreferencesModifier(ChromePreferencesModifiers.disableViewersOfFlashAndPdf())
+		launched = factory.newChromeDriver()
+		launched.getDriver().navigate().to("http://127.0.0.1/SDG_Guidlines_AUG_2019_Final.pdf");
+		Thread.sleep(3000)
+	}
+
+	@Test
+	void test_newChromeDriver_downloadIntoDirectory() {
+		Path dir = outputFolder.resolve("test_newChromeDriver_downloadIntoDirectory")
+		Files.createDirectories(dir)
+		String fileName = "SDG_DSD_MATRIX.1.7.xlsm"
+		Path xlsm = dir.resolve(fileName)
+		if (Files.exists(xlsm)) {
+			Files.delete(xlsm)
+		}
+		ChromeDriverFactory factory = ChromeDriverFactory
+				.newChromeDriverFactory()
+				.addChromePreferencesModifier(ChromePreferencesModifiers.downloadIntoDirectory(dir))
+		launched = factory.newChromeDriver()
+		System.out.println("test_newChromeDriver_downloadIntoDirectory: " + launched.getEmployedOptionsAsJSON().get())
+		launched.getDriver().navigate().to("http://127.0.0.1/" + fileName)
+		Thread.sleep(3000)
+		assert Files.exists(xlsm)
+	}
+
+	@Test
+	void test_newChromeDriver_downloadIntoUserHomeDownloadsDirectory() {
+		fail("TODO")
+	}
+
+	@Test
+	void test_newChromeDriver_downloadWithoutPrompt() {
+		String fileName = "SDG_DSD_MATRIX.1.7.xlsm"
+		Path xlsm = Paths.get(System.getProperty("user.home"))
+				.resolve("Downloads").resolve(fileName)
+		if (Files.exists(xlsm)) {
+			Files.delete(xlsm)
+		}
+		ChromeDriverFactory factory = ChromeDriverFactory
+				.newChromeDriverFactory()
+				.addChromePreferencesModifier(ChromePreferencesModifiers.downloadWithoutPrompt())
+		launched = factory.newChromeDriver()
+		launched.getDriver().navigate().to("http://127.0.0.1/" + fileName)
+		Thread.sleep(3000)
+		assert Files.exists(xlsm)
+	}
+
+	@Test
+	void test_newChromeDriver_no_default_settings() {
+		ChromeDriverFactory cdFactory = ChromeDriverFactory.newChromeDriverFactory(false)
+		launched = cdFactory.newChromeDriver()
+		assertNotNull(launched)
+		launched.getEmployedOptionsAsJSON().ifPresent({ json ->
+			println("options is\n${json}")
+		})
+		//
+		launched.getDriver().navigate().to('http://example.com/')
+		//
+		launched.getEmployedOptionsAsJSON().ifPresent({ String json ->
+			/* in case "with default setting" you will see
+		{
+			"acceptSslCerts": true,
+			"browserName": "chrome",
+			"goog:chromeOptions": {
+				"args": [
+						"window-size=1024,768",
+						...
+		 */
+			assertFalse("window-size option should not be there when no default setting",
+					json.contains("window-size=1024,768")
+			)
+		})
+	}
+
+
+	/**
+	 * Basic case.
+	 * Instantiate a ChromeDriver to open a Chrome browser with the default profile.
+	 * 
+	 */
+	@Test
+	void test_newChromeDriver_noUserProfileSpecified() {
+		ChromeDriverFactory cdFactory = ChromeDriverFactory.newChromeDriverFactory()
+		launched = cdFactory.newChromeDriver()
+		assertNotNull(launched)
+		launched.getEmployedOptionsAsJSON().ifPresent({ json ->
+			println("options is\n${json}")
+		})
+		//
+		launched.getDriver().navigate().to('http://example.com/')
+	}
+
+
+	/**
+	 * Instantiate a ChromeDriver to open a Chrome browser specifying a user profile "Picasso"
+	 * while cloning the User Data directory to a temporary folder
+	 * You are likely to see an error:
+	 * > invalid argument: user data directory is already in use, please specify a unique value for --user-data-dir argument, or don't use --user-data-dir
+	 * when you have at least 1 Chrome browser already opened.
+	 */
+	@Ignore
+	// This test case is ignored because it tends to fail easily:
+	// when you have Chrome opened when you execute this test, it will certainly fail
+	@Test
+	void test_newChromeDriver_withUserProfile_FOR_HERE() {
+		ChromeDriverFactory cdFactory = ChromeDriverFactory.newChromeDriverFactory()
+		launched = cdFactory.newChromeDriver(
+				new UserProfile('Picasso'),
+				UserDataAccess.FOR_HERE)
+		assertNotNull(launched)
+
+		launched.getDriver().navigate().to('http://example.com/')
+	}
+
 
 	@Test
 	void test_speed() {
@@ -363,12 +412,4 @@ class ChromeDriverFactoryTest {
 		assertNotNull(launched)
 		launched.getDriver().navigate().to("http://example.com")
 	}
-
-
-	@Test
-	void test_filesAreIdentical() {
-		Path file = Paths.get("build.gradle")
-		assert TestUtils.filesAreIdentical(file, file)
-	}
-
 }

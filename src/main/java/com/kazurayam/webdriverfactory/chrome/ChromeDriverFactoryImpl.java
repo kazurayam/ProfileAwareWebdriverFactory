@@ -58,45 +58,50 @@ public class ChromeDriverFactoryImpl extends ChromeDriverFactory {
 	}
 
 	@Override
-	public void addChromePreferencesModifier(ChromePreferencesModifier cpm) {
+	public ChromeDriverFactory addChromePreferencesModifier(ChromePreferencesModifier cpm) {
 		if (this.chromePreferencesModifiers.contains(cpm)) {
 			// The late comer wins
 			this.chromePreferencesModifiers.remove(cpm);
 		}
 		this.chromePreferencesModifiers.add(cpm);
+		return this;
 	}
 
 	@Override
-	public void addAllChromePreferencesModifiers(List<ChromePreferencesModifier> list) {
+	public ChromeDriverFactory addAllChromePreferencesModifiers(List<ChromePreferencesModifier> list) {
 		list.forEach(this::addChromePreferencesModifier);
+		return this;
 	}
 
 	@Override
-	public void addChromeOptionsModifier(ChromeOptionsModifier com) {
+	public ChromeDriverFactory addChromeOptionsModifier(ChromeOptionsModifier com) {
 		if (this.chromeOptionsModifiers.contains(com)) {
 			// The late comer wins
 			this.chromeOptionsModifiers.remove(com);
 		}
 		this.chromeOptionsModifiers.add(com);
+		return this;
 	}
 
 	@Override
-	public void addAllChromeOptionsModifiers(List<ChromeOptionsModifier> list) {
+	public ChromeDriverFactory addAllChromeOptionsModifiers(List<ChromeOptionsModifier> list) {
 		list.forEach(this::addChromeOptionsModifier);
+		return this;
 	}
 
 	@Override
-	public void pageLoadTimeout(final Integer waitSeconds) {
+	public ChromeDriverFactory pageLoadTimeout(final Integer waitSeconds) {
 		Objects.requireNonNull(waitSeconds);
 		if (waitSeconds <= 0) {
-			throw new IllegalArgumentException(String.format("waitSeconds=%d must not be <= 0", waitSeconds));
+			throw new IllegalArgumentException(
+					String.format("waitSeconds=%d must not be <= 0", waitSeconds));
 		}
-
 		if (waitSeconds > 999) {
 			throw new IllegalArgumentException(
 					String.format("waitSeconds=%d must not be > 999", waitSeconds));
 		}
 		this.pageLoadTimeoutSeconds = waitSeconds;
+		return this;
 	}
 
 	protected static void setPageLoadTimeout(ChromeDriver driver, Integer seconds) {

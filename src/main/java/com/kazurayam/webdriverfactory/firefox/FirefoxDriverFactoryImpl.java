@@ -57,35 +57,39 @@ public class FirefoxDriverFactoryImpl extends FirefoxDriverFactory {
     }
 
     @Override
-    public void addFirefoxPreferencesModifier(FirefoxPreferencesModifier fpm) {
+    public FirefoxDriverFactory addFirefoxPreferencesModifier(FirefoxPreferencesModifier fpm) {
         if (this.firefoxPreferencesModifiers.contains(fpm)) {
             // The late comer wins
             this.firefoxPreferencesModifiers.remove(fpm);
         }
         firefoxPreferencesModifiers.add(fpm);
+        return this;
     }
 
     @Override
-    public void addAllFirefoxPreferencesModifier(List<FirefoxPreferencesModifier> list) {
+    public FirefoxDriverFactory addAllFirefoxPreferencesModifier(List<FirefoxPreferencesModifier> list) {
         list.forEach(this::addFirefoxPreferencesModifier);
+        return this;
     }
 
     @Override
-    public void addFirefoxOptionsModifier(FirefoxOptionsModifier fom) {
+    public FirefoxDriverFactory addFirefoxOptionsModifier(FirefoxOptionsModifier fom) {
         if (this.firefoxOptionsModifiers.contains(fom)) {
             // The late comer wins
             this.firefoxOptionsModifiers.remove(fom);
         }
         firefoxOptionsModifiers.add(fom);
+        return this;
     }
 
     @Override
-    public void addAllFirefoxOptionsModifier(List<FirefoxOptionsModifier> list) {
+    public FirefoxDriverFactory addAllFirefoxOptionsModifier(List<FirefoxOptionsModifier> list) {
         list.forEach(this::addFirefoxOptionsModifier);
+        return this;
     }
 
     @Override
-    public void pageLoadTimeout(final Integer waitSeconds) {
+    public FirefoxDriverFactory pageLoadTimeout(final Integer waitSeconds) {
         Objects.requireNonNull(waitSeconds);
         if (waitSeconds <= 0) {
             throw new IllegalArgumentException("waitSeconds=" + waitSeconds + " must not be <=0");
@@ -94,8 +98,8 @@ public class FirefoxDriverFactoryImpl extends FirefoxDriverFactory {
         if (waitSeconds > 999) {
             throw new IllegalArgumentException("waitSeconds=" + waitSeconds + " must not be > 999");
         }
-
         this.pageLoadTimeoutSeconds = waitSeconds;
+        return this;
     }
 
     protected static void setPageLoadTimeout(FirefoxDriver driver, Integer seconds) {

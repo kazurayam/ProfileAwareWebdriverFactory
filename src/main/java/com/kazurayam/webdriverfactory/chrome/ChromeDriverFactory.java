@@ -32,15 +32,15 @@ public abstract class ChromeDriverFactory {
 		return cdfi;
 	}
 
-	public abstract void addChromePreferencesModifier(ChromePreferencesModifier chromePreferencesModifier);
+	public abstract ChromeDriverFactory addChromePreferencesModifier(ChromePreferencesModifier chromePreferencesModifier);
 
-	public abstract void addAllChromePreferencesModifiers(List<ChromePreferencesModifier> chromePreferencesModifierList);
+	public abstract ChromeDriverFactory addAllChromePreferencesModifiers(List<ChromePreferencesModifier> chromePreferencesModifierList);
 
-	public abstract void addChromeOptionsModifier(ChromeOptionsModifier chromeOptionsModifier);
+	public abstract ChromeDriverFactory addChromeOptionsModifier(ChromeOptionsModifier chromeOptionsModifier);
 
-	public abstract void addAllChromeOptionsModifiers(List<ChromeOptionsModifier> chromeOptionsModifierList);
+	public abstract ChromeDriverFactory addAllChromeOptionsModifiers(List<ChromeOptionsModifier> chromeOptionsModifierList);
 
-	public abstract void pageLoadTimeout(Integer waitSeconds);
+	public abstract ChromeDriverFactory pageLoadTimeout(Integer waitSeconds);
 
 	public abstract LaunchedChromeDriver newChromeDriver();
 

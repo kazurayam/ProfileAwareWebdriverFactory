@@ -89,6 +89,16 @@ UserDataAccess: TO_GO
 
 == Problem to solve
 
+A quotation from https://chromedriver.chromium.org/capabilities
+
+____
+By default, ChromeDriver will create a new temporary profile for each session. At times you may want to set special preferences or just use a custom profile altogether. If the former, you can use the 'chrome.prefs' capability (described later below) to specify preferences that will be applied after Chrome starts. If the latter, you can use the user-data-dir Chrome command-line switch to tell Chrome which profile to use:
+____
+
+
+
+
+
 === What is "user profile", "user-data-dir" and "profile directory" in Chrome
 
 What is "user profile" in Chrome browser? There are a few articles about it, for example
