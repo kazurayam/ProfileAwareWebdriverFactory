@@ -22,7 +22,6 @@ import org.junit.runners.JUnit4
 import org.openqa.selenium.Cookie
 
 import io.github.bonigarcia.wdm.WebDriverManager
-import groovy.json.*
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
@@ -280,11 +279,6 @@ class ChromeDriverFactoryTest {
 		launched.getDriver().navigate().to("http://127.0.0.1/" + fileName)
 		Thread.sleep(3000)
 		assert Files.exists(xlsm)
-	}
-
-	@Test
-	void test_newChromeDriver_downloadIntoUserHomeDownloadsDirectory() {
-		fail("TODO")
 	}
 
 	@Test

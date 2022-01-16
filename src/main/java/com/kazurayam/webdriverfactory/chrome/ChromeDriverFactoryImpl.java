@@ -45,7 +45,6 @@ public class ChromeDriverFactoryImpl extends ChromeDriverFactory {
 
 	private void prepareDefaultSettings() {
 		this.addChromePreferencesModifier(ChromePreferencesModifiers.downloadWithoutPrompt());
-		this.addChromePreferencesModifier(ChromePreferencesModifiers.downloadIntoUserHomeDownloadsDirectory());
 		this.addChromePreferencesModifier(ChromePreferencesModifiers.disableViewersOfFlashAndPdf());
 		//
 		this.addChromeOptionsModifier(ChromeOptionsModifiers.windowSize1024_768());

@@ -37,11 +37,6 @@ public class ChromePreferencesModifiers {
         return new Base(Type.downloadWithoutPrompt, modifier, arguments);
     }
 
-    static ChromePreferencesModifier downloadIntoUserHomeDownloadsDirectory() {
-        Path p = Paths.get(System.getProperty("user.home"), "Downloads");
-        return downloadIntoDirectory(p);
-    }
-
     static ChromePreferencesModifier downloadIntoDirectory(Path directory) {
         Objects.requireNonNull(directory);
         List<Object> arguments = Collections.singletonList(directory);
@@ -51,7 +46,7 @@ public class ChromePreferencesModifiers {
             }
             Path dir = (Path) args.get(0);
             prefs.put("profile.default_content_settings.popups", 0);
-            prefs.put("download.default_directory", dir.toString());
+            prefs.put("download.default_directory", dir.toAbsolutePath().normalize().toString());
             return prefs;
         };
         return new Base(Type.downloadIntoDirectory, modifier, arguments);
