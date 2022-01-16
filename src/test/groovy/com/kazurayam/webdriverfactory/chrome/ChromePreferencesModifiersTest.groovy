@@ -27,15 +27,6 @@ class ChromePreferencesModifiersTest {
     }
 
     @Test
-    void test_downloadIntoUserHomeDownloadsDirectory() {
-        ChromePreferencesModifier pm = ChromePreferencesModifiers.downloadIntoUserHomeDownloadsDirectory()
-        Map<String, Object> modified = pm.modify(preferences)
-        assertNotNull(modified.get('download.default_directory'))
-        String value = (String)modified.get('download.default_directory')
-        assertTrue(value.endsWith('Downloads'))
-    }
-
-    @Test
     void test_downloadIntoDirectory() {
         Path dir = Paths.get(System.getProperty('user.dir'), 'tmp')
         ChromePreferencesModifier pm = ChromePreferencesModifiers.downloadIntoDirectory(dir)
