@@ -274,6 +274,7 @@ public class CookieServer {
             OutputStream os = exchange.getResponseBody();
             copy(is, os);
             os.flush();
+            os.close();
         }
 
         private void writeListOfFilesInDir(HttpExchange exchange, Path baseDir, File dir) throws IOException {

@@ -27,7 +27,7 @@ public class ChromePreferencesModifiers {
         disableViewersOfFlashAndPdf,
     }
 
-    static ChromePreferencesModifier downloadWithoutPrompt() {
+    public static ChromePreferencesModifier downloadWithoutPrompt() {
         List<Object> arguments = Collections.emptyList();
         BiFunction<Map<String,Object>, List<Object>, Map<String,Object>> modifier = (prefs, args) -> {
             prefs.put("profile.default_content_settings.popups", 0);
@@ -37,7 +37,7 @@ public class ChromePreferencesModifiers {
         return new Base(Type.downloadWithoutPrompt, modifier, arguments);
     }
 
-    static ChromePreferencesModifier downloadIntoDirectory(Path directory) {
+    public static ChromePreferencesModifier downloadIntoDirectory(Path directory) {
         Objects.requireNonNull(directory);
         List<Object> arguments = Collections.singletonList(directory);
         BiFunction<Map<String,Object>, List<Object>, Map<String,Object>> modifier = (prefs, args) -> {
@@ -52,7 +52,7 @@ public class ChromePreferencesModifiers {
         return new Base(Type.downloadIntoDirectory, modifier, arguments);
     }
 
-    static ChromePreferencesModifier disableViewersOfFlashAndPdf() {
+    public static ChromePreferencesModifier disableViewersOfFlashAndPdf() {
         List<Object> arguments = Collections.emptyList();
         BiFunction<Map<String,Object>, List<Object>, Map<String,Object>> modifier = (prefs, args) -> {
             prefs.put("plugins.plugins_disabled",
