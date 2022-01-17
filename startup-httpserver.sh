@@ -1,4 +1,1 @@
-theDir=`echo $PWD`
-cd ./src/web
-groovy $theDir/httpserver.groovy -b . --debug
-cd $theDir
+gradle run --args="-b src/web --print-request --debug"

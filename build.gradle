@@ -5,6 +5,7 @@ plugins {
     id 'jacoco'
     id 'maven-publish'
     id 'signing'
+    id 'application'
 }
 
 group 'com.kazurayam'
@@ -57,6 +58,10 @@ tasks.withType(JavaCompile) {
 
 test {
     finalizedBy jacocoTestReport
+}
+
+application {
+    mainClass = 'com.kazurayam.webdriverfactory.CookieServer'
 }
 
 javadoc {
