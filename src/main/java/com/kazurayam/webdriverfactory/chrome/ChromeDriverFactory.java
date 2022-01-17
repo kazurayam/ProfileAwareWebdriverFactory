@@ -55,7 +55,7 @@ public abstract class ChromeDriverFactory {
 	public abstract void enableChromeDriverLog(Path outputDirectory) throws IOException;
 
 	/**
-	 *
+	 * @param chromeDriverPath the path of the chromedriver binary
 	 */
 	public static void setPathToChromeDriverExecutable(String chromeDriverPath) {
 		Objects.requireNonNull(chromeDriverPath);

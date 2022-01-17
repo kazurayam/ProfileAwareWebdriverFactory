@@ -1,6 +1,6 @@
 plugins {
-    id 'groovy'
     id 'java'
+    id 'groovy'
     id 'idea'
     id 'jacoco'
     id 'maven-publish'
@@ -31,10 +31,6 @@ ext {
     jcommanderVersion = '1.82'
 }
 
-configurations {
-    generateDocs
-}
-
 repositories {
     mavenCentral()
     mavenLocal()
@@ -63,41 +59,34 @@ test {
     finalizedBy jacocoTestReport
 }
 
-task javadoc(type:Javadoc, overwrite:true) {
-    group = 'com.kazurayam'
-    source = sourceSets.main.groovy
-    classpath = configurations.generateDocs
-    //javaClasspath = project.configurations.generateDocs
-    include 'com/kazurayam/webdriverfactory/**'
-    exclude '**/*Test.groovy'
+javadoc {
+    options.encoding ='UTF-8'
+    options.locale = "en_US"
 }
-
-task publishJavadoc(type: Copy) {
+task copyJavadoc(type: Copy) {
     from 'build/docs/javadoc'
     into 'docs/api'
 }
-groovydoc.finalizedBy publishJavadoc
+javadoc.finalizedBy copyJavadoc
 
-task javadocJar(type: Jar) {
-    archiveClassifier = 'javadoc'
-    from javadoc
+java {
+    withJavadocJar()
+    withSourcesJar()
 }
 
-task sourcesJar(type: Jar) {
-    archiveClassifier = 'sources'
-    from sourceSets.main.allSource
+artifacts {
+    archives javadocJar, sourcesJar
 }
+
 
 publishing {
     publications {
-        webdriverfactory(MavenPublication) {
-            artifact sourcesJar
-            artifact javadocJar
+        chromedriverfactory(MavenPublication) {
             pom {
                 groupId = project.group
                 name = project.rootProject.name
                 description = 'A Java/Groovy library that enbles launching Selenium WebDriver specifying User Profile'
-                url = 'https://kazurayam.github.io/webdriverfactory/'
+                url = 'https://kazurayam.github.io/chromedriverfactory/'
                 from components.java
                 licenses {
                     license {
@@ -134,7 +123,7 @@ publishing {
 }
 
 signing {
-    sign publishing.publications.webdriverfactory
+    sign publishing.publications.chromedriverfactory
 }
 // I do not want to sign the SNAPSHOT
 

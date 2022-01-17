@@ -132,7 +132,7 @@ public final class ChromeProfileUtils {
     }
 
     /**
-     * @return
+     * @return String representaion in JSON of all ChromeUserProfiles found
      */
     public static String allChromeUserProfilesAsString() throws IOException {
         List<ChromeUserProfile> userProfiles = getChromeUserProfileList();

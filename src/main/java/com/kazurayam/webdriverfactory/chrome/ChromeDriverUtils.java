@@ -11,7 +11,7 @@ public class ChromeDriverUtils {
     /**
      * let ChromeDriver to make verbose log into the logsDir
      *
-     * @param logsDir
+     * @param logsDir the path of a directory where the log file should be located
      */
     public static void enableChromeDriverLog(Path logsDir) throws IOException {
         Files.createDirectories(logsDir);

@@ -145,7 +145,8 @@ public class ChromeDriverFactoryImpl extends ChromeDriverFactory {
 	 * used. When a Chrome using the same user profile has been opened and are
 	 * still present, then the "User-data" folder is locked; hence a contention will
 	 * occur.
-	 * >invalid argument: user data directory is already in use, please specify a unique value for --user-data-dir argument, or don't use --user-data-dir
+	 *
+	 * invalid argument: user data directory is already in use, please specify a unique value for --user-data-dir argument, or don't use --user-data-dir
 	 * In this case, you have to close the elder Chrome browser, and try again.
 	 *
 	 * @param userProfile e.g. new com.kazurayam.webdriverfactory.UserProfile("Alice")
@@ -181,7 +182,6 @@ public class ChromeDriverFactoryImpl extends ChromeDriverFactory {
 	/**
 	 * @param profileDirectoryName e.g. "Default", "Profile 1", "Profile 2"
 	 * @param instruction   FOR_HERE or TO_GO
-	 * @return
 	 */
 	@Override
 	public LaunchedChromeDriver newChromeDriver(ProfileDirectoryName profileDirectoryName, UserDataAccess instruction)

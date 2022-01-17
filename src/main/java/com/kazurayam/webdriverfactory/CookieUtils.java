@@ -10,7 +10,7 @@ import java.util.Locale;
 
 public class CookieUtils {
     /**
-     * @returns "timestamp=Sat, 08 Jan 2022 05:13:04 GMT; expires=Sat, 08 Jan 2022 05:13:34 GMT; path=/; domain=127.0.0.1"
+     * @return "timestamp=Sat, 08 Jan 2022 05:13:04 GMT; expires=Sat, 08 Jan 2022 05:13:34 GMT; path=/; domain=127.0.0.1"
      */
     public static String stringifyCookie(Cookie cookie) {
         StringBuilder sb = new StringBuilder();

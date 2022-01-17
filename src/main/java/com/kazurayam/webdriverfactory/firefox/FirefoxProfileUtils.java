@@ -64,6 +64,7 @@ public class FirefoxProfileUtils {
      * $ ls 0iyozca2.kazurayam/ | grep cookie
      * cookies.sqlite
      * cookies.sqlite-wal
+     * @param userDataDir user-data-dir
      */
     public static List<FirefoxUserProfile> getFirefoxUserProfileList(final Path userDataDir)
             throws IOException {
