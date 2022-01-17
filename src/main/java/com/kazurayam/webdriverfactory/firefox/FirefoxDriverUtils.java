@@ -9,7 +9,8 @@ import java.nio.file.Paths;
 
 public class FirefoxDriverUtils {
     /**
-     *
+     * @param logsDir TODO
+     * @throws IOException TODO
      */
     public static void enableFirefoxDriverLog(Path logsDir) throws IOException {
         Files.createDirectories(logsDir);

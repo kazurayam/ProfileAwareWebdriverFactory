@@ -178,8 +178,8 @@ public class ChromeOptionsModifiers {
 
         /**
          * if this.getType() == other.getType(), this equals other
-         * @param obj
-         * @return
+         * @param obj the other instance
+         * @return true if the Type is equal
          */
         @Override
         public boolean equals(Object obj) {

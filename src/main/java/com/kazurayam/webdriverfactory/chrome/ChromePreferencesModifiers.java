@@ -11,7 +11,7 @@ import java.util.function.BiFunction;
 
 /**
  * FIXME
- * I can move the capability of setting "download.prompt_for_download => false" etc
+ * I can move the capability of setting "download.prompt_for_download is false" etc
  * from ChromePreferencesModifiers to ChromeOptionsModifiers
  * and remove ChromePreferencesModifiers.
  * This makes me safely work around the incompatibility between Selenium 3 vs Selenium 4

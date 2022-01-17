@@ -12,6 +12,7 @@ public class ChromeDriverUtils {
      * let ChromeDriver to make verbose log into the logsDir
      *
      * @param logsDir the path of a directory where the log file should be located
+     * @throws IOException when failed to create the directory
      */
     public static void enableChromeDriverLog(Path logsDir) throws IOException {
         Files.createDirectories(logsDir);
@@ -26,6 +27,8 @@ public class ChromeDriverUtils {
      * https://github.com/SeleniumHQ/selenium/wiki/ChromeDriver#requirements
      * <p>
      * No more used. we will to delegate to the binogracia/webdrivermanager
+     *
+     * @return the path of chromedirever executable according to the type of OS
      */
     @Deprecated
     public static Path getChromeBinaryPath() {

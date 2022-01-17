@@ -20,9 +20,6 @@ public final class ChromeProfileUtils {
 
     private static Logger logger_ = LoggerFactory.getLogger(ChromeProfileUtils.class);
 
-    /**
-     *
-     */
     public static Path getDefaultUserDataDir() {
         if (OSIdentifier.isWindows()) {
             // It is important that this chromeProfilesPath ends with User Data and not with the profile folder
@@ -40,9 +37,6 @@ public final class ChromeProfileUtils {
 
     }
 
-    /**
-     *
-     */
     public static List<ChromeUserProfile> getChromeUserProfileList()
             throws IOException
     {
@@ -67,9 +61,6 @@ public final class ChromeProfileUtils {
         return userProfiles;
     }
 
-    /**
-     *
-     */
     public static ChromeUserProfile findChromeUserProfile(UserProfile userProfile)
             throws IOException
     {
@@ -92,6 +83,10 @@ public final class ChromeProfileUtils {
 
     /**
      * if a Profile of the name is defined, return true, otherwise false
+     *
+     * @param userProfile TODO
+     * @return TODO
+     * @throws IOException TODO
      */
     public static boolean hasChromeUserProfile(UserProfile userProfile) throws IOException {
         return hasChromeUserProfile(getDefaultUserDataDir(), userProfile);
@@ -101,9 +96,6 @@ public final class ChromeProfileUtils {
         return findChromeUserProfile(userDataDir, userProfile) != null;
     }
 
-    /**
-     *
-     */
     public static ChromeUserProfile findChromeUserProfileByProfileDirectoryName(ProfileDirectoryName profileDirectoryName) throws IOException {
         return findChromeUserProfileByProfileDirectoryName(getDefaultUserDataDir(), profileDirectoryName);
     }
@@ -120,19 +112,19 @@ public final class ChromeProfileUtils {
         return null;
     }
 
-    /**
-     *
-     */
-    public static UserProfile findUserProfileByProfileDirectoryName(ProfileDirectoryName profileDirectoryName) throws IOException {
+    public static UserProfile findUserProfileByProfileDirectoryName(ProfileDirectoryName profileDirectoryName)
+            throws IOException {
         return findUserProfileByProfileDirectoryName(getDefaultUserDataDir(), profileDirectoryName);
     }
 
-    public static UserProfile findUserProfileByProfileDirectoryName(Path userDataDir, ProfileDirectoryName profileDirectoryName) throws IOException {
+    public static UserProfile findUserProfileByProfileDirectoryName(Path userDataDir, ProfileDirectoryName profileDirectoryName)
+            throws IOException {
         return findChromeUserProfileByProfileDirectoryName(userDataDir, profileDirectoryName).getUserProfile();
     }
 
     /**
      * @return String representaion in JSON of all ChromeUserProfiles found
+     * @throws IOException TODO
      */
     public static String allChromeUserProfilesAsString() throws IOException {
         List<ChromeUserProfile> userProfiles = getChromeUserProfileList();

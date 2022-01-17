@@ -27,6 +27,7 @@ public class ChromeUserProfile implements Comparable<ChromeUserProfile> {
     /**
      * @param userDataDir "~/Library/Application Support/Google/Chrome/"
      * @param profileDirectoryName "Default", "Profile 1", "Profile 2", "Profile 3", ...
+     * @throws IOException TOOD
      */
     public ChromeUserProfile(final Path userDataDir, ProfileDirectoryName profileDirectoryName) throws IOException {
         Objects.requireNonNull(userDataDir);

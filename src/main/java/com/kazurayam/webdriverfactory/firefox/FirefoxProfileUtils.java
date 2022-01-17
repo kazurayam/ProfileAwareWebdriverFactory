@@ -65,6 +65,8 @@ public class FirefoxProfileUtils {
      * cookies.sqlite
      * cookies.sqlite-wal
      * @param userDataDir user-data-dir
+     * @return TODO
+     * @throws IOException TODO
      */
     public static List<FirefoxUserProfile> getFirefoxUserProfileList(final Path userDataDir)
             throws IOException {
@@ -86,7 +88,8 @@ public class FirefoxProfileUtils {
     }
 
     /**
-     *
+     * @return TODO
+     * @throws IOException TODO
      */
     public static String allFirefoxUserProfilesAsString() throws IOException {
         List<FirefoxUserProfile> userProfiles = getFirefoxUserProfileList();
