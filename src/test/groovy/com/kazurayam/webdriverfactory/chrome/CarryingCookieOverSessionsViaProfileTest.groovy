@@ -14,7 +14,7 @@ import java.nio.file.Paths
 
 import static org.junit.Assert.*
 
-class CarryingCookieOverSessionsViaChromeProfile {
+class CarryingCookieOverSessionsViaChromeProfileTest {
 
     private CookieServer cookieServer
 
