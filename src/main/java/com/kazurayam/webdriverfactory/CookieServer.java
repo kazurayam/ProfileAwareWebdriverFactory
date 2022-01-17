@@ -7,10 +7,12 @@ import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
@@ -29,14 +31,18 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 /**
- * A simple HTTP Server. This is usefule to test my ChromeDriverFactory class.
+ * A simple HTTP Server. This is useful to test my ChromeDriverFactory class.
  * It sends a Set-Cookie header for a cookie "timestamp" in the HTTP Response.
- * If the HTTP Request contained a cookie "timestamp", then the server will echoes it back.
+ * If the HTTP Request contained a cookie "timestamp", then the server will echo it back.
  *
  */
-public class SetCookieServer {
+public class CookieServer {
 
     static final String URL_ENCODING = "UTF-8";
     static final String RESPONSE_ENCODING = "UTF-8";
@@ -44,14 +50,12 @@ public class SetCookieServer {
     @Parameter(
             names = {"-p", "--port"},
             description = "port number. default : 80.",
-            required = false,
             arity = 1)
     Integer port = 80;
 
     @Parameter(
             names = {"-b", "--base-dir"},
             description = "base directory path. default : current directory.",
-            required = false,
             arity = 1)
     Path baseDir = Paths.get(".");
 
@@ -61,44 +65,84 @@ public class SetCookieServer {
     boolean help;
 
     @Parameter(names = { "--print-request"},
-            description = "display HTTP Request",
-            required = false
+            description = "display HTTP Request. default : true"
     )
-    boolean isPrintingRequested = false;
+    boolean isPrintingRequested = true;
 
     @Parameter(names = { "--debug"},
-            description = "run with debug mode",
-            required = false
+            description = "run with debug mode. default : false"
     )
     boolean isDebugMode = false;
 
-    SetCookieServer() {}
+    @Parameter(names = { "--cookieMaxAge" },
+            description = "Max-Age of cookies. default : 60 (in seconds)",
+            arity = 1)
+    Integer cookieMaxAge = 60;
 
-    public static void main(String[] args) throws IOException {
-        SetCookieServer server = new SetCookieServer();
-        JCommander jc = JCommander.newBuilder().addObject(server).build();
-        jc.parse(args);
-        if (server.help) {
-            jc.usage();
-        } else {
-            server.startup();
-        }
+    private HttpServer httpServer;
+    private ExecutorService httpThreadPool;
+    private static final int NUM_OF_THREADS = 4;
+
+    CookieServer() {}
+
+    public CookieServer setPort(Integer port) {
+        this.port = port;
+        return this;
+    }
+
+    public CookieServer setBaseDir(Path baseDir) {
+        this.baseDir = baseDir.toAbsolutePath().normalize();
+        return this;
+    }
+
+    public CookieServer isPrintingRequested(boolean isPrintingRequested) {
+        this.isPrintingRequested = isPrintingRequested;
+        return this;
+    }
+
+    public CookieServer isDebugMode(boolean isDebugMode) {
+        this.isDebugMode = isDebugMode;
+        return this;
+    }
+
+    public CookieServer setCookieMaxAge(Integer cookieMaxAge) {
+        this.cookieMaxAge = cookieMaxAge;
+        return this;
     }
 
     public void startup() throws IOException {
-        HttpServer server = HttpServer.create(
+        httpServer = HttpServer.create(
                 new InetSocketAddress(port), 0);
-        server.createContext("/",
+        httpServer.createContext("/",
                 new Handler(this.baseDir,
                         this.isDebugMode,
-                        this.isPrintingRequested));
-        server.start();
+                        this.isPrintingRequested,
+                        this.cookieMaxAge));
+        httpThreadPool = Executors.newFixedThreadPool(NUM_OF_THREADS);
+        httpServer.setExecutor(httpThreadPool);
+        httpServer.start();
     }
 
     public void shutdown() {
-        throw new RuntimeException("TODO");
+        httpServer.stop(0);
+        httpThreadPool.shutdown();
+        try {
+            httpThreadPool.awaitTermination(2, TimeUnit.HOURS);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
+    public static void main(String[] args) throws IOException {
+        CookieServer cookieServer = new CookieServer();
+        JCommander jc = JCommander.newBuilder().addObject(cookieServer).build();
+        jc.parse(args);
+        if (cookieServer.help) {
+            jc.usage();
+        } else {
+            cookieServer.startup();
+        }
+    }
 
     /**
      *
@@ -107,24 +151,26 @@ public class SetCookieServer {
         private final Path baseDir;
         private final Boolean isDebugMode;
         private final Boolean isPrintingRequestRequired;
-
-        private static final Long MAX_AGE_SECONDS = 60L;
+        private final Integer cookieMaxAge;
         private static final DateTimeFormatter RFC7231 =
                 DateTimeFormatter
                         .ofPattern("EEE, dd MMM yyyy HH:mm:ss z", Locale.ENGLISH)
                         .withZone(ZoneId.of("GMT"));
 
-        Handler(Path baseDir, Boolean isDebugMode, Boolean isPrintingRequestRequired) {
+        Handler(Path baseDir, Boolean isDebugMode, Boolean isPrintingRequestRequired, Integer cookieMaxAge) {
             this.baseDir = baseDir;
             this.isDebugMode = isDebugMode;
             this.isPrintingRequestRequired = isPrintingRequestRequired;
+            this.cookieMaxAge = cookieMaxAge;
         }
 
         @Override
         public void handle(HttpExchange exchange) throws IOException {
             try {
                 // accept the request
-                printRequest(exchange);
+                if (isPrintingRequestRequired) {
+                    printRequest(exchange);
+                }
                 String uri = exchange.getRequestURI().toString();
                 String decodedUri = URLDecoder.decode(uri, URL_ENCODING);
 
@@ -132,16 +178,17 @@ public class SetCookieServer {
                 operateCookies(exchange);
 
                 // build the response and send it back
+                debugLog("\n>>>> Response sent");
                 File file = new File(this.baseDir.toFile(), decodedUri);
                 if (file.exists()) {
                     if (file.isFile()) {
-                        debugLog(String.format("%s is a file", file.getName()));
+                        debugLog(String.format("%s is a file", decodedUri));
                         writeFile(exchange, file);
                     } else if (file.isDirectory()) {
-                        debugLog(String.format("%s is directory.", file.getName()));
+                        debugLog(String.format("%s is a directory.", decodedUri));
                         writeListOfFilesInDir(exchange, this.baseDir, file);
                     } else {
-                        throw new IOException(String.format("%s is mysterious", file.toString()));
+                        throw new IOException(String.format("%s is mysterious", file));
                     }
                 } else {
                     debugLog(String.format("%s is not found.", file.getName()));
@@ -158,12 +205,17 @@ public class SetCookieServer {
 
         private void printRequest(HttpExchange exchange) {
             StringBuilder sb = new StringBuilder();
-            sb.append("\n\n\n\n");
-            sb.append(">>>>\n");
+            sb.append("\n\n");
+            sb.append("<<<< Request received\n");
             sb.append(String.format("method = %s\n", exchange.getRequestMethod()));
-            sb.append(String.format("uri = %s\n", exchange.getRequestURI()));
-            sb.append(String.format("body = %s\n", exchange.getRequestBody()));
-            System.out.println(sb.toString());
+            sb.append(String.format("uri = %s\n", exchange.getRequestURI().toString()));
+            sb.append(String.format("body = %s\n", stringifyInputStream(exchange.getRequestBody())));
+            System.out.println(sb);
+        }
+
+        private String stringifyInputStream(InputStream inputStream) {
+            BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream));
+            return reader.lines().collect(Collectors.joining("\n"));
         }
 
         /**
@@ -171,29 +223,35 @@ public class SetCookieServer {
          * if the request doesn't have "timestamp" cookie, add it
          */
         private void operateCookies(HttpExchange exchange) {
+            boolean foundTimestampInRequest = false;
+            List<String> cookieValues = new ArrayList<>();
             // copy the cookies from the request to the response
             Headers reqHeaders = exchange.getRequestHeaders();
             List<String> cookies = reqHeaders.get("Cookie");
-            this.debugLog(String.format("request:  cookies=%s", cookies));
-            List<String> values = new ArrayList<>();
-            boolean foundTimestamp = false;
-            for (String cookie : cookies) {
-                values.add(cookie + "; max-age=" + MAX_AGE_SECONDS);
-                // check if the timestamp cookie is found
-                if (cookie.startsWith("timestamp")) {
-                    foundTimestamp = true;
+            debugLog("==== Cookies cooked");
+            if (cookies != null) {
+                debugLog(String.format("in the request:  cookies=%s", cookies));
+                for (String cookie : cookies) {
+                    cookieValues.add(cookie + "; max-age=" + this.cookieMaxAge);
+                    // check if the timestamp cookie is found
+                    if (cookie.startsWith("timestamp")) {
+                        foundTimestampInRequest = true;
+                    }
                 }
+            } else {
+                debugLog("in the request:  no cookies found");
             }
             // if the request has no "timestamp" cookie, create it into the response
-            if (! foundTimestamp) {
+            if (! foundTimestampInRequest) {
                 ZonedDateTime now = ZonedDateTime.now();
-                String timestampString = "timestamp=" + RFC7231.format(now) + "; " +
-                        "Max-Age=" + MAX_AGE_SECONDS + ";";
-                values.add(timestampString);
+                String timestampString =
+                        String.format("timestamp=%s; Max-Age=%s;",
+                                RFC7231.format(now), this.cookieMaxAge);
+                cookieValues.add(timestampString);
             }
             Headers respHeaders = exchange.getResponseHeaders();
-            respHeaders.put("Set-Cookie", values);
-            this.debugLog(String.format("response: cookies=%s", values));
+            respHeaders.put("Set-Cookie", cookieValues);
+            debugLog(String.format("in the response: cookies=%s", cookieValues));
         }
 
 
@@ -205,6 +263,7 @@ public class SetCookieServer {
             OutputStreamWriter osw = new OutputStreamWriter(os, RESPONSE_ENCODING);
             osw.write(message);
             osw.flush();
+            osw.close();
         }
 
         private void writeFile(HttpExchange exchange, File file) throws IOException {
@@ -220,19 +279,22 @@ public class SetCookieServer {
         private void writeListOfFilesInDir(HttpExchange exchange, Path baseDir, File dir) throws IOException {
             StringBuilder sb = new StringBuilder();
             sb.append("<html><ul>\n");
-            Files.list(dir.toPath())
-                    .sorted(Path::compareTo)
-                    .forEach(file -> {
-                        Path path = basePath.relativize(file).toString().replace('\\', '/');
-                        try {
-                            String encodedPath = URLEncoder.encode(path.toString(), URL_ENCODING);
-                            sb.append("<li><a href=\"${encodedPath}\">${file.name}</a></li>\n");
-                        } catch (UnsupportedEncodingException e) {
-                            throw new RuntimeException(e)
-                        }
-                    });
+            List<Path> sortedList = Files.list(dir.toPath())
+                    .sorted((o1, o2) ->
+                            o1.getFileName().toString().compareToIgnoreCase(o2.getFileName().toString()))
+                    .collect(Collectors.toList());
+            for (Path file : sortedList) {
+                Path path = baseDir.relativize(file);
+                try {
+                    String encodedPath = URLEncoder.encode(path.toString(), URL_ENCODING);
+                    sb.append(String.format("<li><a href=\"%s\">%s</a></li>\n",
+                            encodedPath, file.getFileName()));
+                } catch (UnsupportedEncodingException e) {
+                    throw new RuntimeException(e);
+                }
+            }
             sb.append("</ul></html>");
-            this.writeResponse(exchange, 200, sb.toString())
+            this.writeResponse(exchange, 200, sb.toString());
         }
 
         private static void copy(InputStream source, OutputStream target) throws IOException {
