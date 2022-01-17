@@ -2,9 +2,6 @@ package com.kazurayam.webdriverfactory.firefox;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import groovy.json.JsonOutput;
-import groovy.lang.Closure;
-import groovy.lang.Reference;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxOptions;
 
@@ -55,9 +52,4 @@ public class LaunchedFirefoxDriver {
     private final FirefoxDriver driver;
     private Optional<FirefoxUserProfile> firefoxUserProfile;
     private Optional<FirefoxOptions> employedOptions;
-
-    private static <T> T setGroovyRef(Reference<T> ref, T newValue) {
-        ref.set(newValue);
-        return newValue;
-    }
 }

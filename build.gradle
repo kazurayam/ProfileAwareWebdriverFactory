@@ -41,47 +41,46 @@ repositories {
 }
 
 dependencies {
-    implementation "org.codehaus.groovy:groovy-all:${groovyVersion}"
-    generateDocs "org.codehaus.groovy:groovy-all:${groovyVersion}"
     implementation "org.slf4j:slf4j-api:${slf4jVersion}"
     implementation group: 'org.slf4j', name: 'slf4j-simple', version: "${slf4jVersion}"
     implementation group: 'org.seleniumhq.selenium', name: 'selenium-java', version: "${selenium3Version}"
     implementation group: 'com.google.code.gson', name: 'gson', version: "${gsonVersion}"
     implementation group: 'com.beust', name: 'jcommander', version: "${jcommanderVersion}"
 
+    testImplementation "org.codehaus.groovy:groovy-all:${groovyVersion}"
     testImplementation group: 'org.seleniumhq.selenium', name: 'selenium-java', version: "${selenium3Version}"
     testImplementation group: 'io.github.bonigarcia', name: 'webdrivermanager', version: "${webdrivermanagerVersion}"
     testImplementation group: 'junit', name: 'junit', version: "${junitVersion}"
-    // https://mvnrepository.com/artifact/com.kazurayam/subprocessj
     testImplementation group: 'com.kazurayam', name: 'subprocessj', version: "${subprocessjVersion}"
+    testImplementation group: 'com.kazurayam', name: 'timekeeper', version: '0.3.3'
+}
 
-    // https://mvnrepository.com/artifact/com.kazurayam/timekeeper
-    implementation group: 'com.kazurayam', name: 'timekeeper', version: '0.3.3'
-
+tasks.withType(JavaCompile) {
+    options.compilerArgs << '-Xlint:unchecked'
 }
 
 test {
     finalizedBy jacocoTestReport
 }
 
-task groovydoc(type:Groovydoc, overwrite:true) {
+task javadoc(type:Javadoc, overwrite:true) {
     group = 'com.kazurayam'
     source = sourceSets.main.groovy
     classpath = configurations.generateDocs
-    groovyClasspath = project.configurations.generateDocs
+    //javaClasspath = project.configurations.generateDocs
     include 'com/kazurayam/webdriverfactory/**'
     exclude '**/*Test.groovy'
 }
 
-task publishGroovydoc(type: Copy) {
-    from 'build/docs/groovydoc'
+task publishJavadoc(type: Copy) {
+    from 'build/docs/javadoc'
     into 'docs/api'
 }
-groovydoc.finalizedBy publishGroovydoc
+groovydoc.finalizedBy publishJavadoc
 
-task groovydocJar(type: Jar) {
+task javadocJar(type: Jar) {
     archiveClassifier = 'javadoc'
-    from groovydoc
+    from javadoc
 }
 
 task sourcesJar(type: Jar) {
@@ -93,7 +92,7 @@ publishing {
     publications {
         webdriverfactory(MavenPublication) {
             artifact sourcesJar
-            artifact groovydocJar
+            artifact javadocJar
             pom {
                 groupId = project.group
                 name = project.rootProject.name

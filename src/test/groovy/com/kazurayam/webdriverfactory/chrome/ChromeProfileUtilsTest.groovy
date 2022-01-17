@@ -53,6 +53,6 @@ class ChromeProfileUtilsTest {
 				ChromeProfileUtils.findUserProfileByProfileDirectoryName(
 						new ProfileDirectoryName('Default'))
 		assertNotNull(profileName)
-		println("DirectoryName \'Default\' is associated with the Profile \'${profileName}\'")
+		//println("DirectoryName \'Default\' is associated with the Profile \'${profileName}\'")
 	}
 }

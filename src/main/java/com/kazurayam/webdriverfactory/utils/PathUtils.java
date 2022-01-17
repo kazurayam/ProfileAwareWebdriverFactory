@@ -1,14 +1,14 @@
 package com.kazurayam.webdriverfactory.utils;
 
-import com.kazurayam.webdriverfactory.chrome.ChromeDriverFactoryImpl;
-import org.codehaus.groovy.runtime.ResourceGroovyMethods;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -39,8 +39,12 @@ public class PathUtils {
         return sources.size();
     }
 
-    public static void deleteDirectoryRecursively(Path rootPath) {
-        ResourceGroovyMethods.deleteDir(rootPath.toFile());
+    public static void deleteDirectoryRecursively(Path rootPath)
+            throws IOException {
+        Files.walk(rootPath)
+                .sorted(Comparator.reverseOrder())
+                .map(Path::toFile)
+                .forEach(File::delete);
     }
 
 }

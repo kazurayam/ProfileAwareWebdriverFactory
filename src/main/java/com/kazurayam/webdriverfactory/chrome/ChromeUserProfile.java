@@ -1,13 +1,15 @@
 package com.kazurayam.webdriverfactory.chrome;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.kazurayam.webdriverfactory.ProfileDirectoryName;
 import com.kazurayam.webdriverfactory.UserProfile;
-import groovy.json.JsonOutput;
-import groovy.json.JsonSlurper;
-import org.codehaus.groovy.runtime.DefaultGroovyMethods;
-import org.codehaus.groovy.runtime.ResourceGroovyMethods;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.io.File;
 import java.io.IOException;
+import java.io.Reader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Map;
@@ -19,6 +21,9 @@ import java.util.Objects;
  * @author kazurayam
  */
 public class ChromeUserProfile implements Comparable<ChromeUserProfile> {
+
+    private static Logger logger_ = LoggerFactory.getLogger(ChromeUserProfile.class);
+
     /**
      * @param userDataDir "~/Library/Application Support/Google/Chrome/"
      * @param profileDirectoryName "Default", "Profile 1", "Profile 2", "Profile 3", ...
@@ -28,22 +33,27 @@ public class ChromeUserProfile implements Comparable<ChromeUserProfile> {
         Objects.requireNonNull(profileDirectoryName);
         if (!Files.exists(userDataDir)) {
             throw new IllegalArgumentException(
-                    String.format("%s is not found", userDataDir.toString()));
+                    String.format("%s is not found", userDataDir));
         }
 
         Path profilePath = userDataDir.resolve(profileDirectoryName.toString());
         if (!Files.exists(profilePath)) {
             throw new IllegalArgumentException(
-                    String.format("%s is not found", profilePath.toString()));
+                    String.format("%s is not found", profilePath));
         }
 
         this.userDataDir = userDataDir;
         this.profileDirectoryName = profileDirectoryName;
 
-        Map m = (Map) new JsonSlurper().parseText(getPreferences());
-        String name = (String) DefaultGroovyMethods.getAt(m.get("profile"), "name");
+        logger_.debug("getPreferences(): " + getPreferences());
+
+        Gson gson = new Gson();
+        Map m = gson.fromJson(getPreferences(), Map.class);
+        Map prof = (Map)m.get("profile");
+        assert prof != null;
+        String name = (String)prof.get("name");
+        assert name != null;
         this.userProfile = new UserProfile(name);
-        assert this.userProfile != null;
     }
 
     public Path getUserDataDir() {
@@ -67,16 +77,16 @@ public class ChromeUserProfile implements Comparable<ChromeUserProfile> {
         final Path preferencesPath = profilePath.resolve(PREFERENCES_FILE_NAME);
         if (!Files.exists(preferencesPath)) {
             throw new IOException(
-                    String.format("%s is not found", preferencesPath.toString()));
+                    String.format("%s is not found", preferencesPath));
         }
-        return JsonOutput.prettyPrint(ResourceGroovyMethods.getText(preferencesPath.toFile()));
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        Reader reader = Files.newBufferedReader(preferencesPath);
+        Map m = gson.fromJson(reader, Map.class);
+        return gson.toJson(m);
     }
 
     /**
      * order by UserProfileName
-     *
-     * @param other
-     * @return
      */
     @Override
     public int compareTo(ChromeUserProfile other) {
@@ -96,8 +106,8 @@ public class ChromeUserProfile implements Comparable<ChromeUserProfile> {
     @Override
     public int hashCode() {
         int hash = 7;
-        hash = 31 * hash + (int) this.getUserDataDir().hashCode();
-        hash = 31 * hash + (int) this.getProfileDirectoryName().hashCode();
+        hash = 31 * hash + this.getUserDataDir().hashCode();
+        hash = 31 * hash + this.getProfileDirectoryName().hashCode();
         return hash;
     }
 
@@ -119,12 +129,13 @@ public class ChromeUserProfile implements Comparable<ChromeUserProfile> {
         sb.append("\"");
         sb.append("}");
         //
-        return JsonOutput.prettyPrint(sb.toString());
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        return gson.toJson(sb.toString());
     }
 
     private final Path userDataDir;
     private final ProfileDirectoryName profileDirectoryName;
-    private UserProfile userProfile;
+    private final UserProfile userProfile;
     private String preferences;
     private static final String PREFERENCES_FILE_NAME = "Preferences";
 }

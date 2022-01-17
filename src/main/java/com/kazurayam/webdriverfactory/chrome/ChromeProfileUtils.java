@@ -3,6 +3,8 @@ package com.kazurayam.webdriverfactory.chrome;
 import com.kazurayam.webdriverfactory.ProfileDirectoryName;
 import com.kazurayam.webdriverfactory.UserProfile;
 import com.kazurayam.webdriverfactory.utils.OSIdentifier;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -12,10 +14,12 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 public final class ChromeProfileUtils {
+
+    private static Logger logger_ = LoggerFactory.getLogger(ChromeProfileUtils.class);
+
     /**
      *
      */
@@ -50,24 +54,21 @@ public final class ChromeProfileUtils {
     {
         Objects.requireNonNull(userDataDir);
         if (!Files.exists(userDataDir)) {
-            throw new IllegalArgumentException(String.valueOf(userDataDir) + " is not present");
+            throw new IllegalArgumentException(String.format("%s is not present", userDataDir));
         }
-        List<ChromeUserProfile> userProfiles = new ArrayList<ChromeUserProfile>();
+        List<ChromeUserProfile> userProfiles = new ArrayList<>();
         List<Path> dirs = Files.list(userDataDir).collect(Collectors.toList());
         for (Path dir : dirs) {
             if (Files.exists(dir.resolve("Preferences"))) {
                 ChromeUserProfile cp = new ChromeUserProfile(userDataDir, new ProfileDirectoryName(dir.getFileName().toString()));
                 userProfiles.add(cp);
             }
-
         }
-
         return userProfiles;
     }
 
     /**
-     * @param name name of a Chrome Profile. e.g, new UserProfile("Russ Thomas")
-     * @return ChromeUserProfile object of the userProfile specified
+     *
      */
     public static ChromeUserProfile findChromeUserProfile(UserProfile userProfile)
             throws IOException
@@ -79,15 +80,13 @@ public final class ChromeProfileUtils {
             throws IOException
     {
         Objects.requireNonNull(userProfile);
-        List<ChromeUserProfile> userProfiles = getChromeUserProfileList(userDataDir);
-        for (ChromeUserProfile cUP : userProfiles) {
+        List<ChromeUserProfile> chromeUserProfiles = getChromeUserProfileList(userDataDir);
+        for (ChromeUserProfile cup : chromeUserProfiles) {
             //System.out.println("[ChromeProfileFinder#getUserProfile] userProfile.getName()==${userProfile.getName()}, userProfile.getDirectoryName()=${userProfile.getDirectoryName()}")
-            if (cUP.getUserProfile().equals(userProfile)) {
-                return cUP;
+            if (cup.getUserProfile().equals(userProfile)) {
+                return cup;
             }
-
         }
-
         return null;
     }
 
@@ -145,7 +144,6 @@ public final class ChromeProfileUtils {
             if (count > 0) {
                 sb.append(",");
             }
-
             sb.append(up.toString());
             count += 1;
         }

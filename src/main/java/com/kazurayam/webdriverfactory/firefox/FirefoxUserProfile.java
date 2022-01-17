@@ -1,9 +1,9 @@
 package com.kazurayam.webdriverfactory.firefox;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.kazurayam.webdriverfactory.ProfileDirectoryName;
 import com.kazurayam.webdriverfactory.UserProfile;
-import groovy.json.JsonOutput;
-import org.codehaus.groovy.runtime.DefaultGroovyMethods;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -87,7 +87,8 @@ public class FirefoxUserProfile implements Comparable<FirefoxUserProfile> {
         sb.append("\"");
         sb.append("}");
         //
-        return JsonOutput.prettyPrint(sb.toString());
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        return gson.toJson(sb.toString());
     }
 
     private static final String COOKIE_FILE_NAME = "cookies.sqlite";

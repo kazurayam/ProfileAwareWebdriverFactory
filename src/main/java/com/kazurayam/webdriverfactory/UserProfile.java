@@ -1,7 +1,11 @@
 package com.kazurayam.webdriverfactory;
 
+import java.util.Objects;
+
 public class UserProfile implements Comparable<UserProfile> {
+
     public UserProfile(String name) {
+        Objects.requireNonNull(name);
         this.name = name;
     }
 
@@ -31,10 +35,9 @@ public class UserProfile implements Comparable<UserProfile> {
 
     @Override
     public int compareTo(UserProfile other) {
+        Objects.requireNonNull(other);
         return this.getName().compareTo(other.getName());
     }
-
-    public static final UserProfile NULL = new UserProfile(null);
 
     private final String name;
 }
