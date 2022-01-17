@@ -31,7 +31,7 @@ class CookieServerTest {
         ChromeDriverFactory factory = ChromeDriverFactory.newChromeDriverFactory()
         LaunchedChromeDriver launched = factory.newChromeDriver()
         launched.getDriver().navigate().to("http://127.0.0.1:8080/")
-        Thread.sleep(55000)
+        Thread.sleep(3000)
         launched.getDriver().quit()
         cookieServer.shutdown()
     }
