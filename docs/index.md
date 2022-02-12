@@ -174,22 +174,19 @@ Basic case where we launch Chrome browser without profile specified. The example
 
 When `UserDataAccess.TO_GO` is specified,
 ChromeDriverFactory will let ChromeDriver to generate a commandline to start Chrome browser as follows for example on my Mac:
-
-/Applications/Google Chrome.app/Contents/MacOS/Google Chrome --allow-pre-commit-input --disable-background-networking --disable-client-side-phishing-detection --disable-default-apps --disable-dev-shm-usage --disable-gpu --disable-hang-monitor --disable-infobars --disable-popup-blocking --disable-prompt-on-repost --disable-sync --disableExtensions --enable-automation --enable-blink-features=ShadowDOMV0 --enable-logging --log-level=0 --no-first-run --no-sandbox --no-service-autorun --password-store=basic --profile-directory=Profile 14 --remote-debugging-port=0 --test-type=webdriver --use-mock-keychain
---user-data-dir=/var/folders/7m/lm7d6nx51kj0kbtnsskz6r3m0000gn/T/*user-data-dir*7501750884155054730 --window-size=1024,768 --flag-switches-begin --flag-switches-end
----
-
 Please note that the `--user-data-dir` option is given with a temporary directory.
+
+    /Applications/Google Chrome.app/Contents/MacOS/Google Chrome --allow-pre-commit-input --disable-background-networking --disable-client-side-phishing-detection --disable-default-apps --disable-dev-shm-usage --disable-gpu --disable-hang-monitor --disable-infobars --disable-popup-blocking --disable-prompt-on-repost --disable-sync --disableExtensions --enable-automation --enable-blink-features=ShadowDOMV0 --enable-logging --log-level=0 --no-first-run --no-sandbox --no-service-autorun --password-store=basic --profile-directory=Profile 14 --remote-debugging-port=0 --test-type=webdriver --use-mock-keychain
+        --user-data-dir=/var/folders/7m/lm7d6nx51kj0kbtnsskz6r3m0000gn/T/__user-data-dir__7501750884155054730 --window-size=1024,768 --flag-switches-begin --flag-switches-end
 
 #### FOR\_HERE
 
 When `UserDataAccess.FOR_HERE` is specified,
 ChromeDriverFactory will let ChromeDriver to generate a commandline to start Chrome browser as follows for example on my Mac:
+Please note that the `--user-data-dir` option is given with a path of "genuine User Data directory", which will be locked by a running Chrome process.
 
     /Applications/Google Chrome.app/Contents/MacOS/Google Chrome --allow-pre-commit-input --disable-background-networking --disable-client-side-phishing-detection --disable-default-apps --disable-dev-shm-usage --disable-gpu --disable-hang-monitor --disable-infobars --disable-popup-blocking --disable-prompt-on-repost --disable-sync --disableExtensions --enable-automation --enable-blink-features=ShadowDOMV0 --enable-logging --log-level=0 --no-first-run --no-sandbox --no-service-autorun --password-store=basic --profile-directory=Profile 14 --remote-debugging-port=0 --test-type=webdriver --use-mock-keychain
         --user-data-dir=/Users/kazuakiurayama/Library/Application Support/Google/Chrome --window-size=1024,768 --flag-switches-begin --flag-switches-end
-
-Please note that the `--user-data-dir` option is given with a path of "genuine User Data directory", which will be locked by a running Chrome process.
 
 #### Caution
 
