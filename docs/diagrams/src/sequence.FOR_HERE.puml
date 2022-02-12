@@ -1,0 +1,37 @@
+@startuml sequence
+actor       "Tester"              as tester
+collections "Test script"         as script
+participant "ChromeDriverFactory" as cdf
+participant ChromeDriver          as driver
+database    "profile in UserData" as userdata
+'database    "temp dir"            as tempdir
+participant Chrome                as chrome
+boundary "http://host/path" as site
+tester   -> chrome     : open with profile
+tester   -> chrome     : do something
+chrome   -> userdata   : save properties
+chrome   -> tester     : done
+
+tester   -> script     : run
+script   -> cdf        : FOR_HERE
+cdf      -> driver     : run
+driver   -> chrome     : open with profile
+userdata -> chrome     : use
+script   -> chrome     : navigate to URL
+chrome   -> site
+script   -> chrome     : do something
+script   -> tester     : done
+/'
+tester   -> script     : run
+script   -> cdf        : TO_GO
+cdf      -> userdata   : make copy
+userdata -> tempdir    : copy
+cdf      -> driver     : run
+driver   -> chrome     : open with profile
+tempdir  -> chrome     : use
+script   -> chrome     : navigate to URL
+chrome   -> site
+script   -> chrome     : do something
+script   -> tester     : done
+ '/
+@enduml
