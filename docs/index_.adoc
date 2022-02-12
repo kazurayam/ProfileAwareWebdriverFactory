@@ -94,7 +94,7 @@ Please note that the `--user-data-dir` option is given with a path of "genuine U
 ==== Caution
 
 Chrome browser is very strict that only 1 process of Chrome can
-have access to the genuine "UserData" folder. If you have
+have access to the "genuine User Data directory". If you have
 one Chrome window already opened when you try to launch one more Chrome process with `UserDataAccess.FOR_HERE`,
 then that attempt will fail with a message:
 
