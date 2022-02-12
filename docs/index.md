@@ -43,26 +43,6 @@ You have an option where to find the profile directory:
 
 ![sequence.FOR HERE](diagrams/out/sequence.FOR_HERE.png)
 
-#### Caution
-
-Chrome browser is very strict that one 1 process of Chrome can
-have the access right to the genuine "UserData" folder. If you have
-one Chrome window already opened when you try to launch one more Chrome process with `UserDataAccess.FOR_HERE`,
-then that attempt will fail with a message:
-
-    targetUserDataDir="/Users/username/Library/Application Support/Google/Chrome"
-    profileDirectoryName="Profile 14"
-    org.openqa.selenium.InvalidArgumentException was thrown.
-    Exception message:
-
-    invalid argument: user data directory is already in use, please specify a unique value for --user-data-dir argument, or don't use --user-data-dir
-
-As countermeasures you have 2 options.
-
-1.  close all Chrome windows before running your test, or
-
-2.  your test uses `UserDataAccess.TO_GO` instead
-
 ## Sample codes
 
 ### Launch Chrome browser without profile specified
@@ -210,6 +190,26 @@ ChromeDriverFactory will let ChromeDriver to generate a commandline to start Chr
         --user-data-dir=/Users/kazuakiurayama/Library/Application Support/Google/Chrome --window-size=1024,768 --flag-switches-begin --flag-switches-end
 
 Please note that the `--user-data-dir` option is given with a path of "genuine User Data directory", which will be locked by a running Chrome process.
+
+#### Caution
+
+Chrome browser is very strict that only 1 process of Chrome can
+have access to the genuine "UserData" folder. If you have
+one Chrome window already opened when you try to launch one more Chrome process with `UserDataAccess.FOR_HERE`,
+then that attempt will fail with a message:
+
+    targetUserDataDir="/Users/username/Library/Application Support/Google/Chrome"
+    profileDirectoryName="Profile 14"
+    org.openqa.selenium.InvalidArgumentException was thrown.
+    Exception message:
+
+    invalid argument: user data directory is already in use, please specify a unique value for --user-data-dir argument, or don't use --user-data-dir
+
+As countermeasures you have 2 options.
+
+1.  close all Chrome windows before running your test, or
+
+2.  your test uses `UserDataAccess.TO_GO` instead
 
 ### Launch Headless Chrome with ProfileDirectoryName specified
 
