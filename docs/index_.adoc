@@ -64,7 +64,11 @@ Exception message:
 invalid argument: user data directory is already in use, please specify a unique value for --user-data-dir argument, or don't use --user-data-dir
 ----
 
-The only workaround is to use `UserDataAccess.TO_GO` instead.
+As countermeasures you have 2 options.
+
+1. close all Chrome windows before running your test, or
+2. your test uses `UserDataAccess.TO_GO` instead
+
 
 == Sample codes
 
