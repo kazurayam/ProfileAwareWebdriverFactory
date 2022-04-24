@@ -6,7 +6,8 @@ import org.junit.Test
 
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.nio.file.Paths
+import java.nio.file.StandardCopyOption;
 
 public class TestUtilsTest {
 
@@ -28,9 +29,11 @@ public class TestUtilsTest {
     @Test
     void test_filesAreIdentical_large() {
         Path file = Paths.get("./src/web/SDG_DSD_MATRIX.1.7.xlsm")
-        Path copied = outputFolder.resolve("test_filesAreIdentical_large").resolve("copied.xlsm")
+        Path copied = outputFolder
+                        .resolve("test_filesAreIdentical_large")
+                        .resolve("copied.xlsm")
         Files.createDirectories(copied.getParent())
-        Files.copy(file, copied)
+        Files.copy(file, copied, StandardCopyOption.REPLACE_EXISTING)
         assert TestUtils.filesAreIdentical(file, copied)
     }
 

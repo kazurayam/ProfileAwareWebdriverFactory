@@ -5,7 +5,9 @@ import com.kazurayam.webdriverfactory.chrome.ChromeDriverFactory
 import com.kazurayam.webdriverfactory.chrome.ChromeDriverFactoryImpl
 import com.kazurayam.webdriverfactory.chrome.ChromePreferencesModifiers
 import com.kazurayam.webdriverfactory.chrome.LaunchedChromeDriver
+import io.github.bonigarcia.wdm.WebDriverManager
 import org.junit.Before
+import org.junit.BeforeClass
 import org.junit.Test
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -20,6 +22,12 @@ class CookieServerTest {
     JCommander jc
 
     Path outputDir
+
+    @BeforeClass
+    static void beforeClass() {
+        // setup the ChromeDriver binary
+        WebDriverManager.chromedriver().setup()
+    }
 
     @Before
     void setup() {
