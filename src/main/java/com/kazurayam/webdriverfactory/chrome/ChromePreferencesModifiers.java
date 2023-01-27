@@ -4,6 +4,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -25,6 +26,7 @@ public class ChromePreferencesModifiers {
         downloadWithoutPrompt,
         downloadIntoDirectory,
         disableViewersOfFlashAndPdf,
+        grantAccessToClipboard,
     }
 
     public static ChromePreferencesModifier downloadWithoutPrompt() {
@@ -62,7 +64,23 @@ public class ChromePreferencesModifiers {
         return new Base(Type.disableViewersOfFlashAndPdf, modifier, arguments);
     }
 
-
+    public static ChromePreferencesModifier grantAccessToClipboard() {
+        List<Object> arguments = Collections.emptyList();
+        BiFunction<Map<String,Object>, List<Object>, Map<String, Object>> modifier = (prefs, args) -> {
+            Map<String, Object> entries = new HashMap<>();
+            entries.put("last_modified", "1576491240619");
+            entries.put("setting", Integer.valueOf(1));
+            Map<String, Map<String, Object>> map = new HashMap<>();
+            map.put("[*.],*", entries);
+            //"[*.],*":{
+            //    "last_modified":"1576491240619",
+            //            "setting":1
+            //};
+            prefs.put("profile.content_settings.exceptions.clipboard", map);
+            return prefs;
+        };
+        return new Base(Type.grantAccessToClipboard, modifier, arguments);
+    }
 
     /**
      *
