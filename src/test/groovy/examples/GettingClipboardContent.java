@@ -9,7 +9,6 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.openqa.selenium.By;
-import org.openqa.selenium.JavascriptException;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -51,7 +50,7 @@ import java.util.concurrent.TimeUnit;
  *    The JavaScript will return a URL string back to the test script.
  * 5. It verifies if the returned URL string is equal to the expected.
  */
-public class GettingClipboardContentTest {
+public class GettingClipboardContent {
     private final String targetURL = "https://codepen.io/RevCred/pen/vxXrww";
     private final String iframeLocator = "//iframe[@id='result']";
     private final String buttonLocator = "//div[@id='copy']";
@@ -65,8 +64,13 @@ public class GettingClipboardContentTest {
 
     @Before
     public void setup() throws IOException {
-        ChromeDriverFactory factory = ChromeDriverFactory.newChromeDriverFactory();
-        factory.addChromePreferencesModifier(ChromePreferencesModifiers.grantAccessToClipboard());
+        ChromeDriverFactory factory =
+                ChromeDriverFactory.newChromeDriverFactory();
+
+        // modify Chrome Preferences to grant access to Clipboard
+        factory.addChromePreferencesModifier(
+                ChromePreferencesModifiers.grantAccessToClipboard());
+
         LaunchedChromeDriver launched = factory.newChromeDriver();
         driver = launched.getDriver();
         driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);

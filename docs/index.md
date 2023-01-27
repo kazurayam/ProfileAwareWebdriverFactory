@@ -159,7 +159,7 @@ Basic case where we launch Chrome browser without profile specified. The example
             launched = null
         }
 
-        /*
+
         @After
         void tearDown() {
             if (launched != null) {
@@ -167,7 +167,7 @@ Basic case where we launch Chrome browser without profile specified. The example
                 launched = null
             }
         }
-    */
+
     }
 
 #### TO\_GO
@@ -425,6 +425,149 @@ This emits
         "profileDirectoryName": "Default"
     }
     UserDataAccess: TO_GO
+
+### Getting Clipboard content from remote Selenium Chrome node
+
+Have a look at the following web site:
+
+-   <https://codepen.io/RevCred/pen/vxXrww>
+
+in there you will find a button:
+
+![10 copy link button](images/10_copy-link-button.png)
+
+If you click this button, the URL string displayed on the left of the button will be written into the OS Clipboard. The URL string may change. So a tester of this page would want to read the content text of the clipboard. He/she would want to get text out of the OS clipboard into his/her selenium test script and verify if the value is appropriate.
+
+How to implement this testing story?
+
+1.  My Selenium test script will open the page in a Chrome browser, find the button element, and click it. Then a text will be written in the OS clipboard.
+
+2.  My test script will execute a JavaScript script inside Chrome:
+
+<!-- -->
+
+    return navigator.clipboard.readText();
+
+1.  WebDriver will return a text read out of the clipboard.
+
+2.  My test script will accept the returned value and do whatever verification.
+
+Here arises a difficulty. Chrome browser blocks my script. Chrome won’t let my javascript to read the clipboard. Chrome will prompt a dialog and as me if I grand the javascript to read the OS clipboard:
+
+![11 grant access to clipboard](images/11_grant_access_to_clipboard.png)
+
+I wanted to automate my test entirely. I wanted to configure Chrome NOT to elicit that disturbing prompt. The following article explained how to configure Chrome’s preference.
+
+["Getting Clipboard Contet from Remote Selenium Chrome Nodes", AMIT RAWAT](https://sahajamit.medium.com/getting-clipboard-content-from-remote-selenium-chrome-nodes-67a4c4d862bd)
+
+So, I have implemented a built-in support of "granting access to Clipboard" built in my `chromedriverfactory`.
+
+Here is a sample code:
+
+    package examples;
+
+    import com.kazurayam.webdriverfactory.chrome.ChromeDriverFactory;
+    import com.kazurayam.webdriverfactory.chrome.ChromePreferencesModifiers;
+    import com.kazurayam.webdriverfactory.chrome.LaunchedChromeDriver;
+    import io.github.bonigarcia.wdm.WebDriverManager;
+    import org.junit.After;
+    import org.junit.Before;
+    import org.junit.BeforeClass;
+    import org.junit.Test;
+    import org.openqa.selenium.By;
+    import org.openqa.selenium.JavascriptExecutor;
+    import org.openqa.selenium.WebDriver;
+    import org.openqa.selenium.WebElement;
+
+    import java.io.IOException;
+    import java.util.concurrent.TimeUnit;
+
+    /**
+     * An implementation of a Tips suggested at
+     * [Getting Clipboard content from remote Selenium Chrome Nodes](https://sahajamit.medium.com/getting-clipboard-content-from-remote-selenium-chrome-nodes-67a4c4d862bd)
+     * by AMIT RAWAT
+     *
+     * Some web page has a button labeled "copy link".
+     * Here is an example:
+     *     https://codepen.io/RevCred/pen/vxXrww
+     * If you click the button, a URL is copied into the clipboard of the machine
+     * on which the browser is working.
+     *
+     * Now I want to write a Selenium test case which verifies
+     * if the URL written into the clipboard matches is as expected or not.
+     *
+     * In order to do that, I need to read the clipboard content and
+     * transfer the text back to the test case script.
+     * You can use JavaScript's Clipboard.readText()
+     * https://developer.mozilla.org/en-US/docs/Web/API/Clipboard/readText
+     *
+     * When you try to call Clipboard.readText() from your Selenium test,
+     * you would be blocked by a Dialog from browser. Browser ask you if
+     * you grant JavaScript to get access to the clipboard or not.
+     *
+     * The above-mentioned article explains that you can grant it by
+     * setting the Chrome preference `profile.content_settings.exceptions.clipboard`
+     * What this test case does?
+     * 1. It opens a Chrome browser specifying a configures preference
+     * 2. It visits the target page "https://codepen.io/RevCred/pen/vxXrww"
+     * 3. It clicks the button. By this, a URL string will be written into the OS clipboard
+     * 4. It sends a JavaScript script to the Chrome browser;
+     *    Chrome will execute the script;
+     *    The JavaScript will return a URL string back to the test script.
+     * 5. It verifies if the returned URL string is equal to the expected.
+     */
+    public class GettingClipboardContent {
+        private final String targetURL = "https://codepen.io/RevCred/pen/vxXrww";
+        private final String iframeLocator = "//iframe[@id='result']";
+        private final String buttonLocator = "//div[@id='copy']";
+        private WebDriver driver;
+
+        @BeforeClass
+        public static void beforeClass() {
+            // setup the ChromeDriver binary
+            WebDriverManager.chromedriver().setup();
+        }
+
+        @Before
+        public void setup() throws IOException {
+            ChromeDriverFactory factory =
+                    ChromeDriverFactory.newChromeDriverFactory();
+
+            // modify Chrome Preferences to grant access to Clipboard
+            factory.addChromePreferencesModifier(
+                    ChromePreferencesModifiers.grantAccessToClipboard());
+
+            LaunchedChromeDriver launched = factory.newChromeDriver();
+            driver = launched.getDriver();
+            driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
+        }
+
+        @Test
+        public void testReadingClipboard() throws InterruptedException {
+            driver.navigate().to(targetURL);
+            WebElement iframe = driver.findElement(By.xpath(iframeLocator));
+            driver.switchTo().frame(iframe);
+            WebElement button = driver.findElement(By.xpath(buttonLocator));
+            button.click();
+            Thread.sleep(1 * 1000);
+            if (driver instanceof JavascriptExecutor) {
+                JavascriptExecutor js = (JavascriptExecutor)driver;
+                Object val = js.executeScript("return navigator.clipboard.readText();");
+                if (val instanceof String) {
+                    String text = (String)val;
+                    System.out.println("*** Text out of clipboard: " + text);
+                    assert text.startsWith("https://staging.revolutioncredit.com/signupc/");
+                }
+            }
+
+        }
+
+        @After
+        public void teardown() {
+            driver.quit();
+        }
+
+    }
 
 ## References
 
