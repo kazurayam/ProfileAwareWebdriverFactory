@@ -6,29 +6,20 @@ import com.kazurayam.timekeeper.Table
 import com.kazurayam.timekeeper.Timekeeper
 import com.kazurayam.webdriverfactory.CookieServer
 import com.kazurayam.webdriverfactory.ProfileDirectoryName
-import com.kazurayam.webdriverfactory.UserProfile
-import com.kazurayam.webdriverfactory.chrome.ChromeDriverFactory.UserDataAccess
-import org.junit.After
-import org.junit.AfterClass
-import org.junit.BeforeClass
-
-import java.time.LocalDateTime
-
-import static org.junit.Assert.*
-
-import org.junit.Before
-import org.junit.Ignore
-import org.junit.Test
+import com.kazurayam.webdriverfactory.TestUtils
+import com.kazurayam.webdriverfactory.UserDataAccess
+import io.github.bonigarcia.wdm.WebDriverManager
+import org.junit.*
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
 import org.openqa.selenium.Cookie
 
-import io.github.bonigarcia.wdm.WebDriverManager
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
+import java.time.LocalDateTime
 
-import com.kazurayam.webdriverfactory.TestUtils
+import static org.junit.Assert.*
 
 /**
  * @author kazurayam
@@ -77,7 +68,7 @@ class ChromeDriverFactoryTest {
 	void test_addChromeOptionsModifier_incognito() {
 		ChromeDriverFactory cdFactory = ChromeDriverFactory.newChromeDriverFactory()
 		//
-		cdFactory.addChromeOptionsModifier(ChromeOptionsModifiers.incognito())
+		cdFactory.addChromiumOptionsModifier(ChromeOptionsModifiers.incognito())
 		//
 		launched = cdFactory.newChromeDriver()
 		assertNotNull(launched)
@@ -154,7 +145,7 @@ class ChromeDriverFactoryTest {
 		assertTrue(launched.getInstruction().isPresent())
 		launched.getChromeUserProfile().ifPresent({ ChromeUserProfile up ->
 			println up
-			assertEquals(new UserProfile("Kazuaki"), up.getUserProfile())
+			assertEquals(new ChromeUserProfile("Kazuaki"), up.getUserProfile())
 			assertEquals(new ProfileDirectoryName("Default"), up.getProfileDirectoryName())
 			assertTrue(Files.exists(up.getUserDataDir()))
 			// e.g, "/Users/kazurayam/Library/Application Support/Google/Chrome"
@@ -175,7 +166,7 @@ class ChromeDriverFactoryTest {
 		cdFactory.enableChromeDriverLog(outputFolder)
 		launched = cdFactory.newChromeDriver()
 		assertNotNull(launched)
-		Path logFile = outputFolder.resolve(ChromeDriverUtils.LOG_FILE_NAME)
+		Path logFile = outputFolder.resolve(ChromeDriverLogConfig.LOG_FILE_NAME)
 		assertTrue(Files.exists(logFile))
 		assertTrue(logFile.size() > 0)
 	}
@@ -188,14 +179,14 @@ class ChromeDriverFactoryTest {
 	void test_if_cookie_file_is_cloned_TO_GO() {
 		ChromeDriverFactory cdFactory = ChromeDriverFactory.newChromeDriverFactory()
 		launched = cdFactory.newChromeDriver(
-				new UserProfile('Picasso'),
+				new ChromeUserProfile('Picasso'),
 				UserDataAccess.TO_GO)
 		assertNotNull(launched)
 
 		// check if the user-data-dir/ProfileDireName/Cookie file is properly copied
 		// from the genuine one into the temporary directory
 		launched.getChromeUserProfile().ifPresent({ ChromeUserProfile chromeUserProfile ->
-			Path originalCookieFile = ChromeProfileUtils.getDefaultUserDataDir()
+			Path originalCookieFile = ChromeUserProfileUtils.getDefaultUserDataDir()
 					.resolve(chromeUserProfile.getProfileDirectoryName().toString())
 					.resolve("Cookies")
 			Path clonedCookieFile = chromeUserProfile.getProfileDirectory().resolve("Cookies")
@@ -230,7 +221,7 @@ class ChromeDriverFactoryTest {
 		//
 		String url = 'http://localhost/'
 		// 1st session
-		launched = cdFactory.newChromeDriver(new UserProfile('Picasso'))
+		launched = cdFactory.newChromeDriver(new ChromeUserProfile('Picasso'))
 		launched.getDriver().navigate().to(url)
 		Set<Cookie> cookies = launched.getDriver().manage().getCookies()
 		println "1st session: " + cookies
@@ -238,7 +229,7 @@ class ChromeDriverFactoryTest {
 		launched.quit()
 
 		// 2nd session
-		launched = cdFactory.newChromeDriver(new UserProfile('Picasso'))
+		launched = cdFactory.newChromeDriver(new ChromeUserProfile('Picasso'))
 		launched.getDriver().navigate().to(url)
 		cookies = launched.getDriver().manage().getCookies()
 		println "2nd session: " + cookies
@@ -276,7 +267,7 @@ class ChromeDriverFactoryTest {
 	@Test
 	void test_newChromeDriver_disableViewersOfFlashAndPdf() {
 		ChromeDriverFactory factory = ChromeDriverFactory.newChromeDriverFactory()
-		factory.addChromePreferencesModifier(ChromePreferencesModifiers.disableViewersOfFlashAndPdf())
+		factory.addChromiumPreferencesModifier(ChromePreferencesModifiers.disableViewersOfFlashAndPdf())
 		launched = factory.newChromeDriver()
 		launched.getDriver().navigate().to("http://127.0.0.1/SDG_Guidlines_AUG_2019_Final.pdf");
 		Thread.sleep(3000)
@@ -293,7 +284,7 @@ class ChromeDriverFactoryTest {
 		}
 		ChromeDriverFactory factory = ChromeDriverFactory
 				.newChromeDriverFactory()
-				.addChromePreferencesModifier(ChromePreferencesModifiers.downloadIntoDirectory(dir))
+				.addChromiumPreferencesModifier(ChromePreferencesModifiers.downloadIntoDirectory(dir))
 		launched = factory.newChromeDriver()
 		System.out.println("test_newChromeDriver_downloadIntoDirectory: " + launched.getEmployedOptionsAsJSON().get())
 		launched.getDriver().navigate().to("http://127.0.0.1/" + fileName)
@@ -311,7 +302,7 @@ class ChromeDriverFactoryTest {
 		}
 		ChromeDriverFactory factory = ChromeDriverFactory
 				.newChromeDriverFactory()
-				.addChromePreferencesModifier(ChromePreferencesModifiers.downloadWithoutPrompt())
+				.addChromiumPreferencesModifier(ChromePreferencesModifiers.downloadWithoutPrompt())
 		launched = factory.newChromeDriver()
 		launched.getDriver().navigate().to("http://127.0.0.1/" + fileName)
 		Thread.sleep(3000)
@@ -378,7 +369,7 @@ class ChromeDriverFactoryTest {
 	void test_newChromeDriver_withUserProfile_FOR_HERE() {
 		ChromeDriverFactory cdFactory = ChromeDriverFactory.newChromeDriverFactory()
 		launched = cdFactory.newChromeDriver(
-				new UserProfile('Picasso'),
+				new ChromeUserProfile('Picasso'),
 				UserDataAccess.FOR_HERE)
 		assertNotNull(launched)
 

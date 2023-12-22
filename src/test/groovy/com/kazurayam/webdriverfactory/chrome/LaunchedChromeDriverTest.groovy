@@ -42,7 +42,7 @@ class LaunchedChromeDriverTest {
                 new LaunchedChromeDriver(driver)
         assertNotNull(launched)
         ChromeUserProfile chromeUserProfile =
-                ChromeProfileUtils.findChromeUserProfileByProfileDirectoryName(
+                ChromeUserProfileUtils.findChromeUserProfileByProfileDirectoryName(
                         new ProfileDirectoryName("Default")
                 )
         launched.setChromeUserProfile(chromeUserProfile)
@@ -65,7 +65,7 @@ class LaunchedChromeDriverTest {
     @Test
     void test_getEmployedOptions() {
         ChromeDriverFactory factory = ChromeDriverFactory.newHeadlessChromeDriverFactory()
-        factory.addChromeOptionsModifier(ChromeOptionsModifiers.incognito())
+        factory.addChromiumOptionsModifier(ChromeOptionsModifiers.incognito())
         LaunchedChromeDriver launched = factory.newChromeDriver()
         launched.getEmployedOptions().ifPresent { ChromeOptions options ->
             println options

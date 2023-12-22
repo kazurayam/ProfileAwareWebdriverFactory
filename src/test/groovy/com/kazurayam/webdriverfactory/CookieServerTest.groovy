@@ -2,15 +2,12 @@ package com.kazurayam.webdriverfactory
 
 import com.beust.jcommander.JCommander
 import com.kazurayam.webdriverfactory.chrome.ChromeDriverFactory
-import com.kazurayam.webdriverfactory.chrome.ChromeDriverFactoryImpl
 import com.kazurayam.webdriverfactory.chrome.ChromePreferencesModifiers
 import com.kazurayam.webdriverfactory.chrome.LaunchedChromeDriver
 import io.github.bonigarcia.wdm.WebDriverManager
 import org.junit.Before
 import org.junit.BeforeClass
 import org.junit.Test
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
 
 import java.nio.file.Files
 import java.nio.file.Path
@@ -69,9 +66,9 @@ class CookieServerTest {
         Files.createDirectories(dir)
         ChromeDriverFactory factory =
                 ChromeDriverFactory.newChromeDriverFactory()
-                .addChromePreferencesModifier(
+                .addChromiumPreferencesModifier(
                         ChromePreferencesModifiers.downloadWithoutPrompt())
-                .addChromePreferencesModifier(
+                .addChromiumPreferencesModifier(
                         ChromePreferencesModifiers.downloadIntoDirectory(dir))
         LaunchedChromeDriver launched = factory.newChromeDriver()
         launched.getDriver().navigate().to("http://127.0.0.1/SDG_DSD_MATRIX.1.7.xlsm")

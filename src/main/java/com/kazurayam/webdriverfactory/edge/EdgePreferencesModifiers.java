@@ -1,4 +1,4 @@
-package com.kazurayam.webdriverfactory.chrome;
+package com.kazurayam.webdriverfactory.edge;
 
 import java.nio.file.Path;
 import java.util.Arrays;
@@ -19,7 +19,7 @@ import java.util.function.BiFunction;
  * this library in both Selenium3 and Selenium4
  * https://stackoverflow.com/questions/36901891/chromeoptions-to-not-prompt-for-download-when-running-remotedriver
  */
-public class ChromePreferencesModifiers {
+public class EdgePreferencesModifiers {
 
     enum Type {
         downloadWithoutPrompt,
@@ -28,7 +28,7 @@ public class ChromePreferencesModifiers {
         grantAccessToClipboard,
     }
 
-    public static ChromePreferencesModifier downloadWithoutPrompt() {
+    public static EdgePreferencesModifier downloadWithoutPrompt() {
         List<Object> arguments = Collections.emptyList();
         BiFunction<Map<String,Object>, List<Object>, Map<String,Object>> modifier = (prefs, args) -> {
             prefs.put("profile.default_content_settings.popups", 0);
@@ -38,7 +38,7 @@ public class ChromePreferencesModifiers {
         return new Base(Type.downloadWithoutPrompt, modifier, arguments);
     }
 
-    public static ChromePreferencesModifier downloadIntoDirectory(Path directory) {
+    public static EdgePreferencesModifier downloadIntoDirectory(Path directory) {
         Objects.requireNonNull(directory);
         List<Object> arguments = Collections.singletonList(directory);
         BiFunction<Map<String,Object>, List<Object>, Map<String,Object>> modifier = (prefs, args) -> {
@@ -53,7 +53,7 @@ public class ChromePreferencesModifiers {
         return new Base(Type.downloadIntoDirectory, modifier, arguments);
     }
 
-    public static ChromePreferencesModifier disableViewersOfFlashAndPdf() {
+    public static EdgePreferencesModifier disableViewersOfFlashAndPdf() {
         List<Object> arguments = Collections.emptyList();
         BiFunction<Map<String,Object>, List<Object>, Map<String,Object>> modifier = (prefs, args) -> {
             prefs.put("plugins.plugins_disabled",
@@ -63,7 +63,7 @@ public class ChromePreferencesModifiers {
         return new Base(Type.disableViewersOfFlashAndPdf, modifier, arguments);
     }
 
-    public static ChromePreferencesModifier grantAccessToClipboard() {
+    public static EdgePreferencesModifier grantAccessToClipboard() {
         List<Object> arguments = Collections.emptyList();
         BiFunction<Map<String,Object>, List<Object>, Map<String, Object>> modifier = (prefs, args) -> {
             Map<String, Object> entries = new HashMap<>();
@@ -84,7 +84,7 @@ public class ChromePreferencesModifiers {
     /**
      *
      */
-    static class Base implements ChromePreferencesModifier {
+    static class Base implements EdgePreferencesModifier {
 
         private final Type type;
         private final BiFunction<Map<String, Object>, List<Object>, Map<String, Object>> fn;
@@ -113,10 +113,10 @@ public class ChromePreferencesModifiers {
          */
         @Override
         public boolean equals(Object obj) {
-            if (!(obj instanceof ChromePreferencesModifiers.Base)) {
+            if (!(obj instanceof EdgePreferencesModifiers.Base)) {
                 return false;
             }
-            ChromePreferencesModifiers.Base other = (ChromePreferencesModifiers.Base)obj;
+            EdgePreferencesModifiers.Base other = (EdgePreferencesModifiers.Base)obj;
             return this.getType() == other.getType();
         }
 

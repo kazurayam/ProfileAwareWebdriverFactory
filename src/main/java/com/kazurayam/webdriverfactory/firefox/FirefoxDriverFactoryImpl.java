@@ -168,7 +168,7 @@ public class FirefoxDriverFactoryImpl extends FirefoxDriverFactory {
         assert Files.exists(sourceProfileDirectory);
         final Path targetUserDataDir = userDataDir;
 
-        // use the specified UserProfile to launch Firefox browser
+        // use the specified ChromeUserProfile to launch Firefox browser
         this.addFirefoxOptionsModifier(FirefoxOptionsModifiers.withProfileDirectoryName(userDataDir, profileDirectoryName));
 
         // launch the Firefox driver

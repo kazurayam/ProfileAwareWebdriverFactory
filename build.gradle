@@ -23,7 +23,8 @@ tasks.withType(AbstractCompile).each {
 ext {
     groovyVersion = '2.4.21'
     slf4jVersion = '1.7.25'
-    selenium3Version = '3.141.59'
+    seleniumVersion = '3.141.59'
+    edgedriverVersion = '4.16.1'
     webdrivermanagerVersion = '5.4.1'
     junitVersion = '4.12'
     subprocessjVersion = '0.3.3'
@@ -39,12 +40,12 @@ repositories {
 dependencies {
     implementation "org.slf4j:slf4j-api:${slf4jVersion}"
     implementation group: 'org.slf4j', name: 'slf4j-simple', version: "${slf4jVersion}"
-    implementation group: 'org.seleniumhq.selenium', name: 'selenium-java', version: "${selenium3Version}"
+    implementation group: 'org.seleniumhq.selenium', name: 'selenium-edge-driver', version: "${edgedriverVersion}"
+    implementation group: 'org.seleniumhq.selenium', name: 'selenium-java', version: "${seleniumVersion}"
     implementation group: 'com.google.code.gson', name: 'gson', version: "${gsonVersion}"
     implementation group: 'com.beust', name: 'jcommander', version: "${jcommanderVersion}"
 
     testImplementation "org.codehaus.groovy:groovy-all:${groovyVersion}"
-    testImplementation group: 'org.seleniumhq.selenium', name: 'selenium-java', version: "${selenium3Version}"
     testImplementation group: 'io.github.bonigarcia', name: 'webdrivermanager', version: "${webdrivermanagerVersion}"
     testImplementation group: 'junit', name: 'junit', version: "${junitVersion}"
     testImplementation group: 'com.kazurayam', name: 'subprocessj', version: "${subprocessjVersion}"

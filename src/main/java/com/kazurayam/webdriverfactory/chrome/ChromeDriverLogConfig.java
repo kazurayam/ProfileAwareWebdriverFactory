@@ -1,13 +1,10 @@
 package com.kazurayam.webdriverfactory.chrome;
 
-import com.kazurayam.webdriverfactory.utils.OSIdentifier;
-
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 
-public class ChromeDriverUtils {
+public class ChromeDriverLogConfig {
     /**
      * let ChromeDriver to make verbose log into the logsDir
      *
@@ -29,7 +26,7 @@ public class ChromeDriverUtils {
      * No more used. we will to delegate to the binogracia/webdrivermanager
      *
      * @return the path of chromedirever executable according to the type of OS
-     */
+
     @Deprecated
     public static Path getChromeBinaryPath() {
         if (OSIdentifier.isWindows()) {
@@ -42,8 +39,8 @@ public class ChromeDriverUtils {
         } else {
             throw new IllegalStateException("Windows, Mac, Linux are supported. Other platforms are not supported");
         }
-
     }
+    */
 
     public static String getLOG_FILE_NAME() {
         return LOG_FILE_NAME;

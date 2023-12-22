@@ -1,7 +1,6 @@
 package com.kazurayam.webdriverfactory.chrome
 
 import com.kazurayam.webdriverfactory.ProfileDirectoryName
-import com.kazurayam.webdriverfactory.UserProfile
 
 import java.nio.file.Files
 import java.nio.file.Path
@@ -18,7 +17,7 @@ class ChromeProfileUtilsTest {
 	@Test
 	void test_findUserDataDir() {
 		// when:
-		Path userDataDir= ChromeProfileUtils.getDefaultUserDataDir()
+		Path userDataDir= ChromeUserProfileUtils.getDefaultUserDataDir()
 		// then:
 		assertNotNull(userDataDir)
 		assertTrue(Files.exists(userDataDir))
@@ -26,13 +25,13 @@ class ChromeProfileUtilsTest {
 
 	@Test
 	void test_getUserProfiles() {
-		List<ChromeUserProfile> userProfiles = ChromeProfileUtils.getChromeUserProfileList()
+		List<ChromeUserProfile> userProfiles = ChromeUserProfileUtils.getChromeUserProfileList()
 		assertTrue(userProfiles.size() > 0)
 	}
 
 	@Test
 	void test_listAllUserProfiles() {
-		String text = ChromeProfileUtils.allChromeUserProfilesAsString()
+		String text = ChromeUserProfileUtils.allChromeUserProfilesAsString()
 		//println text
 		assertTrue( text.length() > 0)
 	}
@@ -42,15 +41,15 @@ class ChromeProfileUtilsTest {
 	 */
 	@Test
 	void test_getUserProfile() {
-		ChromeUserProfile userProfile = ChromeProfileUtils.findChromeUserProfile(new UserProfile('Picasso'))
+		ChromeUserProfile userProfile = ChromeUserProfileUtils.findChromeUserProfile(new ChromeUserProfile('Picasso'))
 		assertNotNull(userProfile)
-		assertEquals(userProfile.getUserProfile(), new UserProfile('Picasso'))
+		assertEquals(userProfile.getUserProfile(), new ChromeUserProfile('Picasso'))
 	}
 
 	@Test
 	void test_getChromeProfileNameByDirectoryName() {
 		String profileName =
-				ChromeProfileUtils.findUserProfileByProfileDirectoryName(
+				ChromeUserProfileUtils.findUserProfileByProfileDirectoryName(
 						new ProfileDirectoryName('Default'))
 		assertNotNull(profileName)
 		//println("DirectoryName \'Default\' is associated with the Profile \'${profileName}\'")

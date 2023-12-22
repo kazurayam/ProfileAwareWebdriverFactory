@@ -1,4 +1,4 @@
-package com.kazurayam.webdriverfactory.chrome;
+package com.kazurayam.webdriverfactory.edge;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -15,21 +15,16 @@ import java.nio.file.Path;
 import java.util.Map;
 import java.util.Objects;
 
-/**
- * A representation of a Chrome Profile instance.
- *
- * @author kazurayam
- */
-public class ChromeUserProfile implements Comparable<ChromeUserProfile> {
+public class EdgeUserProfile implements Comparable<EdgeUserProfile>{
 
-    private static Logger logger_ = LoggerFactory.getLogger(ChromeUserProfile.class);
+    private static Logger logger_ = LoggerFactory.getLogger(EdgeUserProfile.class);
 
     /**
      * @param userDataDir "~/Library/Application Support/Google/Chrome/"
      * @param profileDirectoryName "Default", "Profile 1", "Profile 2", "Profile 3", ...
      * @throws IOException TOOD
      */
-    public ChromeUserProfile(final Path userDataDir, ProfileDirectoryName profileDirectoryName) throws IOException {
+    public EdgeUserProfile(final Path userDataDir, ProfileDirectoryName profileDirectoryName) throws IOException {
         Objects.requireNonNull(userDataDir);
         Objects.requireNonNull(profileDirectoryName);
         if (!Files.exists(userDataDir)) {
@@ -54,7 +49,7 @@ public class ChromeUserProfile implements Comparable<ChromeUserProfile> {
         assert prof != null;
         String name = (String)prof.get("name");
         assert name != null;
-        this.userProfile = new UserProfile(name);
+        this.userProfile = new com.kazurayam.webdriverfactory.UserProfile(name);
     }
 
     public Path getUserDataDir() {
@@ -90,17 +85,16 @@ public class ChromeUserProfile implements Comparable<ChromeUserProfile> {
      * order by UserProfileName
      */
     @Override
-    public int compareTo(ChromeUserProfile other) {
+    public int compareTo(EdgeUserProfile other) {
         return this.getUserProfile().compareTo(other.getUserProfile());
     }
 
     @Override
     public boolean equals(Object obj) {
-        if (!(obj instanceof ChromeUserProfile)) {
+        if (!(obj instanceof EdgeUserProfile)) {
             return false;
         }
-
-        ChromeUserProfile other = (ChromeUserProfile) obj;
+        EdgeUserProfile other = (EdgeUserProfile) obj;
         return this.getUserDataDir().equals(other.getUserDataDir()) && this.getProfileDirectoryName().equals(other.getProfileDirectoryName());
     }
 
@@ -139,4 +133,5 @@ public class ChromeUserProfile implements Comparable<ChromeUserProfile> {
     private final UserProfile userProfile;
     private String preferences;
     private static final String PREFERENCES_FILE_NAME = "Preferences";
+
 }

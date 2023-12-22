@@ -21,7 +21,7 @@ class ChromeUserProfileTest {
 	@Test
 	void test_ChromeProfile() {
 		// when:
-		Path userDataDir = ChromeProfileUtils.getDefaultUserDataDir()
+		Path userDataDir = ChromeUserProfileUtils.getDefaultUserDataDir()
         ChromeUserProfile defaultProfile =
 				new ChromeUserProfile(userDataDir,
 						new ProfileDirectoryName('Default'))
@@ -34,8 +34,8 @@ class ChromeUserProfileTest {
 
 	@Test
 	void test_getUserProfileDirectory() {
-		Path userDataDir = ChromeProfileUtils.getDefaultUserDataDir()
-		ChromeUserProfile defaultProfile =
+		Path userDataDir = ChromeUserProfileUtils.getDefaultUserDataDir()
+        ChromeUserProfile defaultProfile =
 				new ChromeUserProfile(userDataDir,
 						new ProfileDirectoryName('Default')
 				)
@@ -47,7 +47,7 @@ class ChromeUserProfileTest {
 
 	@Test
 	void test_toString() {
-		Path userDataDir = ChromeProfileUtils.getDefaultUserDataDir()
+		Path userDataDir = ChromeUserProfileUtils.getDefaultUserDataDir()
 		ChromeUserProfile defaultProfile =
 				new ChromeUserProfile(userDataDir,
 						new ProfileDirectoryName('Default')

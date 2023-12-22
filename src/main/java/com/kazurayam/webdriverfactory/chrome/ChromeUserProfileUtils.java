@@ -16,9 +16,9 @@ import java.util.List;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-public final class ChromeProfileUtils {
+public final class ChromeUserProfileUtils {
 
-    private static Logger logger_ = LoggerFactory.getLogger(ChromeProfileUtils.class);
+    private static Logger logger_ = LoggerFactory.getLogger(ChromeUserProfileUtils.class);
 
     public static Path getDefaultUserDataDir() {
         if (OSIdentifier.isWindows()) {
@@ -61,13 +61,13 @@ public final class ChromeProfileUtils {
         return userProfiles;
     }
 
-    public static ChromeUserProfile findChromeUserProfile(UserProfile userProfile)
+    public static ChromeUserProfile findChromeUserProfile(com.kazurayam.webdriverfactory.UserProfile userProfile)
             throws IOException
     {
         return findChromeUserProfile(getDefaultUserDataDir(), userProfile);
     }
 
-    public static ChromeUserProfile findChromeUserProfile(Path userDataDir, UserProfile userProfile)
+    public static ChromeUserProfile findChromeUserProfile(Path userDataDir, com.kazurayam.webdriverfactory.UserProfile userProfile)
             throws IOException
     {
         Objects.requireNonNull(userProfile);
@@ -88,11 +88,11 @@ public final class ChromeProfileUtils {
      * @return TODO
      * @throws IOException TODO
      */
-    public static boolean hasChromeUserProfile(UserProfile userProfile) throws IOException {
+    public static boolean hasChromeUserProfile(com.kazurayam.webdriverfactory.UserProfile userProfile) throws IOException {
         return hasChromeUserProfile(getDefaultUserDataDir(), userProfile);
     }
 
-    public static boolean hasChromeUserProfile(Path userDataDir, UserProfile userProfile) throws IOException {
+    public static boolean hasChromeUserProfile(Path userDataDir, com.kazurayam.webdriverfactory.UserProfile userProfile) throws IOException {
         return findChromeUserProfile(userDataDir, userProfile) != null;
     }
 
@@ -144,6 +144,6 @@ public final class ChromeProfileUtils {
         return sb.toString();
     }
 
-    private ChromeProfileUtils() {
+    private ChromeUserProfileUtils() {
     }
 }

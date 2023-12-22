@@ -3,6 +3,7 @@ package com.kazurayam.webdriverfactory.chrome;
 import com.kazurayam.webdriverfactory.ProfileDirectoryName;
 import com.kazurayam.webdriverfactory.UserProfile;
 import com.kazurayam.webdriverfactory.WebDriverFactoryException;
+import com.kazurayam.webdriverfactory.UserDataAccess;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -20,25 +21,25 @@ public abstract class ChromeDriverFactory {
 	}
 
 	public static ChromeDriverFactory newHeadlessChromeDriverFactory() throws IOException {
-		ChromeDriverFactoryImpl cdfi = new ChromeDriverFactoryImpl();
-		cdfi.addChromeOptionsModifier(ChromeOptionsModifiers.headless());
-		return cdfi;
+		ChromeDriverFactoryImpl cdfl = new ChromeDriverFactoryImpl();
+		cdfl.addChromiumOptionsModifier(ChromeOptionsModifiers.headless());
+		return cdfl;
 	}
 
 	public static ChromeDriverFactory newHeadlessChromeDriverFactory(boolean requireDefaultSettings)
 			throws IOException {
 		ChromeDriverFactoryImpl cdfi = new ChromeDriverFactoryImpl(requireDefaultSettings);
-		cdfi.addChromeOptionsModifier(ChromeOptionsModifiers.headless());
+		cdfi.addChromiumOptionsModifier(ChromeOptionsModifiers.headless());
 		return cdfi;
 	}
 
-	public abstract ChromeDriverFactory addChromePreferencesModifier(ChromePreferencesModifier chromePreferencesModifier);
+	public abstract ChromeDriverFactory addChromiumPreferencesModifier(ChromePreferencesModifier chromePreferencesModifier);
 
-	public abstract ChromeDriverFactory addAllChromePreferencesModifiers(List<ChromePreferencesModifier> chromePreferencesModifierList);
+	public abstract ChromeDriverFactory addChromiumPreferencesModifiers(List<ChromePreferencesModifier> chromePreferencesModifierList);
 
-	public abstract ChromeDriverFactory addChromeOptionsModifier(ChromeOptionsModifier chromeOptionsModifier);
+	public abstract ChromeDriverFactory addChromiumOptionsModifier(ChromeOptionsModifier chromeOptionsModifier);
 
-	public abstract ChromeDriverFactory addAllChromeOptionsModifiers(List<ChromeOptionsModifier> chromeOptionsModifierList);
+	public abstract ChromeDriverFactory addChromiumOptionsModifiers(List<ChromeOptionsModifier> chromeOptionsModifierList);
 
 	public abstract ChromeDriverFactory pageLoadTimeout(Integer waitSeconds);
 
@@ -60,9 +61,5 @@ public abstract class ChromeDriverFactory {
 	public static void setPathToChromeDriverExecutable(String chromeDriverPath) {
 		Objects.requireNonNull(chromeDriverPath);
 		System.setProperty("webdriver.chrome.driver", chromeDriverPath);
-	}
-
-	public static enum UserDataAccess {
-		FOR_HERE, TO_GO;
 	}
 }

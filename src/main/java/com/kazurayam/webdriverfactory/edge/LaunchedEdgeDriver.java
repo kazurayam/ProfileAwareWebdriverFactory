@@ -1,39 +1,39 @@
-package com.kazurayam.webdriverfactory.chrome;
+package com.kazurayam.webdriverfactory.edge;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.kazurayam.webdriverfactory.UserDataAccess;
-import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.edge.EdgeDriver;
+import org.openqa.selenium.edge.EdgeOptions;
 
 import java.util.Objects;
 import java.util.Optional;
 
-public class LaunchedChromeDriver {
+public class LaunchedEdgeDriver {
 
-    public LaunchedChromeDriver(ChromeDriver driver) {
+    public LaunchedEdgeDriver(EdgeDriver driver) {
         Objects.requireNonNull(driver);
         this.driver = driver;
-        this.chromeUserProfile = Optional.empty();
+        this.edgeUserProfile = Optional.empty();
         this.instruction = Optional.empty();
         this.employedOptions = Optional.empty();
     }
 
-    public ChromeDriver getDriver() {
+    public EdgeDriver getDriver() {
         return this.driver;
     }
 
-    public LaunchedChromeDriver setChromeUserProfile(ChromeUserProfile cup) {
+    public LaunchedEdgeDriver setChromeUserProfile(EdgeUserProfile cup) {
         Objects.requireNonNull(cup);
-        this.chromeUserProfile = Optional.of(cup);
+        this.edgeUserProfile = Optional.of(cup);
         return this;
     }
 
-    public Optional<ChromeUserProfile> getChromeUserProfile() {
-        return this.chromeUserProfile;
+    public Optional<EdgeUserProfile> getEdgeUserProfile() {
+        return this.edgeUserProfile;
     }
 
-    public LaunchedChromeDriver setInstruction(UserDataAccess instruction) {
+    public LaunchedEdgeDriver setInstruction(UserDataAccess instruction) {
         Objects.requireNonNull(instruction);
         this.instruction = Optional.of(instruction);
         return this;
@@ -43,18 +43,18 @@ public class LaunchedChromeDriver {
         return this.instruction;
     }
 
-    public LaunchedChromeDriver setEmployedOptions(ChromeOptions options) {
+    public LaunchedEdgeDriver setEmployedOptions(EdgeOptions options) {
         Objects.requireNonNull(options);
         this.employedOptions = Optional.of(options);
         return this;
     }
 
-    public Optional<ChromeOptions> getEmployedOptions() {
+    public Optional<EdgeOptions> getEmployedOptions() {
         return this.employedOptions;
     }
 
     public Optional<String> getEmployedOptionsAsJSON() {
-        Optional<ChromeOptions> options = getEmployedOptions();
+        Optional<EdgeOptions> options = getEmployedOptions();
         if (options.isPresent()) {
             Gson gson = new GsonBuilder().setPrettyPrinting().create();
             return Optional.of(gson.toJson(options.get()));
@@ -63,9 +63,9 @@ public class LaunchedChromeDriver {
         }
     }
 
-    private final ChromeDriver driver;
-    private Optional<ChromeUserProfile> chromeUserProfile;
+    private final EdgeDriver driver;
+    private Optional<EdgeUserProfile> edgeUserProfile;
     private Optional<UserDataAccess> instruction;
-    private Optional<ChromeOptions> employedOptions;
+    private Optional<EdgeOptions> employedOptions;
 
 }

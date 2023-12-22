@@ -68,7 +68,7 @@ public class GettingClipboardContent {
                 ChromeDriverFactory.newChromeDriverFactory();
 
         // modify Chrome Preferences to grant access to Clipboard
-        factory.addChromePreferencesModifier(
+        factory.addChromiumPreferencesModifier(
                 ChromePreferencesModifiers.grantAccessToClipboard());
 
         LaunchedChromeDriver launched = factory.newChromeDriver();

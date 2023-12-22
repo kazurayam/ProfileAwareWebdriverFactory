@@ -1,8 +1,8 @@
 package com.kazurayam.webdriverfactory.chrome;
 
 import com.kazurayam.webdriverfactory.ProfileDirectoryName;
-import com.kazurayam.webdriverfactory.UserProfile;
 import com.kazurayam.webdriverfactory.WebDriverFactoryException;
+import com.kazurayam.webdriverfactory.UserDataAccess;
 import com.kazurayam.webdriverfactory.utils.PathUtils;
 import org.openqa.selenium.InvalidArgumentException;
 import org.openqa.selenium.chrome.ChromeDriver;
@@ -24,10 +24,9 @@ import java.util.concurrent.TimeUnit;
 
 public class ChromeDriverFactoryImpl extends ChromeDriverFactory {
 
-	private static Logger logger_ = LoggerFactory.getLogger(ChromeDriverFactoryImpl.class);
-
-	private final Set<ChromePreferencesModifier> chromePreferencesModifiers;
-	private final Set<ChromeOptionsModifier> chromeOptionsModifiers;
+	private static Logger logger = LoggerFactory.getLogger(ChromeDriverFactoryImpl.class);
+	private final Set<ChromePreferencesModifier> chromiumPreferencesModifiers;
+	private final Set<ChromeOptionsModifier> chromiumOptionsModifiers;
 	private Integer pageLoadTimeoutSeconds;
 
 	public ChromeDriverFactoryImpl() throws IOException {
@@ -35,8 +34,8 @@ public class ChromeDriverFactoryImpl extends ChromeDriverFactory {
 	}
 
 	public ChromeDriverFactoryImpl(boolean requireDefaultSettings) throws IOException {
-		this.chromePreferencesModifiers = new HashSet<>();
-		this.chromeOptionsModifiers = new HashSet<>();
+		this.chromiumPreferencesModifiers = new HashSet<>();
+		this.chromiumOptionsModifiers = new HashSet<>();
 		if (requireDefaultSettings) {
 			this.prepareDefaultSettings();
 		}
@@ -44,47 +43,47 @@ public class ChromeDriverFactoryImpl extends ChromeDriverFactory {
 	}
 
 	private void prepareDefaultSettings() {
-		this.addChromePreferencesModifier(ChromePreferencesModifiers.downloadWithoutPrompt());
-		this.addChromePreferencesModifier(ChromePreferencesModifiers.disableViewersOfFlashAndPdf());
+		this.addChromiumPreferencesModifier(ChromePreferencesModifiers.downloadWithoutPrompt());
+		this.addChromiumPreferencesModifier(ChromePreferencesModifiers.disableViewersOfFlashAndPdf());
 		//
-		this.addChromeOptionsModifier(ChromeOptionsModifiers.windowSize1024_768());
-		this.addChromeOptionsModifier(ChromeOptionsModifiers.noSandbox());
+		this.addChromiumOptionsModifier(ChromeOptionsModifiers.windowSize1024_768());
+		this.addChromiumOptionsModifier(ChromeOptionsModifiers.noSandbox());
 		//this.addChromeOptionsModifier(ChromeOptionsModifiers.singleProcess())
-		this.addChromeOptionsModifier(ChromeOptionsModifiers.disableInfobars());
-		this.addChromeOptionsModifier(ChromeOptionsModifiers.disableExtensions());
-		this.addChromeOptionsModifier(ChromeOptionsModifiers.disableGpu());
-		this.addChromeOptionsModifier(ChromeOptionsModifiers.disableDevShmUsage());
+		this.addChromiumOptionsModifier(ChromeOptionsModifiers.disableInfobars());
+		this.addChromiumOptionsModifier(ChromeOptionsModifiers.disableExtensions());
+		this.addChromiumOptionsModifier(ChromeOptionsModifiers.disableGpu());
+		this.addChromiumOptionsModifier(ChromeOptionsModifiers.disableDevShmUsage());
 	}
 
 	@Override
-	public ChromeDriverFactory addChromePreferencesModifier(ChromePreferencesModifier cpm) {
-		if (this.chromePreferencesModifiers.contains(cpm)) {
+	public ChromeDriverFactory addChromiumPreferencesModifier(ChromePreferencesModifier cpm) {
+		if (this.chromiumPreferencesModifiers.contains(cpm)) {
 			// The late comer wins
-			this.chromePreferencesModifiers.remove(cpm);
+			this.chromiumPreferencesModifiers.remove(cpm);
 		}
-		this.chromePreferencesModifiers.add(cpm);
+		this.chromiumPreferencesModifiers.add(cpm);
 		return this;
 	}
 
 	@Override
-	public ChromeDriverFactory addAllChromePreferencesModifiers(List<ChromePreferencesModifier> list) {
-		list.forEach(this::addChromePreferencesModifier);
+	public ChromeDriverFactory addChromiumPreferencesModifiers(List<ChromePreferencesModifier> list) {
+		list.forEach(this::addChromiumPreferencesModifier);
 		return this;
 	}
 
 	@Override
-	public ChromeDriverFactory addChromeOptionsModifier(ChromeOptionsModifier com) {
-		if (this.chromeOptionsModifiers.contains(com)) {
+	public ChromeDriverFactory addChromiumOptionsModifier(ChromeOptionsModifier com) {
+		if (this.chromiumOptionsModifiers.contains(com)) {
 			// The late comer wins
-			this.chromeOptionsModifiers.remove(com);
+			this.chromiumOptionsModifiers.remove(com);
 		}
-		this.chromeOptionsModifiers.add(com);
+		this.chromiumOptionsModifiers.add(com);
 		return this;
 	}
 
 	@Override
-	public ChromeDriverFactory addAllChromeOptionsModifiers(List<ChromeOptionsModifier> list) {
-		list.forEach(this::addChromeOptionsModifier);
+	public ChromeDriverFactory addChromiumOptionsModifiers(List<ChromeOptionsModifier> list) {
+		list.forEach(this::addChromiumOptionsModifier);
 		return this;
 	}
 
@@ -109,14 +108,13 @@ public class ChromeDriverFactoryImpl extends ChromeDriverFactory {
 			long millis = dur.toMillis();
 			driver.manage().timeouts().pageLoadTimeout(millis, TimeUnit.MILLISECONDS);
 		}
-
 	}
 
 	@Override
 	public LaunchedChromeDriver newChromeDriver() {
 		ChromeOptions options = buildOptions(
-				this.chromePreferencesModifiers,
-				this.chromeOptionsModifiers);
+				this.chromiumPreferencesModifiers,
+				this.chromiumOptionsModifiers);
 		ChromeDriver driver = new ChromeDriver(options);
 		setPageLoadTimeout(driver, this.pageLoadTimeoutSeconds);
 		return new LaunchedChromeDriver(driver).setEmployedOptions(options);
@@ -126,12 +124,12 @@ public class ChromeDriverFactoryImpl extends ChromeDriverFactory {
 	 *
 	 */
 	@Override
-	public LaunchedChromeDriver newChromeDriver(UserProfile userProfile) throws IOException, WebDriverFactoryException {
+	public LaunchedChromeDriver newChromeDriver(com.kazurayam.webdriverfactory.UserProfile userProfile) throws IOException, WebDriverFactoryException {
 		return newChromeDriver(userProfile, UserDataAccess.TO_GO);
 	}
 
 	/**
-	 * create a new instance of ChromeDriver using the UserProfile specified.
+	 * create a new instance of ChromeDriver using the ChromeUserProfile specified.
 	 * <p>
 	 * If UserDataAccess.CLONE_TO_TEMP is given, create a temporary directory as
 	 * the replacement of "User-data" folder into which the profile directory of
@@ -149,26 +147,26 @@ public class ChromeDriverFactoryImpl extends ChromeDriverFactory {
 	 * invalid argument: user data directory is already in use, please specify a unique value for --user-data-dir argument, or don't use --user-data-dir
 	 * In this case, you have to close the elder Chrome browser, and try again.
 	 *
-	 * @param userProfile e.g. new com.kazurayam.webdriverfactory.UserProfile("Alice")
+	 * @param userProfile e.g. new com.kazurayam.webdriverfactory.ChromeUserProfile("Alice")
 	 * @param instruction default to UserDataAccess.CLONE_TO_TEMP
 	 * @return a ChromeDriver object; Chrome browser will be opened.
 	 */
 	@Override
-	public LaunchedChromeDriver newChromeDriver(final UserProfile userProfile, UserDataAccess instruction) throws IOException, WebDriverFactoryException {
+	public LaunchedChromeDriver newChromeDriver(final com.kazurayam.webdriverfactory.UserProfile userProfile, UserDataAccess instruction) throws IOException, WebDriverFactoryException {
 		Objects.requireNonNull(userProfile, "userProfile must not be null");
 		Objects.requireNonNull(instruction, "instruction must not be null");
-		ChromeUserProfile chromeUserProfile = ChromeProfileUtils.findChromeUserProfile(userProfile);
+		ChromeUserProfile chromeUserProfile = ChromeUserProfileUtils.findChromeUserProfile(userProfile);
 		if (chromeUserProfile == null) {
 			throw new WebDriverFactoryException(
 					String.format(
 							"ChromeUserProfile of \"%s\" is not found in :\n%s",
 							userProfile,
-							ChromeProfileUtils.allChromeUserProfilesAsString()
+							ChromeUserProfileUtils.allChromeUserProfilesAsString()
 					)
 			);
 		}
 
-		Path userDataDir = ChromeProfileUtils.getDefaultUserDataDir();
+		Path userDataDir = ChromeUserProfileUtils.getDefaultUserDataDir();
 		ProfileDirectoryName profileDirectoryName = chromeUserProfile.getProfileDirectoryName();
 		return launchChrome(userDataDir, profileDirectoryName, instruction);
 	}
@@ -188,7 +186,7 @@ public class ChromeDriverFactoryImpl extends ChromeDriverFactory {
 			throws IOException, WebDriverFactoryException {
 		Objects.requireNonNull(profileDirectoryName, "profileDirectoryName must not be null");
 		Objects.requireNonNull(instruction, "instruction must not be null");
-		Path userDataDir = ChromeProfileUtils.getDefaultUserDataDir();
+		Path userDataDir = ChromeUserProfileUtils.getDefaultUserDataDir();
 		return launchChrome(userDataDir, profileDirectoryName, instruction);
 	}
 
@@ -199,7 +197,7 @@ public class ChromeDriverFactoryImpl extends ChromeDriverFactory {
 			Files.createDirectories(outputDirectory);
 		}
 
-		ChromeDriverUtils.enableChromeDriverLog(outputDirectory);
+		ChromeDriverLogConfig.enableChromeDriverLog(outputDirectory);
 	}
 
 	/**
@@ -231,15 +229,15 @@ public class ChromeDriverFactoryImpl extends ChromeDriverFactory {
 			targetUserDataDir = Files.createTempDirectory("__user-data-dir__");
 			final Path targetProfileDirectory = targetUserDataDir.resolve(profileDirectoryName.getName());
 			PathUtils.copyDirectoryRecursively(sourceProfileDirectory, targetProfileDirectory);
-			logger_.info(String.format("copied %d files from %s into %s",
+			logger.info(String.format("copied %d files from %s into %s",
 					PathUtils.listDirectoryRecursively(targetProfileDirectory).size(),
 					sourceProfileDirectory, targetProfileDirectory));
 		} else {
-			logger_.debug(String.format("%s will be used", sourceProfileDirectory));
+			logger.debug(String.format("%s will be used", sourceProfileDirectory));
 		}
 
-		// use the specified UserProfile with which Chrome browser is launched
-		this.addChromeOptionsModifier(
+		// use the specified ChromeUserProfile with which Chrome browser is launched
+		this.addChromiumOptionsModifier(
 				ChromeOptionsModifiers.withProfileDirectoryName(
 						targetUserDataDir, profileDirectoryName)
 		);
@@ -247,7 +245,7 @@ public class ChromeDriverFactoryImpl extends ChromeDriverFactory {
 		// launch the Chrome driver
 		ChromeDriver driver = null;
 		try {
-			ChromeOptions options = buildOptions(this.chromePreferencesModifiers, this.chromeOptionsModifiers);
+			ChromeOptions options = buildOptions(this.chromiumPreferencesModifiers, this.chromiumOptionsModifiers);
 			driver = new ChromeDriver(options);
 			setPageLoadTimeout(driver, this.pageLoadTimeoutSeconds);
 			return new LaunchedChromeDriver(driver)
@@ -256,7 +254,7 @@ public class ChromeDriverFactoryImpl extends ChromeDriverFactory {
 		} catch (InvalidArgumentException iae) {
 			if (driver != null) {
 				driver.quit();
-				logger_.info("forcibly closed the browser");
+				logger.info("forcibly closed the browser");
 			}
 			StringBuilder sb = new StringBuilder();
 			sb.append(String.format("targetUserDataDir=\"%s\"\n", targetUserDataDir));
@@ -266,7 +264,6 @@ public class ChromeDriverFactoryImpl extends ChromeDriverFactory {
 			sb.append(iae.getMessage());
 			throw new WebDriverFactoryException(sb.toString());
 		}
-
 	}
 
 	/**

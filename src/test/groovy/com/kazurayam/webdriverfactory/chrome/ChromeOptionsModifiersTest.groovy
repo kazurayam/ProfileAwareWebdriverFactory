@@ -94,7 +94,7 @@ class ChromeOptionsModifiersTest {
 
     @Test
     void test_withProfileDirectoryName() {
-        Path userDataDir = ChromeProfileUtils.getDefaultUserDataDir()
+        Path userDataDir = ChromeUserProfileUtils.getDefaultUserDataDir()
         ProfileDirectoryName profileDirectoryName = new ProfileDirectoryName("Default")
         ChromeOptions modified =
                 ChromeOptionsModifiers.withProfileDirectoryName(userDataDir, profileDirectoryName)
