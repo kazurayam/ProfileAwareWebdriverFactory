@@ -42,15 +42,17 @@ class ChromeDriverFactoryTest {
 
 	@BeforeClass
 	static void beforeClass() {
-		WebDriverManager.chromedriver().setup()
+		WebDriverManager.chromedriver()
+				.clearDriverCache()
+				.clearResolutionCache().setup()
 		outputFolder = Paths.get(".").resolve("build/tmp/testOutput")
 				.resolve(ChromeDriverFactoryTest.class.getSimpleName())
 		Files.createDirectories(outputFolder)
 		//
 		cookieServer = new CookieServer()
 		cookieServer.setBaseDir(Paths.get("./src/web"))
-		cookieServer.isPrintingRequested(true)
-		cookieServer.isDebugMode(true)
+		cookieServer.setPrintRequestRequired(true)
+		cookieServer.setDebugMode(true)
 		cookieServer.startup()
 	}
 

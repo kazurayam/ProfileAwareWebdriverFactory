@@ -25,7 +25,7 @@ import static org.junit.Assert.*
  * can help you carry over cookie info over HTTP sessions via Chrome profile.
  *
  */
-@Ignore
+//@Ignore
 class CarryingCookieOverSessionsViaChromeProfileTest {
 
     private CookieServer cookieServer
@@ -40,8 +40,8 @@ class CarryingCookieOverSessionsViaChromeProfileTest {
     void setup() {
         cookieServer = new CookieServer()
         cookieServer.setBaseDir(Paths.get("./src/web"))
-        cookieServer.isPrintingRequested(true);
-        cookieServer.isDebugMode(true)
+        cookieServer.setPrintRequestRequired(true);
+        cookieServer.setDebugMode(true)
         cookieServer.startup()
     }
     /**

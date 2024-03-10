@@ -54,7 +54,8 @@ public class LaunchedChromeDriver {
     public Optional<String> getEmployedOptionsAsJSON() {
         Optional<ChromeOptions> options = getEmployedOptions();
         if (options.isPresent()) {
-            Gson gson = new GsonBuilder().setPrettyPrinting().create();
+            Gson gson = new GsonBuilder().setPrettyPrinting()
+                    .excludeFieldsWithoutExposeAnnotation().create();
             return Optional.of(gson.toJson(options.get()));
         } else {
             return Optional.empty();

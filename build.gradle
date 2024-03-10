@@ -12,8 +12,8 @@ version '0.7.0-SNAPSHOT'
 
 ext.isReleaseVersion = ! version.endsWith("SNAPSHOT")
 
-sourceCompatibility = '1.8'
-targetCompatibility = '1.8'
+sourceCompatibility = '17'
+targetCompatibility = '17'
 
 def defaultEncoding = 'UTF-8'
 tasks.withType(AbstractCompile).each {
@@ -22,12 +22,12 @@ tasks.withType(AbstractCompile).each {
 
 ext {
     groovyVersion = '2.4.21'
-    slf4jVersion = '1.7.25'
+    slf4jVersion = '2.0.12'
     selenium3Version = '3.141.59'
-    webdrivermanagerVersion = '5.4.1'
+    webdrivermanagerVersion = '5.7.0'
     junitVersion = '4.12'
     subprocessjVersion = '0.3.3'
-    gsonVersion = '2.8.2'
+    gsonVersion = '2.10.1'
     jcommanderVersion = '1.82'
 }
 
@@ -38,11 +38,11 @@ repositories {
 
 dependencies {
     implementation "org.slf4j:slf4j-api:${slf4jVersion}"
-    implementation group: 'org.slf4j', name: 'slf4j-simple', version: "${slf4jVersion}"
     implementation group: 'org.seleniumhq.selenium', name: 'selenium-java', version: "${selenium3Version}"
     implementation group: 'com.google.code.gson', name: 'gson', version: "${gsonVersion}"
     implementation group: 'com.beust', name: 'jcommander', version: "${jcommanderVersion}"
 
+    testImplementation group: 'org.slf4j', name: 'slf4j-simple', version: "${slf4jVersion}"
     testImplementation "org.codehaus.groovy:groovy-all:${groovyVersion}"
     testImplementation group: 'org.seleniumhq.selenium', name: 'selenium-java', version: "${selenium3Version}"
     testImplementation group: 'io.github.bonigarcia', name: 'webdrivermanager', version: "${webdrivermanagerVersion}"
@@ -58,6 +58,14 @@ tasks.withType(JavaCompile) {
 
 test {
     finalizedBy jacocoTestReport
+}
+
+task testFailed(type: Test) {
+    include '**/CarryingCookieOverSessionsViaChromeProfileTest*'
+    include '**/ChromeDriverFactoryTest*'
+    //include '**/ChromeOptionsTest*'
+    include '**/LaunchedChromeDriverTest*'
+    //include '**/PrintEmployedOptions*'
 }
 
 application {
