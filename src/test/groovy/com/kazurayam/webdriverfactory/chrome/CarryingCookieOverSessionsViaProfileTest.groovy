@@ -33,7 +33,7 @@ class CarryingCookieOverSessionsViaChromeProfileTest {
     @BeforeClass
     static void beforeClass() {
         // setup the ChromeDriver binary
-        WebDriverManager.chromedriver().setup()
+        WebDriverManager.chromedriver().clearDriverCache().setup()
     }
 
     @Before

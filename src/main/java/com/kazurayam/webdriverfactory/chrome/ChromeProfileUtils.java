@@ -130,17 +130,18 @@ public final class ChromeProfileUtils {
         List<ChromeUserProfile> userProfiles = getChromeUserProfileList();
         Collections.sort(userProfiles);
         StringBuilder sb = new StringBuilder();
-        sb.append("[");
+        sb.append("[\n");
         int count = 0;
         for (ChromeUserProfile up : userProfiles) {
             if (count > 0) {
-                sb.append(",");
+                sb.append(",\n");
             }
+            sb.append("\t");
             sb.append(up.toString());
             count += 1;
         }
 
-        sb.append("]");
+        sb.append("\n]");
         return sb.toString();
     }
 

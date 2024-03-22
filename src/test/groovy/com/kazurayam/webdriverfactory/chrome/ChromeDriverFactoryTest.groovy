@@ -143,7 +143,7 @@ class ChromeDriverFactoryTest {
   }
 }
 			 */
-			assertTrue(json.contains("--incognito"))
+			assertTrue("json does not contain --incognito", json.contains("--incognito"))
 		})
 	}
 

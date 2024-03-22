@@ -130,8 +130,9 @@ public class ChromeUserProfile implements Comparable<ChromeUserProfile> {
         sb.append("\"");
         sb.append("}");
         //
-        Gson gson = new GsonBuilder().setPrettyPrinting().create();
-        return gson.toJson(sb.toString());
+        //Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        //return gson.toJson(sb.toString());
+        return sb.toString();
     }
 
     private final Path userDataDir;

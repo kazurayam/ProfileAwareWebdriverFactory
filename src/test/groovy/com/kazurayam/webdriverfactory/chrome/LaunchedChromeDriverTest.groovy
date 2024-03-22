@@ -21,7 +21,7 @@ class LaunchedChromeDriverTest {
 
     @BeforeClass
     static void beforeClass() {
-        WebDriverManager.chromedriver().setup()
+        WebDriverManager.chromedriver().clearDriverCache().setup()
         outputFolder = Paths.get(".").resolve("build/tmp/testOutput")
                 .resolve(LaunchedChromeDriverTest.class.getSimpleName())
         Files.createDirectories(outputFolder)

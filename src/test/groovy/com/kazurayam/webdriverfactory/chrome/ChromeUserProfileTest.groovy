@@ -53,6 +53,8 @@ class ChromeUserProfileTest {
 						new ProfileDirectoryName('Default')
 				)
 		println defaultProfile.toString()
+		assertTrue("defaultProfile.toString() should start with {",
+				defaultProfile.toString().startsWith("{"));
 		JsonSlurper slurper = new JsonSlurper()
 		def obj = slurper.parseText(defaultProfile.toString())
 		assert obj != null
