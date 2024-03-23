@@ -1,6 +1,6 @@
 package com.kazurayam.webdriverfactory.chrome
 
-import com.kazurayam.webdriverfactory.ProfileDirectoryName
+import com.kazurayam.webdriverfactory.CacheDirectoryName
 import io.github.bonigarcia.wdm.WebDriverManager
 import org.junit.After
 import org.junit.BeforeClass
@@ -42,8 +42,8 @@ class LaunchedChromeDriverTest {
                 new LaunchedChromeDriver(driver)
         assertNotNull(launched)
         ChromeUserProfile chromeUserProfile =
-                ChromeProfileUtils.findChromeUserProfileByProfileDirectoryName(
-                        new ProfileDirectoryName("Default")
+                ChromeProfileUtils.findChromeUserProfileByCacheDirectoryName(
+                        new CacheDirectoryName("Default")
                 )
         launched.setChromeUserProfile(chromeUserProfile)
                 .setInstruction(ChromeDriverFactory.UserDataAccess.TO_GO)

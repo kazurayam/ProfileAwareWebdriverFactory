@@ -1,6 +1,6 @@
 package com.kazurayam.webdriverfactory.firefox;
 
-import com.kazurayam.webdriverfactory.ProfileDirectoryName;
+import com.kazurayam.webdriverfactory.CacheDirectoryName;
 import com.kazurayam.webdriverfactory.UserProfile;
 import com.kazurayam.webdriverfactory.WebDriverFactoryException;
 
@@ -45,7 +45,7 @@ public abstract class FirefoxDriverFactory {
 
     public abstract LaunchedFirefoxDriver newFirefoxDriver(UserProfile userProfile) throws IOException, WebDriverFactoryException;
 
-    public abstract LaunchedFirefoxDriver newFirefoxDriver(ProfileDirectoryName profileDirectoryName) throws WebDriverFactoryException;
+    public abstract LaunchedFirefoxDriver newFirefoxDriver(CacheDirectoryName cacheDirectoryName) throws WebDriverFactoryException;
 
     public abstract void enableFirefoxDriverLog(Path outputDirectory) throws IOException;
 

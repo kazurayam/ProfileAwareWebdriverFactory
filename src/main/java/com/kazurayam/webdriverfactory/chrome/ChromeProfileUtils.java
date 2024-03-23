@@ -1,6 +1,6 @@
 package com.kazurayam.webdriverfactory.chrome;
 
-import com.kazurayam.webdriverfactory.ProfileDirectoryName;
+import com.kazurayam.webdriverfactory.CacheDirectoryName;
 import com.kazurayam.webdriverfactory.UserProfile;
 import com.kazurayam.webdriverfactory.utils.OSIdentifier;
 import org.slf4j.Logger;
@@ -62,7 +62,7 @@ public final class ChromeProfileUtils {
         List<Path> dirs = Files.list(userDataDir).collect(Collectors.toList());
         for (Path dir : dirs) {
             if (Files.exists(dir.resolve("Preferences"))) {
-                ChromeUserProfile cp = new ChromeUserProfile(userDataDir, new ProfileDirectoryName(dir.getFileName().toString()));
+                ChromeUserProfile cp = new ChromeUserProfile(userDataDir, new CacheDirectoryName(dir.getFileName().toString()));
                 userProfiles.add(cp);
             }
         }
@@ -105,14 +105,19 @@ public final class ChromeProfileUtils {
         return findChromeUserProfile(userDataDir, userProfile) != null;
     }
 
-    public static ChromeUserProfile findChromeUserProfileByProfileDirectoryName(ProfileDirectoryName profileDirectoryName) throws IOException {
-        return findChromeUserProfileByProfileDirectoryName(getDefaultUserDataDir(), profileDirectoryName);
+    public static ChromeUserProfile findChromeUserProfileByCacheDirectoryName(
+            CacheDirectoryName cacheDirectoryName) throws IOException {
+        return findChromeUserProfileByCacheDirectoryName(
+                getDefaultUserDataDir(),
+                cacheDirectoryName);
     }
 
-    public static ChromeUserProfile findChromeUserProfileByProfileDirectoryName(Path userDataDir, ProfileDirectoryName profileDirectoryName) throws IOException {
+    public static ChromeUserProfile findChromeUserProfileByCacheDirectoryName(
+            Path userDataDir,
+            CacheDirectoryName cacheDirectoryName) throws IOException {
         List<ChromeUserProfile> chromeUserProfiles = getChromeUserProfileList(userDataDir);
         for (ChromeUserProfile chromeUserProfile : chromeUserProfiles) {
-            if (chromeUserProfile.getProfileDirectoryName().equals(profileDirectoryName)) {
+            if (chromeUserProfile.getCacheDirectoryName().equals(cacheDirectoryName)) {
                 return chromeUserProfile;
             }
 
@@ -120,14 +125,17 @@ public final class ChromeProfileUtils {
         return null;
     }
 
-    public static UserProfile findUserProfileByProfileDirectoryName(ProfileDirectoryName profileDirectoryName)
+    public static UserProfile findUserProfileByCacheDirectoryName(CacheDirectoryName cacheDirectoryName)
             throws IOException {
-        return findUserProfileByProfileDirectoryName(getDefaultUserDataDir(), profileDirectoryName);
+        return findUserProfileByCacheDirectoryName(getDefaultUserDataDir(), cacheDirectoryName);
     }
 
-    public static UserProfile findUserProfileByProfileDirectoryName(Path userDataDir, ProfileDirectoryName profileDirectoryName)
+    public static UserProfile findUserProfileByCacheDirectoryName(
+            Path userDataDir,
+            CacheDirectoryName cacheDirectoryName)
             throws IOException {
-        return findChromeUserProfileByProfileDirectoryName(userDataDir, profileDirectoryName).getUserProfile();
+        return findChromeUserProfileByCacheDirectoryName(
+                userDataDir, cacheDirectoryName).getUserProfile();
     }
 
     /**

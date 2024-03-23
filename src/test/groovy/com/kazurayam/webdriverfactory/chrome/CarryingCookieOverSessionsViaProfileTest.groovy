@@ -77,7 +77,7 @@ class CarryingCookieOverSessionsViaChromeProfileTest {
         launched.getDriver().quit()   // at .quit(), the Cookies will be stored into disk
 
         // 2nd session
-        launched = factory.newChromeDriver(new UserProfile("Picasso"),  // or new ProfileDirectoryName("Profile 6")
+        launched = factory.newChromeDriver(new UserProfile("Picasso"),  // or new CacheDirectoryName("Profile 6")
                 ChromeDriverFactory.UserDataAccess.TO_GO)  // the Cookies file will be copied into the temp dir
         Cookie timestamp2 = observeCookie(launched)
         launched.getDriver().quit()

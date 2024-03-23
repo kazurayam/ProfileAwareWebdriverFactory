@@ -5,7 +5,7 @@ import com.kazurayam.webdriverfactory.chrome.ChromeDriverFactory
 import com.kazurayam.webdriverfactory.chrome.ChromeOptionsModifiers
 import com.kazurayam.webdriverfactory.chrome.ChromeUserProfile
 import com.kazurayam.webdriverfactory.chrome.LaunchedChromeDriver
-import com.kazurayam.webdriverfactory.ProfileDirectoryName
+import com.kazurayam.webdriverfactory.CacheDirectoryName
 import io.github.bonigarcia.wdm.WebDriverManager
 import org.junit.After
 import org.junit.Before
@@ -22,7 +22,7 @@ class PrintWebDriverMetadata {
     void test_printUserProfile() {
         ChromeDriverFactory factory = ChromeDriverFactory.newChromeDriverFactory()
         factory.addChromeOptionsModifier(ChromeOptionsModifiers.incognito())
-        launched = factory.newChromeDriver(new ProfileDirectoryName("Default"),
+        launched = factory.newChromeDriver(new CacheDirectoryName("Default"),
                 ChromeDriverFactory.UserDataAccess.TO_GO)
         assertTrue(launched.getChromeUserProfile().isPresent())
         assertTrue(launched.getInstruction().isPresent())

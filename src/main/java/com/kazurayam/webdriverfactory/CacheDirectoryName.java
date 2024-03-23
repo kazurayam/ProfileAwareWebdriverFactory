@@ -1,7 +1,7 @@
 package com.kazurayam.webdriverfactory;
 
-public class ProfileDirectoryName implements Comparable<ProfileDirectoryName> {
-    public ProfileDirectoryName(String name) {
+public class CacheDirectoryName implements Comparable<CacheDirectoryName> {
+    public CacheDirectoryName(String name) {
         this.name = name;
     }
 
@@ -16,11 +16,11 @@ public class ProfileDirectoryName implements Comparable<ProfileDirectoryName> {
 
     @Override
     public boolean equals(Object obj) {
-        if (! (obj instanceof ProfileDirectoryName)) {
+        if (! (obj instanceof CacheDirectoryName)) {
             return false;
         }
 
-        ProfileDirectoryName other = (ProfileDirectoryName) obj;
+        CacheDirectoryName other = (CacheDirectoryName) obj;
         return this.getName().equals(other.getName());
     }
 
@@ -30,7 +30,7 @@ public class ProfileDirectoryName implements Comparable<ProfileDirectoryName> {
     }
 
     @Override
-    public int compareTo(ProfileDirectoryName other) {
+    public int compareTo(CacheDirectoryName other) {
         return this.getName().compareTo(other.getName());
     }
 
