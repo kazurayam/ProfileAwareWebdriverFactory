@@ -1,6 +1,6 @@
 package com.kazurayam.webdriverfactory.chrome
 
-import com.kazurayam.webdriverfactory.ProfileDirectoryName
+import com.kazurayam.webdriverfactory.CacheDirectoryName
 import com.kazurayam.webdriverfactory.UserProfile
 
 import java.nio.file.Files
@@ -50,8 +50,8 @@ class ChromeProfileUtilsTest {
 	@Test
 	void test_getChromeProfileNameByDirectoryName() {
 		String profileName =
-				ChromeProfileUtils.findUserProfileByProfileDirectoryName(
-						new ProfileDirectoryName('Default'))
+				ChromeProfileUtils.findUserProfileByCacheDirectoryName(
+						new CacheDirectoryName('Default'))
 		assertNotNull(profileName)
 		//println("DirectoryName \'Default\' is associated with the Profile \'${profileName}\'")
 	}

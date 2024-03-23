@@ -1,6 +1,6 @@
 package com.kazurayam.webdriverfactory.firefox;
 
-import com.kazurayam.webdriverfactory.ProfileDirectoryName;
+import com.kazurayam.webdriverfactory.CacheDirectoryName;
 import com.kazurayam.webdriverfactory.UserProfile;
 import com.kazurayam.webdriverfactory.WebDriverFactoryException;
 import org.openqa.selenium.InvalidArgumentException;
@@ -128,18 +128,18 @@ public class FirefoxDriverFactoryImpl extends FirefoxDriverFactory {
         Optional<FirefoxUserProfile> opt = FirefoxProfileUtils.findFirefoxUserProfileOf(userProfile);
         assert opt.isPresent();
         FirefoxUserProfile firefoxUserProfile = opt.get();
-        ProfileDirectoryName profileDirectoryName = firefoxUserProfile.getProfileDirectoryName();
+        CacheDirectoryName cacheDirectoryName = firefoxUserProfile.getCacheDirectoryName();
         Path userDataDir = FirefoxProfileUtils.getDefaultUserDataDir();
-        return launchFirefox(userDataDir, profileDirectoryName);
+        return launchFirefox(userDataDir, cacheDirectoryName);
     }
 
     @Override
-    public LaunchedFirefoxDriver newFirefoxDriver(ProfileDirectoryName profileDirectoryName)
+    public LaunchedFirefoxDriver newFirefoxDriver(CacheDirectoryName cacheDirectoryName)
             throws WebDriverFactoryException
     {
-        Objects.requireNonNull(profileDirectoryName, "profileDirectoryName must not be null");
+        Objects.requireNonNull(cacheDirectoryName, "cacheDirectoryName must not be null");
         Path userDataDir = FirefoxProfileUtils.getDefaultUserDataDir();
-        return launchFirefox(userDataDir, profileDirectoryName);
+        return launchFirefox(userDataDir, cacheDirectoryName);
     }
 
     @Override
@@ -155,21 +155,23 @@ public class FirefoxDriverFactoryImpl extends FirefoxDriverFactory {
     /**
      * Launch a Firefox browser.
      */
-    private LaunchedFirefoxDriver launchFirefox(final Path userDataDir, final ProfileDirectoryName profileDirectoryName)
+    private LaunchedFirefoxDriver launchFirefox(
+            final Path userDataDir,
+            final CacheDirectoryName cacheDirectoryName)
             throws WebDriverFactoryException
     {
         Objects.requireNonNull(userDataDir);
-        Objects.requireNonNull(profileDirectoryName);
+        Objects.requireNonNull(cacheDirectoryName);
         if (!Files.exists(userDataDir)) {
             throw new IllegalArgumentException(String.valueOf(userDataDir) + " is not present");
         }
 
-        Path sourceProfileDirectory = userDataDir.resolve(profileDirectoryName.toString());
+        Path sourceProfileDirectory = userDataDir.resolve(cacheDirectoryName.toString());
         assert Files.exists(sourceProfileDirectory);
         final Path targetUserDataDir = userDataDir;
 
         // use the specified UserProfile to launch Firefox browser
-        this.addFirefoxOptionsModifier(FirefoxOptionsModifiers.withProfileDirectoryName(userDataDir, profileDirectoryName));
+        this.addFirefoxOptionsModifier(FirefoxOptionsModifiers.withCacheDirectoryName(userDataDir, cacheDirectoryName));
 
         // launch the Firefox driver
         FirefoxDriver driver = null;
@@ -177,7 +179,7 @@ public class FirefoxDriverFactoryImpl extends FirefoxDriverFactory {
             FirefoxOptions options = buildOptions(this.firefoxPreferencesModifiers, this.firefoxOptionsModifiers);
             driver = new FirefoxDriver(options);
             setPageLoadTimeout(driver, this.pageLoadTimeoutSeconds);
-            LaunchedFirefoxDriver launched = new LaunchedFirefoxDriver(driver).setFirefoxUserProfile(new FirefoxUserProfile(targetUserDataDir, profileDirectoryName)).setEmployedOptions(options);
+            LaunchedFirefoxDriver launched = new LaunchedFirefoxDriver(driver).setFirefoxUserProfile(new FirefoxUserProfile(targetUserDataDir, cacheDirectoryName)).setEmployedOptions(options);
             return launched;
         } catch (InvalidArgumentException iae) {
             if (driver != null) {
@@ -187,7 +189,7 @@ public class FirefoxDriverFactoryImpl extends FirefoxDriverFactory {
 
             StringBuilder sb = new StringBuilder();
             sb.append("targetUserDataDir=\"" + String.valueOf(targetUserDataDir) + "\"\n");
-            sb.append("profileDirectoryName=\"" + String.valueOf(profileDirectoryName) + "\"\n");
+            sb.append("cacheDirectoryName=\"" + String.valueOf(cacheDirectoryName) + "\"\n");
             sb.append("org.openqa.selenium.InvalidArgumentException was thrown.\n");
             sb.append("Exception message:\n\n");
             sb.append(iae.getMessage());

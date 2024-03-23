@@ -3,7 +3,7 @@ package examples
 import com.kazurayam.webdriverfactory.UserProfile
 import com.kazurayam.webdriverfactory.chrome.ChromeDriverFactory
 import com.kazurayam.webdriverfactory.chrome.LaunchedChromeDriver
-import com.kazurayam.webdriverfactory.ProfileDirectoryName
+import com.kazurayam.webdriverfactory.CacheDirectoryName
 import io.github.bonigarcia.wdm.WebDriverManager
 import org.junit.After
 import org.junit.Before
@@ -25,10 +25,10 @@ class HowCookiesAreDigested {
     }
 
     @Test
-    void test_launch_browser_with_profiledirectoryname_TO_GO() {
+    void test_launch_browser_withCacheDirectoryName_TO_GO() {
         ChromeDriverFactory factory = ChromeDriverFactory.newChromeDriverFactory()
         launched = factory.newChromeDriver(
-                new ProfileDirectoryName("Default"),
+                new CacheDirectoryName("Default"),
                 ChromeDriverFactory.UserDataAccess.TO_GO)
         launched.getDriver().navigate().to("https://mail.google.com/mail/u/0/#inbox")
         Thread.sleep(1000)

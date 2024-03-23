@@ -1,6 +1,6 @@
 package com.kazurayam.webdriverfactory.chrome;
 
-import com.kazurayam.webdriverfactory.ProfileDirectoryName;
+import com.kazurayam.webdriverfactory.CacheDirectoryName;
 import com.kazurayam.webdriverfactory.UserProfile;
 import com.kazurayam.webdriverfactory.WebDriverFactoryException;
 import com.kazurayam.webdriverfactory.utils.PathUtils;
@@ -169,27 +169,31 @@ public class ChromeDriverFactoryImpl extends ChromeDriverFactory {
 		}
 
 		Path userDataDir = ChromeProfileUtils.getDefaultUserDataDir();
-		ProfileDirectoryName profileDirectoryName = chromeUserProfile.getProfileDirectoryName();
-		return launchChrome(userDataDir, profileDirectoryName, instruction);
+		CacheDirectoryName cacheDirectoryName = chromeUserProfile.getCacheDirectoryName();
+		return launchChrome(userDataDir, cacheDirectoryName, instruction);
 	}
 
 	@Override
-	public LaunchedChromeDriver newChromeDriver(ProfileDirectoryName profileDirectoryName)
+	public LaunchedChromeDriver newChromeDriver(CacheDirectoryName cacheDirectoryName)
 			throws IOException, WebDriverFactoryException {
-		return this.newChromeDriver(profileDirectoryName, UserDataAccess.TO_GO);
+		return this.newChromeDriver(cacheDirectoryName, UserDataAccess.TO_GO);
 	}
 
 	/**
-	 * @param profileDirectoryName e.g. "Default", "Profile 1", "Profile 2"
+	 * @param cacheDirectoryName e.g. "Default", "Profile 1", "Profile 2"
 	 * @param instruction   FOR_HERE or TO_GO
 	 */
 	@Override
-	public LaunchedChromeDriver newChromeDriver(ProfileDirectoryName profileDirectoryName, UserDataAccess instruction)
+	public LaunchedChromeDriver newChromeDriver(
+			CacheDirectoryName cacheDirectoryName,
+			UserDataAccess instruction)
 			throws IOException, WebDriverFactoryException {
-		Objects.requireNonNull(profileDirectoryName, "profileDirectoryName must not be null");
-		Objects.requireNonNull(instruction, "instruction must not be null");
+		Objects.requireNonNull(cacheDirectoryName,
+				"cacheDirectoryName must not be null");
+		Objects.requireNonNull(instruction,
+				"instruction must not be null");
 		Path userDataDir = ChromeProfileUtils.getDefaultUserDataDir();
-		return launchChrome(userDataDir, profileDirectoryName, instruction);
+		return launchChrome(userDataDir, cacheDirectoryName, instruction);
 	}
 
 	@Override
@@ -205,31 +209,34 @@ public class ChromeDriverFactoryImpl extends ChromeDriverFactory {
 	/**
 	 * Launch a Chrome browser.
 	 * If the instruction is UserDataAccess.FOR_HERE, will launch a Chrome with the profile directory
-	 * under the userDataDir with the profileDirectoryName.
+	 * under the userDataDir with the cacheDirectoryName.
 	 * Else (the instruction is UserDataAccess.TO_GO), will allocate a temporary directory
-	 * under which a directory with the profileDirectoryName is created, and into which
+	 * under which a directory with the cacheDirectoryName is created, and into which
 	 * the contents of the genuine profile are copied; then a Chrome is launched with the
 	 * profileDirectory
 	 *
 	 * @param userDataDir
-	 * @param profileDirectoryName
+	 * @param cacheDirectoryName
 	 * @param instruction
 	 * @return
 	 */
-	private LaunchedChromeDriver launchChrome(final Path userDataDir, final ProfileDirectoryName profileDirectoryName, UserDataAccess instruction) throws IOException, WebDriverFactoryException {
+	private LaunchedChromeDriver launchChrome(final Path userDataDir,
+											  final CacheDirectoryName cacheDirectoryName,
+											  UserDataAccess instruction)
+			throws IOException, WebDriverFactoryException {
 		Objects.requireNonNull(userDataDir);
-		Objects.requireNonNull(profileDirectoryName);
+		Objects.requireNonNull(cacheDirectoryName);
 		Objects.requireNonNull(instruction);
 		if (!Files.exists(userDataDir)) {
 			throw new IllegalArgumentException(String.format("%s is not present", userDataDir));
 		}
 
-		final Path sourceProfileDirectory = userDataDir.resolve(profileDirectoryName.toString());
+		final Path sourceProfileDirectory = userDataDir.resolve(cacheDirectoryName.toString());
 		assert Files.exists(sourceProfileDirectory);
 		Path targetUserDataDir = userDataDir;
 		if (instruction.equals(UserDataAccess.TO_GO)) {
 			targetUserDataDir = Files.createTempDirectory("__user-data-dir__");
-			final Path targetProfileDirectory = targetUserDataDir.resolve(profileDirectoryName.getName());
+			final Path targetProfileDirectory = targetUserDataDir.resolve(cacheDirectoryName.getName());
 			PathUtils.copyDirectoryRecursively(sourceProfileDirectory, targetProfileDirectory);
 			logger_.info(String.format("copied %d files from %s into %s",
 					PathUtils.listDirectoryRecursively(targetProfileDirectory).size(),
@@ -240,8 +247,8 @@ public class ChromeDriverFactoryImpl extends ChromeDriverFactory {
 
 		// use the specified UserProfile with which Chrome browser is launched
 		this.addChromeOptionsModifier(
-				ChromeOptionsModifiers.withProfileDirectoryName(
-						targetUserDataDir, profileDirectoryName)
+				ChromeOptionsModifiers.withCacheDirectoryName(
+						targetUserDataDir, cacheDirectoryName)
 		);
 
 		// launch the Chrome driver
@@ -251,7 +258,7 @@ public class ChromeDriverFactoryImpl extends ChromeDriverFactory {
 			driver = new ChromeDriver(options);
 			setPageLoadTimeout(driver, this.pageLoadTimeoutSeconds);
 			return new LaunchedChromeDriver(driver)
-					.setChromeUserProfile(new ChromeUserProfile(targetUserDataDir, profileDirectoryName))
+					.setChromeUserProfile(new ChromeUserProfile(targetUserDataDir, cacheDirectoryName))
 					.setInstruction(instruction).setEmployedOptions(options);
 		} catch (InvalidArgumentException iae) {
 			if (driver != null) {
@@ -260,7 +267,7 @@ public class ChromeDriverFactoryImpl extends ChromeDriverFactory {
 			}
 			StringBuilder sb = new StringBuilder();
 			sb.append(String.format("targetUserDataDir=\"%s\"\n", targetUserDataDir));
-			sb.append(String.format("profileDirectoryName=\"%s\"\n", profileDirectoryName));
+			sb.append(String.format("cacheDirectoryName=\"%s\"\n", cacheDirectoryName));
 			sb.append("org.openqa.selenium.InvalidArgumentException was thrown.\n");
 			sb.append("Exception message:\n\n");
 			sb.append(iae.getMessage());

@@ -1,6 +1,6 @@
 package com.kazurayam.webdriverfactory.firefox;
 
-import com.kazurayam.webdriverfactory.ProfileDirectoryName;
+import com.kazurayam.webdriverfactory.CacheDirectoryName;
 import com.kazurayam.webdriverfactory.UserProfile;
 import com.kazurayam.webdriverfactory.utils.OSIdentifier;
 
@@ -13,7 +13,6 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 public class FirefoxProfileUtils {
@@ -39,7 +38,7 @@ public class FirefoxProfileUtils {
         List<FirefoxUserProfile> list = getFirefoxUserProfileList();
         // println "list.size is ${list.size()}"
         for (FirefoxUserProfile fup : list) {
-            if (fup.getProfileDirectoryName().getName().endsWith(userProfile.getName())) {
+            if (fup.getCacheDirectoryName().getName().endsWith(userProfile.getName())) {
                 return Optional.of(fup);
             }
         }
@@ -80,7 +79,7 @@ public class FirefoxProfileUtils {
         for (Path dir : dirs) {
             String dirName = dir.getFileName().toString();
             FirefoxUserProfile fup = new FirefoxUserProfile(userDataDir,
-                    new ProfileDirectoryName(dirName));
+                    new CacheDirectoryName(dirName));
             userProfiles.add(fup);
         }
 

@@ -1,6 +1,6 @@
 package com.kazurayam.webdriverfactory.chrome
 
-import com.kazurayam.webdriverfactory.ProfileDirectoryName
+import com.kazurayam.webdriverfactory.CacheDirectoryName
 import org.junit.Before
 import org.junit.Test
 import org.openqa.selenium.chrome.ChromeOptions
@@ -93,13 +93,13 @@ class ChromeOptionsModifiersTest {
     }
 
     @Test
-    void test_withProfileDirectoryName() {
+    void test_withCacheDirectoryName() {
         Path userDataDir = ChromeProfileUtils.getDefaultUserDataDir()
-        ProfileDirectoryName profileDirectoryName = new ProfileDirectoryName("Default")
+        CacheDirectoryName cacheDirectoryName = new CacheDirectoryName("Default")
         ChromeOptions modified =
-                ChromeOptionsModifiers.withProfileDirectoryName(userDataDir, profileDirectoryName)
+                ChromeOptionsModifiers.withCacheDirectoryName(userDataDir, cacheDirectoryName)
                         .modify(options)
-        verifyContainsArgument(/**/modified, 'Default')
+        verifyContainsArgument(modified, 'Default')
     }
 
     /**

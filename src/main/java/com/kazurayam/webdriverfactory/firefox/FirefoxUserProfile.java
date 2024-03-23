@@ -2,7 +2,7 @@ package com.kazurayam.webdriverfactory.firefox;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.kazurayam.webdriverfactory.ProfileDirectoryName;
+import com.kazurayam.webdriverfactory.CacheDirectoryName;
 import com.kazurayam.webdriverfactory.UserProfile;
 
 import java.nio.file.Files;
@@ -10,23 +10,23 @@ import java.nio.file.Path;
 import java.util.Objects;
 
 public class FirefoxUserProfile implements Comparable<FirefoxUserProfile> {
-    public FirefoxUserProfile(final Path userDataDir, ProfileDirectoryName profileDirectoryName) {
+    public FirefoxUserProfile(final Path userDataDir, CacheDirectoryName cacheDirectoryName) {
         Objects.requireNonNull(userDataDir);
-        Objects.requireNonNull(profileDirectoryName);
+        Objects.requireNonNull(cacheDirectoryName);
         if (!Files.exists(userDataDir)) {
             throw new IllegalArgumentException(String.valueOf(userDataDir) + " is not found");
         }
 
-        final Path profilePath = userDataDir.resolve(profileDirectoryName.toString());
+        final Path profilePath = userDataDir.resolve(cacheDirectoryName.toString());
         if (!Files.exists(profilePath)) {
             throw new IllegalArgumentException(String.valueOf(profilePath) + " is not found");
         }
 
         this.userDataDir = userDataDir;
-        this.profileDirectoryName = profileDirectoryName;
+        this.cacheDirectoryName = cacheDirectoryName;
 
         // dir name "0iyozca2.kazurayam" => profile name "kazurayam"
-        String name = profileDirectoryName.toString().substring(profileDirectoryName.toString().indexOf(".") + 1);
+        String name = cacheDirectoryName.toString().substring(cacheDirectoryName.toString().indexOf(".") + 1);
         this.userProfile = new UserProfile(name);
         assert this.userProfile != null;
     }
@@ -35,12 +35,12 @@ public class FirefoxUserProfile implements Comparable<FirefoxUserProfile> {
         return this.userDataDir;
     }
 
-    public ProfileDirectoryName getProfileDirectoryName() {
-        return this.profileDirectoryName;
+    public CacheDirectoryName getCacheDirectoryName() {
+        return this.cacheDirectoryName;
     }
 
     public Path getProfileDirectory() {
-        return this.getUserDataDir().resolve(this.getProfileDirectoryName().getName());
+        return this.getUserDataDir().resolve(this.getCacheDirectoryName().getName());
     }
 
     public UserProfile getUserProfile() {
@@ -58,14 +58,14 @@ public class FirefoxUserProfile implements Comparable<FirefoxUserProfile> {
             return false;
         }
         FirefoxUserProfile other = (FirefoxUserProfile) obj;
-        return this.getUserDataDir().equals(other.getUserDataDir()) && this.getProfileDirectoryName().equals(other.getProfileDirectoryName());
+        return this.getUserDataDir().equals(other.getUserDataDir()) && this.getCacheDirectoryName().equals(other.getCacheDirectoryName());
     }
 
     @Override
     public int hashCode() {
         int hash = 7;
         hash = 31 * hash + (int) this.getUserDataDir().hashCode();
-        hash = 31 * hash + (int) this.getProfileDirectoryName().hashCode();
+        hash = 31 * hash + (int) this.getCacheDirectoryName().hashCode();
         return hash;
     }
 
@@ -82,8 +82,8 @@ public class FirefoxUserProfile implements Comparable<FirefoxUserProfile> {
         sb.append(this.getUserDataDir().toString());
         sb.append("\"");
         sb.append(",");
-        sb.append("\"profileDirectoryName\":\"");
-        sb.append(this.getProfileDirectoryName());
+        sb.append("\"cacheDirectoryName\":\"");
+        sb.append(this.getCacheDirectoryName());
         sb.append("\"");
         sb.append("}");
         //
@@ -93,6 +93,6 @@ public class FirefoxUserProfile implements Comparable<FirefoxUserProfile> {
 
     private static final String COOKIE_FILE_NAME = "cookies.sqlite";
     private final Path userDataDir;
-    private final ProfileDirectoryName profileDirectoryName;
+    private final CacheDirectoryName cacheDirectoryName;
     private UserProfile userProfile;
 }

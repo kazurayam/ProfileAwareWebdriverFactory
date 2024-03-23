@@ -1,6 +1,6 @@
 package com.kazurayam.webdriverfactory.firefox;
 
-import com.kazurayam.webdriverfactory.ProfileDirectoryName;
+import com.kazurayam.webdriverfactory.CacheDirectoryName;
 import org.openqa.selenium.firefox.FirefoxOptions;
 import org.openqa.selenium.firefox.FirefoxProfile;
 import org.openqa.selenium.firefox.ProfilesIni;
@@ -19,7 +19,7 @@ public class FirefoxOptionsModifiers {
         windowSize,
         windowSize1024x768,
         withProfile,
-        withProfileDirectoryName,
+        withCacheDirectoryName,
     }
 
     public static FirefoxOptionsModifier headless() {
@@ -75,26 +75,26 @@ public class FirefoxOptionsModifiers {
         return new Base(Type.withProfile, modifier, arguments);
     }
 
-    public static FirefoxOptionsModifier withProfileDirectoryName(
+    public static FirefoxOptionsModifier withCacheDirectoryName(
             final Path userDataDir,
-            final ProfileDirectoryName profileDirectoryName)
+            final CacheDirectoryName cacheDirectoryName)
     {
         Objects.requireNonNull(userDataDir);
-        Objects.requireNonNull(profileDirectoryName);
-        List<Object> arguments = Arrays.asList(userDataDir, profileDirectoryName);
+        Objects.requireNonNull(cacheDirectoryName);
+        List<Object> arguments = Arrays.asList(userDataDir, cacheDirectoryName);
         BiFunction<FirefoxOptions, List<Object>, FirefoxOptions> modifier = (opts, args) -> {
             assert args.size() >= 2;
             assert args.get(0) instanceof Path;
-            assert args.get(1) instanceof ProfileDirectoryName;
+            assert args.get(1) instanceof CacheDirectoryName;
             Path udd = (Path)args.get(0);
-            ProfileDirectoryName pdn = (ProfileDirectoryName)args.get(1);
+            CacheDirectoryName pdn = (CacheDirectoryName)args.get(1);
             Path profileDir = udd.resolve(pdn.getName());
             // http://kb.mozillazine.org/Command_line_arguments
             FirefoxProfile profile = new FirefoxProfile(profileDir.toFile());
             opts.setProfile(profile);
             return opts;
         };
-        return new Base(Type.withProfileDirectoryName, modifier, arguments);
+        return new Base(Type.withCacheDirectoryName, modifier, arguments);
     }
 
     /**
