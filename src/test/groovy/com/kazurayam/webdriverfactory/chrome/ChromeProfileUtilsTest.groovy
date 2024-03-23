@@ -25,7 +25,7 @@ class ChromeProfileUtilsTest {
 	}
 
 	@Test
-	void test_getUserProfiles() {
+	void test_getUserProfileList() {
 		List<ChromeUserProfile> userProfiles = ChromeProfileUtils.getChromeUserProfileList()
 		assertTrue(userProfiles.size() > 0)
 	}
@@ -41,9 +41,9 @@ class ChromeProfileUtilsTest {
 	 * This test requires you to have a custom profile 'Picasso' defined in your Google Chrome browser
 	 */
 	@Test
-	void test_getUserProfile() {
+	void test_findChromeUserProfile() {
 		ChromeUserProfile userProfile = ChromeProfileUtils.findChromeUserProfile(new UserProfile('Picasso'))
-		assertNotNull(userProfile)
+		assertNotNull("ChromeProfileUtils.findChromeUserProfile() returned null", userProfile)
 		assertEquals(userProfile.getUserProfile(), new UserProfile('Picasso'))
 	}
 

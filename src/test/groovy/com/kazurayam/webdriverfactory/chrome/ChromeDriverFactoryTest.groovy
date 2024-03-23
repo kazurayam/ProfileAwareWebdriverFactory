@@ -83,6 +83,7 @@ class ChromeDriverFactoryTest {
 		//
 		launched = cdFactory.newChromeDriver()
 		assertNotNull(launched)
+		//println "raw: " + launched.getEmployedOptionsAsJSON()
 		launched.getEmployedOptionsAsJSON().ifPresent({ json ->
 			println("options is\n${json}")
 		})

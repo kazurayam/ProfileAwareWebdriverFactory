@@ -22,17 +22,25 @@ public final class ChromeProfileUtils {
 
     public static Path getDefaultUserDataDir() {
         if (OSIdentifier.isWindows()) {
-            // It is important that this chromeProfilesPath ends with User Data and not with the profile folder
-            // %HOME%\AppData\Local\Google\Chrome\User Data
-            return Paths.get("C:", "Users", System.getProperty("user.name"), "AppData", "Local", "Google", "Chrome", "User Data");
+            // It is important that this chromeProfilesPath ends with User Data
+            // and not with the profile folder.
+            // e.g., "%HOME%\AppData\Local\Google\Chrome\User Data"
+            return Paths.get("C:", "Users",
+                    System.getProperty("user.name"), "AppData", "Local", "Google", "Chrome",
+                    "User Data");
         } else if (OSIdentifier.isMac()) {
             // ~/Library/Application Support/Google/Chrome
-            return Paths.get(System.getProperty("user.home")).resolve("Library").resolve("Application Support").resolve("Google").resolve("Chrome");
+            return Paths.get(System.getProperty("user.home")).resolve("Library")
+                    .resolve("Application Support")
+                    .resolve("Google")
+                    .resolve("Chrome");
         } else if (OSIdentifier.isUnix()) {
             // ~/.config/google-chrome
-            return Paths.get(System.getProperty("user.home")).resolve(".config").resolve("google-chrome");
+            return Paths.get(System.getProperty("user.home")).resolve(".config")
+                    .resolve("google-chrome");
         } else {
-            throw new IllegalStateException("Windows, Mac, Linux are supported. Other platforms are not supported.");
+            throw new IllegalStateException(
+                    "Windows, Mac, Linux are supported. Other platforms are not supported.");
         }
 
     }
@@ -60,6 +68,7 @@ public final class ChromeProfileUtils {
         }
         return userProfiles;
     }
+
 
     public static ChromeUserProfile findChromeUserProfile(UserProfile userProfile)
             throws IOException
@@ -108,7 +117,6 @@ public final class ChromeProfileUtils {
             }
 
         }
-
         return null;
     }
 

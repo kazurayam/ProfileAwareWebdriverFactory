@@ -28,6 +28,7 @@ ext {
     junitVersion = '4.12'
     subprocessjVersion = '0.3.3'
     gsonVersion = '2.10.1'
+    jacksonVersion = '2.14.0'
     jcommanderVersion = '1.82'
 }
 
@@ -40,6 +41,7 @@ dependencies {
     implementation "org.slf4j:slf4j-api:${slf4jVersion}"
     implementation group: 'org.seleniumhq.selenium', name: 'selenium-java', version: "${selenium3Version}"
     implementation group: 'com.google.code.gson', name: 'gson', version: "${gsonVersion}"
+    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: "${jacksonVersion}"
     implementation group: 'com.beust', name: 'jcommander', version: "${jcommanderVersion}"
 
     testImplementation group: 'org.slf4j', name: 'slf4j-simple', version: "${slf4jVersion}"
@@ -60,12 +62,15 @@ test {
     finalizedBy jacocoTestReport
 }
 
-task testFailed(type: Test) {
+task runFailedTests(type: Test) {
     include '**/CarryingCookieOverSessionsViaChromeProfileTest*'
+    include '**/ChromeDriverFactoryImplTest*'
     include '**/ChromeDriverFactoryTest*'
-    //include '**/ChromeOptionsTest*'
+    include '**/ChromeProfileUtilsTest*'
     include '**/LaunchedChromeDriverTest*'
-    //include '**/PrintEmployedOptions*'
+    include '**/LaunchChromeWithProfileDirectory*'
+    include '**/LaunchChromeWithUserProfile*'
+    include '**/PrintEmployedOptions*'
 }
 
 application {
