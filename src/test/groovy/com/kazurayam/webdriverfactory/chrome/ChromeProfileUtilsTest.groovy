@@ -2,6 +2,9 @@ package com.kazurayam.webdriverfactory.chrome
 
 import com.kazurayam.webdriverfactory.CacheDirectoryName
 import com.kazurayam.webdriverfactory.UserProfile
+import org.junit.Test
+import org.junit.runner.RunWith
+import org.junit.runners.JUnit4
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
@@ -9,10 +12,6 @@ import java.nio.file.Files
 import java.nio.file.Path
 
 import static org.junit.Assert.*
-
-import org.junit.Test
-import org.junit.runner.RunWith
-import org.junit.runners.JUnit4
 
 @RunWith(JUnit4.class)
 class ChromeProfileUtilsTest {

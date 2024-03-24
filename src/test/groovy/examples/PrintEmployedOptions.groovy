@@ -17,9 +17,10 @@ class PrintEmployedOptions {
 
     @Test
     void test_getEmployedOptions() {
-        ChromeDriverFactory factory = ChromeDriverFactory.newHeadlessChromeDriverFactory()
-        factory.addChromeOptionsModifier(ChromeOptionsModifiers.incognito())
-        launched = factory.newChromeDriver()
+        ChromeDriverFactory cdf = ChromeDriverFactory.newHeadlessChromeDriverFactory()
+        cdf.addChromeOptionsModifier(ChromeOptionsModifiers.headless())
+        cdf.addChromeOptionsModifier(ChromeOptionsModifiers.incognito())
+        launched = cdf.newChromeDriver()
         launched.getEmployedOptions().ifPresent { ChromeOptions options ->
             println options
         }

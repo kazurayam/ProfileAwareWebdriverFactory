@@ -9,7 +9,7 @@ import static org.junit.Assert.assertEquals
 /**
  * https://rennnosukesann.hatenablog.com/entry/2018/06/25/000000
  */
-class JacksonObjectMapperTest {
+class JacksonTest {
 
     private str = '''
 {

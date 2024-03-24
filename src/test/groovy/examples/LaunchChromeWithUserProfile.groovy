@@ -2,6 +2,7 @@ package examples
 
 import com.kazurayam.webdriverfactory.UserProfile
 import com.kazurayam.webdriverfactory.chrome.ChromeDriverFactory
+import com.kazurayam.webdriverfactory.chrome.ChromeOptionsModifiers
 import com.kazurayam.webdriverfactory.chrome.LaunchedChromeDriver
 import io.github.bonigarcia.wdm.WebDriverManager
 import org.junit.After
@@ -16,16 +17,18 @@ class LaunchChromeWithUserProfile {
 
     @Test
     void test_launch_browser_with_profile() {
-        ChromeDriverFactory factory = ChromeDriverFactory.newChromeDriverFactory()
-        launched = factory.newChromeDriver(new UserProfile("Picasso"))
+        ChromeDriverFactory cdf = ChromeDriverFactory.newChromeDriverFactory()
+        cdf.addChromeOptionsModifier(ChromeOptionsModifiers.headless())
+        launched = cdf.newChromeDriver(new UserProfile("Picasso"))
         launched.getDriver().navigate().to("http://example.com")
         Thread.sleep(1000)
     }
 
     @Test
     void test_launch_browser_with_profile_TO_GO() {
-        ChromeDriverFactory factory = ChromeDriverFactory.newChromeDriverFactory()
-        launched = factory.newChromeDriver(
+        ChromeDriverFactory cdf = ChromeDriverFactory.newChromeDriverFactory()
+        cdf.addChromeOptionsModifier(ChromeOptionsModifiers.headless())
+        launched = cdf.newChromeDriver(
                 new UserProfile("Picasso"),
                 ChromeDriverFactory.UserDataAccess.TO_GO)
         launched.getDriver().navigate().to("http://example.com")
@@ -35,8 +38,9 @@ class LaunchChromeWithUserProfile {
     @Ignore
     @Test
     void test_launch_browser_with_profile_FOR_HERE() {
-        ChromeDriverFactory factory = ChromeDriverFactory.newChromeDriverFactory()
-        launched = factory.newChromeDriver(
+        ChromeDriverFactory cdf = ChromeDriverFactory.newChromeDriverFactory()
+        cdf.addChromeOptionsModifier(ChromeOptionsModifiers.headless())
+        launched = cdf.newChromeDriver(
                 new UserProfile("Picasso"),
                 ChromeDriverFactory.UserDataAccess.FOR_HERE)
         launched.getDriver().navigate().to("http://example.com")

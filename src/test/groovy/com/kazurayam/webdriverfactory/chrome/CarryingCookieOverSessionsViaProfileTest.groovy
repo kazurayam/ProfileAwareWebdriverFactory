@@ -67,17 +67,18 @@ class CarryingCookieOverSessionsViaChromeProfileTest {
     @Test
     void test_carrying_cookie_over_sessions_via_profile() {
         //ChromeDriverFactory factory = ChromeDriverFactory.newHeadlessChromeDriverFactory()
-        ChromeDriverFactory factory = ChromeDriverFactory.newChromeDriverFactory()
+        ChromeDriverFactory cdf = ChromeDriverFactory.newChromeDriverFactory()
+        cdf.addChromeOptionsModifier(ChromeOptionsModifiers.headless())
         LaunchedChromeDriver launched
 
         // 1st session
-        launched = factory.newChromeDriver(new UserProfile("Picasso"),
+        launched = cdf.newChromeDriver(new UserProfile("Picasso"),
                 ChromeDriverFactory.UserDataAccess.FOR_HERE)
         Cookie timestamp1 = observeCookie(launched)
         launched.getDriver().quit()   // at .quit(), the Cookies will be stored into disk
 
         // 2nd session
-        launched = factory.newChromeDriver(new UserProfile("Picasso"),  // or new CacheDirectoryName("Profile 6")
+        launched = cdf.newChromeDriver(new UserProfile("Picasso"),  // or new CacheDirectoryName("Profile 6")
                 ChromeDriverFactory.UserDataAccess.TO_GO)  // the Cookies file will be copied into the temp dir
         Cookie timestamp2 = observeCookie(launched)
         launched.getDriver().quit()

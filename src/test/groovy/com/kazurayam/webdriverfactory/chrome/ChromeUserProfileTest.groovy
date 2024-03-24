@@ -1,15 +1,15 @@
 package com.kazurayam.webdriverfactory.chrome
 
 import com.kazurayam.webdriverfactory.CacheDirectoryName
+import com.kazurayam.webdriverfactory.UserProfile
 import groovy.json.JsonSlurper
-
-import static org.junit.Assert.*
-
-import java.nio.file.Path
-
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
+
+import java.nio.file.Path
+
+import static org.junit.Assert.*
 
 /**
  * @author kazurayam
@@ -63,10 +63,13 @@ class ChromeUserProfileTest {
 	@Test
 	void test_getPreferences() {
 		Path userDataDir = ChromeProfileUtils.getDefaultUserDataDir()
-		LocalState localState = new LocalState(userDataDir, LocalState.LOCAL_STATE_FILENAME);
-		String cacheName = localState.lookupCacheNameOf("Picasso")
+		Path localStateFile = userDataDir.resolve(LocalState.LOCAL_STATE_FILENAME)
+		LocalState localState = new LocalState(localStateFile);
+		Optional<String> cacheName = localState.lookupCacheNameOf("Picasso")
 		ChromeUserProfile cupPicasso =
-				new ChromeUserProfile(userDataDir, new CacheDirectoryName(cacheName))
-
+				new ChromeUserProfile(userDataDir,
+						new CacheDirectoryName(cacheName.get()),
+						new UserProfile("Picasso"))
+		assertNotNull(cupPicasso.getPreferences())
 	}
 }

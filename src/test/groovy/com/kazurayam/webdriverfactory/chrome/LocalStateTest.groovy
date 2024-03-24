@@ -7,7 +7,7 @@ import java.nio.file.Path
 import java.nio.file.Paths
 
 import static org.junit.Assert.assertEquals
-import static org.junit.Assert.assertNull
+import static org.junit.Assert.assertTrue
 
 class LocalStateTest {
 
@@ -25,20 +25,21 @@ class LocalStateTest {
 
     @Test
     void test_lookupCacheName_Default() {
-        assertEquals("Default", ls.lookupCacheNameOf("Kazuaki"));
+        assertEquals("Default", ls.lookupCacheNameOf("Kazuaki").get());
     }
 
     @Test
     void test_lookupCacheName_Profile17() {
-        assertEquals("Profile 17", ls.lookupCacheNameOf("Picasso"));
+        assertEquals("Profile 17", ls.lookupCacheNameOf("Picasso").get());
     }
 
     @Test
-    void test_lookupCacheName_notfound() {
-        assertNull(ls.lookupCacheNameOf("Renoir"))
+    void test_lookupCacheNameOf_notFound() {
+        Optional<String> result = ls.lookupCacheNameOf("Renoir")
+        assertTrue(result.isEmpty())
     }
 
-    private String getLocalStateText() {
+    private static String getLocalStateText() {
         return '''{
             "profile": {
                  "info_cache": {
@@ -53,7 +54,7 @@ class LocalStateTest {
          }'''
     }
 
-    private Path getLocalState() {
+    private static Path getLocalState() {
         Path home = Paths.get(System.getProperty("user.home"))
         Path chromeInstalledDir =
                 home.resolve("Library/Application Support/Google/Chrome")
@@ -68,7 +69,7 @@ class LocalStateTest {
     @Test
     void test_real_Chrome_Local_State() {
         LocalState localState = new LocalState(getLocalState())
-        assertEquals("Profile 17", ls.lookupCacheNameOf("Picasso"));
-        assertEquals("Default", ls.lookupCacheNameOf("Kazuaki"));
+        assertEquals("Profile 17", ls.lookupCacheNameOf("Picasso").get());
+        assertEquals("Default", ls.lookupCacheNameOf("Kazuaki").get());
     }
 }

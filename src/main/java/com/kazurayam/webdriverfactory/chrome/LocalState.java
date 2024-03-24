@@ -21,7 +21,7 @@ import java.util.Optional;
  * '/Users/(username)/Library/Application Support/Google/Chrome/Local State' file.
  * The file is a text in JSON syntax.
  * Amongst all, I am interested in the "profile" section
- * which contains CacheName & ProfileName pairs.
+ * which contains CacheName &amp; ProfileName pairs.
  *
  * <pre>
  *   {
@@ -35,7 +35,7 @@ import java.util.Optional;
  *       },
  *       "Profile 17": {
  *         ...
- *         "name": "Picasso",                              <=== THIS IS IT!!
+ *         "name": "Picasso",                              &lt;=== THIS IS IT!!
  *         ...
  *       }
  *     },
@@ -56,7 +56,7 @@ public class LocalState {
         if (Files.isRegularFile(localStateFile)) {
             this.localStateFile = localStateFile;
             String json = readAllLines(localStateFile);
-            logger.info("[LocalState] localStateFile: " + localStateFile);
+            logger.debug("[LocalState] localStateFile: " + localStateFile);
             initialize(json);
         } else {
             throw new IOException(localStateFile + " is not a regular file, is a directory");
@@ -69,7 +69,7 @@ public class LocalState {
     }
 
     void initialize(String json) {
-        logger.info("[construct] json: " + json);
+        logger.debug("[initialize] json: " + json);
         ObjectMapper mapper = new ObjectMapper();
         JsonNode root;
         try {

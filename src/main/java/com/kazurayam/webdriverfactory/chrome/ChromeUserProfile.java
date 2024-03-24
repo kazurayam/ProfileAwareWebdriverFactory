@@ -65,13 +65,13 @@ public class ChromeUserProfile implements Comparable<ChromeUserProfile> {
         Objects.requireNonNull(userProfile);
         if (!Files.exists(userDataDir)) {
             throw new IllegalArgumentException(
-                    String.format("%s is not found", userDataDir));
+                    String.format("userDataDir %s is not found", userDataDir ));
         }
         //
-        Path profilePath = userDataDir.resolve(cacheDirectoryName.toString());
-        if (!Files.exists(profilePath)) {
+        Path cacheDir = userDataDir.resolve(cacheDirectoryName.toString());
+        if (!Files.exists(cacheDir)) {
             throw new IllegalArgumentException(
-                    String.format("%s is not found", profilePath));
+                    String.format("cacheDir %s is not found. ", cacheDir));
         }
         //
         this.userDataDir = userDataDir;

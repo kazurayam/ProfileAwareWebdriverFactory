@@ -1,6 +1,7 @@
 package examples;
 
 import com.kazurayam.webdriverfactory.chrome.ChromeDriverFactory;
+import com.kazurayam.webdriverfactory.chrome.ChromeOptionsModifiers;
 import com.kazurayam.webdriverfactory.chrome.ChromePreferencesModifiers;
 import com.kazurayam.webdriverfactory.chrome.LaunchedChromeDriver;
 import io.github.bonigarcia.wdm.WebDriverManager;
@@ -64,14 +65,14 @@ public class GettingClipboardContent {
 
     @Before
     public void setup() throws IOException {
-        ChromeDriverFactory factory =
-                ChromeDriverFactory.newChromeDriverFactory();
+        ChromeDriverFactory cdf = ChromeDriverFactory.newChromeDriverFactory();
+        cdf.addChromeOptionsModifier(ChromeOptionsModifiers.headless());
 
         // modify Chrome Preferences to grant access to Clipboard
-        factory.addChromePreferencesModifier(
+        cdf.addChromePreferencesModifier(
                 ChromePreferencesModifiers.grantAccessToClipboard());
 
-        LaunchedChromeDriver launched = factory.newChromeDriver();
+        LaunchedChromeDriver launched = cdf.newChromeDriver();
         driver = launched.getDriver();
         driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
     }

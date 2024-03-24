@@ -114,9 +114,9 @@ public class ChromeDriverFactoryImpl extends ChromeDriverFactory {
 		ChromeOptions options = buildOptions(
 				this.chromePreferencesModifiers,
 				this.chromeOptionsModifiers);
-		logger_.info("[newChromeDriver] this.chromePreferencesModifiers: " + this.chromePreferencesModifiers);
-		logger_.info("[newChromeDriver] this.chromeOptionsModifiers: " + this.chromeOptionsModifiers);
-		logger_.info("[newChromeDriver] options: " + options);
+		logger_.debug("[newChromeDriver] this.chromePreferencesModifiers: " + this.chromePreferencesModifiers);
+		logger_.debug("[newChromeDriver] this.chromeOptionsModifiers: " + this.chromeOptionsModifiers);
+		logger_.debug("[newChromeDriver] options: " + options);
 		ChromeDriver driver = new ChromeDriver(options);
 		setPageLoadTimeout(driver, this.pageLoadTimeoutSeconds);
 		return new LaunchedChromeDriver(driver).setEmployedOptions(options);
@@ -251,7 +251,7 @@ public class ChromeDriverFactoryImpl extends ChromeDriverFactory {
 			final Path targetProfileDirectory = targetUserDataDir.resolve(cacheDirectoryName.getName());
 			PathUtils.copyDirectoryRecursively(sourceProfileDirectory, targetProfileDirectory);
 			//
-			logger_.info(String.format("copied %d files from %s into %s",
+			logger_.debug(String.format("copied %d files from %s into %s",
 					PathUtils.listDirectoryRecursively(targetProfileDirectory).size(),
 					sourceProfileDirectory, targetProfileDirectory));
 		} else {

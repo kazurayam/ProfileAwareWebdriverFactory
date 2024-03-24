@@ -19,7 +19,6 @@ import com.google.gson.Gson
  */
 class ChromeOptionsTest {
 
-
     @Test(expected = IllegalArgumentException.class)
     void test_ChromeOptions_addExtensions() {
         ChromeOptions options = new ChromeOptions()
@@ -34,10 +33,12 @@ class ChromeOptionsTest {
     void test_ChromeOptions_addArguments_windowSize() {
         ChromeOptions options = new ChromeOptions()
         options.addArguments("window-size=" + 800 + "," + 600)
+        options.addArguments("--headless")
         driver = new ChromeDriver(options)
         println "test_ChromeOptions_addArguments_windowSize: " + gson.toJson(options)
         driver.navigate().to("http://example.com")
         Thread.sleep(3000)
+        driver.quit()
     };
 
     /**
@@ -49,12 +50,14 @@ class ChromeOptionsTest {
     @Test
     void test_ChromeOptions_setCapability() {
         ChromeOptions options = new ChromeOptions();
+        options.addArguments("--headless")
         // Add the WebDriver proxy capability.
         Proxy proxy = new Proxy()
         proxy.setHttpProxy("myhttpproxy:3337")
         options.setCapability("proxy", proxy)
         println "test_ChromeOptions_setCapability: " + gson.toJson(options)
         driver = new ChromeDriver(options);
+        driver.quit()
     }
 
     /**
@@ -67,9 +70,6 @@ class ChromeOptionsTest {
      * If the latter, you can use the user-data-dir Chrome command-line switch
      * to tell Chrome which profile to use:
      */
-
-
-
 
     private ChromeDriver driver;
     private Gson gson

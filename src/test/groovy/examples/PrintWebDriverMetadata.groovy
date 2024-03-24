@@ -20,9 +20,10 @@ class PrintWebDriverMetadata {
 
     @Test
     void test_printUserProfile() {
-        ChromeDriverFactory factory = ChromeDriverFactory.newChromeDriverFactory()
-        factory.addChromeOptionsModifier(ChromeOptionsModifiers.incognito())
-        launched = factory.newChromeDriver(new CacheDirectoryName("Default"),
+        ChromeDriverFactory cdf = ChromeDriverFactory.newChromeDriverFactory()
+        cdf.addChromeOptionsModifier(ChromeOptionsModifiers.headless())
+        cdf.addChromeOptionsModifier(ChromeOptionsModifiers.incognito())
+        launched = cdf.newChromeDriver(new CacheDirectoryName("Default"),
                 ChromeDriverFactory.UserDataAccess.TO_GO)
         assertTrue(launched.getChromeUserProfile().isPresent())
         assertTrue(launched.getInstruction().isPresent())
