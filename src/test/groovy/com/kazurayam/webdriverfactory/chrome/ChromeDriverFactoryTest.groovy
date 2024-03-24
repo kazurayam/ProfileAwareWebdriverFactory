@@ -293,9 +293,18 @@ class ChromeDriverFactoryTest {
 
 	@Test
 	void test_newChromeDriver_disableViewersOfFlashAndPdf() {
-		ChromeDriverFactory cdf = ChromeDriverFactory.newChromeDriverFactory()
-		cdf.addChromeOptionsModifier(ChromeOptionsModifiers.headless())
-		cdf.addChromePreferencesModifier(ChromePreferencesModifiers.disableViewersOfFlashAndPdf())
+		Path dir = outputFolder.resolve("test_newChromeDriver_disableViewersOfFlashAndPdf")
+		Files.createDirectories(dir)
+		String fileName = "SDG_DSD_MATRIX.1.7.xlsm"
+		Path xlsm = dir.resolve(fileName)
+		if (Files.exists(xlsm)) {
+			Files.delete(xlsm)
+		}
+		ChromeDriverFactory cdf =
+				ChromeDriverFactory.newChromeDriverFactory()
+						.addChromeOptionsModifier(ChromeOptionsModifiers.headless())
+						.addChromePreferencesModifier(ChromePreferencesModifiers.downloadIntoDirectory(dir))
+						.addChromePreferencesModifier(ChromePreferencesModifiers.disableViewersOfFlashAndPdf())
 		launched = cdf.newChromeDriver()
 		launched.getDriver().navigate().to("http://127.0.0.1/SDG_Guidlines_AUG_2019_Final.pdf");
 		Thread.sleep(3000)
@@ -313,7 +322,6 @@ class ChromeDriverFactoryTest {
 		}
 		ChromeDriverFactory cdf = ChromeDriverFactory
 				.newChromeDriverFactory()
-				.addChromeOptionsModifier(ChromeOptionsModifiers.headless())
 				.addChromePreferencesModifier(ChromePreferencesModifiers.downloadIntoDirectory(dir))
 		cdf.addChromeOptionsModifier(ChromeOptionsModifiers.headless())
 		launched = cdf.newChromeDriver()
@@ -326,14 +334,16 @@ class ChromeDriverFactoryTest {
 
 	@Test
 	void test_newChromeDriver_downloadWithoutPrompt() {
+		Path dir = outputFolder.resolve("test_newChromeDriver_downloadWithoutPrompt")
+		Files.createDirectories(dir)
 		String fileName = "SDG_DSD_MATRIX.1.7.xlsm"
-		Path xlsm = Paths.get(System.getProperty("user.home"))
-				.resolve("Downloads").resolve(fileName)
+		Path xlsm = dir.resolve(fileName)
 		if (Files.exists(xlsm)) {
 			Files.delete(xlsm)
 		}
 		ChromeDriverFactory cdf = ChromeDriverFactory
 				.newChromeDriverFactory()
+				.addChromePreferencesModifier(ChromePreferencesModifiers.downloadIntoDirectory(dir))
 				.addChromePreferencesModifier(ChromePreferencesModifiers.downloadWithoutPrompt())
 		cdf.addChromeOptionsModifier(ChromeOptionsModifiers.headless())
 		launched = cdf.newChromeDriver()
