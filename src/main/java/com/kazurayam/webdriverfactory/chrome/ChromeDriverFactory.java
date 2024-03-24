@@ -1,6 +1,6 @@
 package com.kazurayam.webdriverfactory.chrome;
 
-import com.kazurayam.webdriverfactory.ProfileDirectoryName;
+import com.kazurayam.webdriverfactory.CacheDirectoryName;
 import com.kazurayam.webdriverfactory.UserProfile;
 import com.kazurayam.webdriverfactory.WebDriverFactoryException;
 
@@ -48,9 +48,9 @@ public abstract class ChromeDriverFactory {
 
 	public abstract LaunchedChromeDriver newChromeDriver(UserProfile userProfile, UserDataAccess instruction) throws IOException, WebDriverFactoryException;
 
-	public abstract LaunchedChromeDriver newChromeDriver(ProfileDirectoryName profileDirectoryName) throws IOException, WebDriverFactoryException;
+	public abstract LaunchedChromeDriver newChromeDriver(CacheDirectoryName cacheDirectoryName) throws IOException, WebDriverFactoryException;
 
-	public abstract LaunchedChromeDriver newChromeDriver(ProfileDirectoryName profileDirectoryName, UserDataAccess instruction) throws IOException, WebDriverFactoryException;
+	public abstract LaunchedChromeDriver newChromeDriver(CacheDirectoryName cacheDirectoryName, UserDataAccess instruction) throws IOException, WebDriverFactoryException;
 
 	public abstract void enableChromeDriverLog(Path outputDirectory) throws IOException;
 

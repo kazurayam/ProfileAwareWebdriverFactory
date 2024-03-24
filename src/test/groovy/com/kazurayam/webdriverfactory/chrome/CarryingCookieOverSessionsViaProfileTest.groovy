@@ -25,7 +25,7 @@ import static org.junit.Assert.*
  * can help you carry over cookie info over HTTP sessions via Chrome profile.
  *
  */
-@Ignore
+//@Ignore
 class CarryingCookieOverSessionsViaChromeProfileTest {
 
     private CookieServer cookieServer
@@ -33,15 +33,15 @@ class CarryingCookieOverSessionsViaChromeProfileTest {
     @BeforeClass
     static void beforeClass() {
         // setup the ChromeDriver binary
-        WebDriverManager.chromedriver().setup()
+        WebDriverManager.chromedriver().clearDriverCache().setup()
     }
 
     @Before
     void setup() {
         cookieServer = new CookieServer()
         cookieServer.setBaseDir(Paths.get("./src/web"))
-        cookieServer.isPrintingRequested(true);
-        cookieServer.isDebugMode(true)
+        cookieServer.setPrintRequestRequired(true);
+        cookieServer.setDebugMode(true)
         cookieServer.startup()
     }
     /**
@@ -77,7 +77,7 @@ class CarryingCookieOverSessionsViaChromeProfileTest {
         launched.getDriver().quit()   // at .quit(), the Cookies will be stored into disk
 
         // 2nd session
-        launched = factory.newChromeDriver(new UserProfile("Picasso"),  // or new ProfileDirectoryName("Profile 6")
+        launched = factory.newChromeDriver(new UserProfile("Picasso"),  // or new CacheDirectoryName("Profile 6")
                 ChromeDriverFactory.UserDataAccess.TO_GO)  // the Cookies file will be copied into the temp dir
         Cookie timestamp2 = observeCookie(launched)
         launched.getDriver().quit()

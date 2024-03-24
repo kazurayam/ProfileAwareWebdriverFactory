@@ -4,11 +4,16 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Objects;
 import java.util.Optional;
 
 public class LaunchedChromeDriver {
+
+    Logger logger = LoggerFactory.getLogger(LaunchedChromeDriver.class);
+
     public LaunchedChromeDriver(ChromeDriver driver) {
         Objects.requireNonNull(driver);
         this.driver = driver;
@@ -54,8 +59,9 @@ public class LaunchedChromeDriver {
     public Optional<String> getEmployedOptionsAsJSON() {
         Optional<ChromeOptions> options = getEmployedOptions();
         if (options.isPresent()) {
-            Gson gson = new GsonBuilder().setPrettyPrinting().create();
-            return Optional.of(gson.toJson(options.get()));
+            Gson gson = new GsonBuilder().setPrettyPrinting()
+                    .excludeFieldsWithoutExposeAnnotation().create();
+            return Optional.of(gson.toJson(options.get().asMap()));
         } else {
             return Optional.empty();
         }

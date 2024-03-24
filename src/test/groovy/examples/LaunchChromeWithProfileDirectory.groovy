@@ -2,7 +2,7 @@ package examples
 
 import com.kazurayam.webdriverfactory.chrome.ChromeDriverFactory
 import com.kazurayam.webdriverfactory.chrome.LaunchedChromeDriver
-import com.kazurayam.webdriverfactory.ProfileDirectoryName
+import com.kazurayam.webdriverfactory.CacheDirectoryName
 import io.github.bonigarcia.wdm.WebDriverManager
 import org.junit.After
 import org.junit.Before
@@ -17,7 +17,7 @@ class LaunchChromeWithProfileDirectory {
     @Test
     void test_launch_browser_with_profile_directory() {
         ChromeDriverFactory factory = ChromeDriverFactory.newChromeDriverFactory()
-        launched = factory.newChromeDriver(new ProfileDirectoryName("Profile 6"))
+        launched = factory.newChromeDriver(new CacheDirectoryName("Profile 17"))
         launched.getDriver().navigate().to("http://example.com")
         Thread.sleep(1000)
     }
@@ -26,7 +26,7 @@ class LaunchChromeWithProfileDirectory {
     void test_launch_browser_with_profile_TO_GO() {
         ChromeDriverFactory factory = ChromeDriverFactory.newChromeDriverFactory()
         launched = factory.newChromeDriver(
-                new ProfileDirectoryName("Profile 6"),
+                new CacheDirectoryName("Profile 17"),
                 ChromeDriverFactory.UserDataAccess.TO_GO)
         launched.getDriver().navigate().to("http://example.com")
         Thread.sleep(1000)
@@ -37,7 +37,7 @@ class LaunchChromeWithProfileDirectory {
     void test_launch_browser_with_profile_FOR_HERE() {
         ChromeDriverFactory factory = ChromeDriverFactory.newChromeDriverFactory()
         launched = factory.newChromeDriver(
-                new ProfileDirectoryName("Profile 6"),
+                new CacheDirectoryName("Profile 17"),
                 ChromeDriverFactory.UserDataAccess.FOR_HERE)
         launched.getDriver().navigate().to("http://example.com")
         Thread.sleep(1000)

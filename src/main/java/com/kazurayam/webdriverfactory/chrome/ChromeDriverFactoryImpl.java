@@ -1,6 +1,6 @@
 package com.kazurayam.webdriverfactory.chrome;
 
-import com.kazurayam.webdriverfactory.ProfileDirectoryName;
+import com.kazurayam.webdriverfactory.CacheDirectoryName;
 import com.kazurayam.webdriverfactory.UserProfile;
 import com.kazurayam.webdriverfactory.WebDriverFactoryException;
 import com.kazurayam.webdriverfactory.utils.PathUtils;
@@ -24,7 +24,7 @@ import java.util.concurrent.TimeUnit;
 
 public class ChromeDriverFactoryImpl extends ChromeDriverFactory {
 
-	private static Logger logger_ = LoggerFactory.getLogger(ChromeDriverFactoryImpl.class);
+	private static final Logger logger_ = LoggerFactory.getLogger(ChromeDriverFactoryImpl.class);
 
 	private final Set<ChromePreferencesModifier> chromePreferencesModifiers;
 	private final Set<ChromeOptionsModifier> chromeOptionsModifiers;
@@ -58,10 +58,8 @@ public class ChromeDriverFactoryImpl extends ChromeDriverFactory {
 
 	@Override
 	public ChromeDriverFactory addChromePreferencesModifier(ChromePreferencesModifier cpm) {
-		if (this.chromePreferencesModifiers.contains(cpm)) {
-			// The late comer wins
-			this.chromePreferencesModifiers.remove(cpm);
-		}
+        // The late comer wins
+        this.chromePreferencesModifiers.remove(cpm);
 		this.chromePreferencesModifiers.add(cpm);
 		return this;
 	}
@@ -74,10 +72,9 @@ public class ChromeDriverFactoryImpl extends ChromeDriverFactory {
 
 	@Override
 	public ChromeDriverFactory addChromeOptionsModifier(ChromeOptionsModifier com) {
-		if (this.chromeOptionsModifiers.contains(com)) {
-			// The late comer wins
-			this.chromeOptionsModifiers.remove(com);
-		}
+        // The late comer should wins;
+		// so first remove the old if any, then add the new one
+        this.chromeOptionsModifiers.remove(com);
 		this.chromeOptionsModifiers.add(com);
 		return this;
 	}
@@ -117,6 +114,9 @@ public class ChromeDriverFactoryImpl extends ChromeDriverFactory {
 		ChromeOptions options = buildOptions(
 				this.chromePreferencesModifiers,
 				this.chromeOptionsModifiers);
+		logger_.info("[newChromeDriver] this.chromePreferencesModifiers: " + this.chromePreferencesModifiers);
+		logger_.info("[newChromeDriver] this.chromeOptionsModifiers: " + this.chromeOptionsModifiers);
+		logger_.info("[newChromeDriver] options: " + options);
 		ChromeDriver driver = new ChromeDriver(options);
 		setPageLoadTimeout(driver, this.pageLoadTimeoutSeconds);
 		return new LaunchedChromeDriver(driver).setEmployedOptions(options);
@@ -133,21 +133,24 @@ public class ChromeDriverFactoryImpl extends ChromeDriverFactory {
 	/**
 	 * create a new instance of ChromeDriver using the UserProfile specified.
 	 * <p>
-	 * If UserDataAccess.CLONE_TO_TEMP is given, create a temporary directory as
+	 * If UserDataAccess.TO_GO is given, create a temporary directory as
 	 * the replacement of "User-data" folder into which the profile directory of
 	 * the given userProfile is cloned from the original. Effectively we can open
 	 * 2 or more Chrome browsers using the same user profile while no IOException
 	 * due to contention to the "User-data" folder. However, please note, that all
 	 * cookies etc stored in the temporary directory wll be discarded
-	 * when the browser is closed; therefore the cookies won't be retained.
+	 * when the browser is closed; therefore the cookies won't be retained to the
+	 * next session.</p>
 	 * <p>
-	 * If UserDataAccess.LOCK_USER_DATA is given, the default "User-data" will be
+	 * If UserDataAccess.FOR_HERE is given, the default "User-data" will be
 	 * used. When a Chrome using the same user profile has been opened and are
 	 * still present, then the "User-data" folder is locked; hence a contention will
-	 * occur.
+	 * occur.</p>
 	 *
-	 * invalid argument: user data directory is already in use, please specify a unique value for --user-data-dir argument, or don't use --user-data-dir
-	 * In this case, you have to close the elder Chrome browser, and try again.
+	 * <p>invalid argument: user data directory is already in use,
+	 * please specify a unique value for --user-data-dir argument,
+	 * or don't use --user-data-dir
+	 * In this case, you have to close the elder Chrome browser, and try again.</p>
 	 *
 	 * @param userProfile e.g. new com.kazurayam.webdriverfactory.UserProfile("Alice")
 	 * @param instruction default to UserDataAccess.CLONE_TO_TEMP
@@ -167,29 +170,32 @@ public class ChromeDriverFactoryImpl extends ChromeDriverFactory {
 					)
 			);
 		}
-
 		Path userDataDir = ChromeProfileUtils.getDefaultUserDataDir();
-		ProfileDirectoryName profileDirectoryName = chromeUserProfile.getProfileDirectoryName();
-		return launchChrome(userDataDir, profileDirectoryName, instruction);
+		CacheDirectoryName cacheDirectoryName = chromeUserProfile.getCacheDirectoryName();
+		return launchChrome(userDataDir, cacheDirectoryName, instruction);
 	}
 
 	@Override
-	public LaunchedChromeDriver newChromeDriver(ProfileDirectoryName profileDirectoryName)
+	public LaunchedChromeDriver newChromeDriver(CacheDirectoryName cacheDirectoryName)
 			throws IOException, WebDriverFactoryException {
-		return this.newChromeDriver(profileDirectoryName, UserDataAccess.TO_GO);
+		return this.newChromeDriver(cacheDirectoryName, UserDataAccess.TO_GO);
 	}
 
 	/**
-	 * @param profileDirectoryName e.g. "Default", "Profile 1", "Profile 2"
+	 * @param cacheDirectoryName e.g. "Default", "Profile 1", "Profile 2"
 	 * @param instruction   FOR_HERE or TO_GO
 	 */
 	@Override
-	public LaunchedChromeDriver newChromeDriver(ProfileDirectoryName profileDirectoryName, UserDataAccess instruction)
+	public LaunchedChromeDriver newChromeDriver(
+			CacheDirectoryName cacheDirectoryName,
+			UserDataAccess instruction)
 			throws IOException, WebDriverFactoryException {
-		Objects.requireNonNull(profileDirectoryName, "profileDirectoryName must not be null");
-		Objects.requireNonNull(instruction, "instruction must not be null");
+		Objects.requireNonNull(cacheDirectoryName,
+				"cacheDirectoryName must not be null");
+		Objects.requireNonNull(instruction,
+				"instruction must not be null");
 		Path userDataDir = ChromeProfileUtils.getDefaultUserDataDir();
-		return launchChrome(userDataDir, profileDirectoryName, instruction);
+		return launchChrome(userDataDir, cacheDirectoryName, instruction);
 	}
 
 	@Override
@@ -205,32 +211,46 @@ public class ChromeDriverFactoryImpl extends ChromeDriverFactory {
 	/**
 	 * Launch a Chrome browser.
 	 * If the instruction is UserDataAccess.FOR_HERE, will launch a Chrome with the profile directory
-	 * under the userDataDir with the profileDirectoryName.
+	 * under the userDataDir with the cacheDirectoryName.
 	 * Else (the instruction is UserDataAccess.TO_GO), will allocate a temporary directory
-	 * under which a directory with the profileDirectoryName is created, and into which
+	 * under which a directory with the cacheDirectoryName is created, and into which
 	 * the contents of the genuine profile are copied; then a Chrome is launched with the
 	 * profileDirectory
 	 *
 	 * @param userDataDir
-	 * @param profileDirectoryName
+	 * @param cacheDirectoryName
 	 * @param instruction
 	 * @return
 	 */
-	private LaunchedChromeDriver launchChrome(final Path userDataDir, final ProfileDirectoryName profileDirectoryName, UserDataAccess instruction) throws IOException, WebDriverFactoryException {
+	private LaunchedChromeDriver launchChrome(final Path userDataDir,
+											  final CacheDirectoryName cacheDirectoryName,
+											  UserDataAccess instruction)
+			throws IOException, WebDriverFactoryException {
 		Objects.requireNonNull(userDataDir);
-		Objects.requireNonNull(profileDirectoryName);
+		Objects.requireNonNull(cacheDirectoryName);
 		Objects.requireNonNull(instruction);
+		logger_.debug("[launchChrome] userDataDir: " + userDataDir);
+		logger_.debug("[launchChrome] cacheDirectoryName: " + cacheDirectoryName);
+		logger_.debug("[launchChrome] instruction: " + instruction);
 		if (!Files.exists(userDataDir)) {
 			throw new IllegalArgumentException(String.format("%s is not present", userDataDir));
 		}
 
-		final Path sourceProfileDirectory = userDataDir.resolve(profileDirectoryName.toString());
-		assert Files.exists(sourceProfileDirectory);
+		final Path sourceProfileDirectory = userDataDir.resolve(cacheDirectoryName.toString());
+		assert Files.exists(sourceProfileDirectory) : sourceProfileDirectory + " is not found";
 		Path targetUserDataDir = userDataDir;
 		if (instruction.equals(UserDataAccess.TO_GO)) {
+			// copy the profile-related files to a temp dir
 			targetUserDataDir = Files.createTempDirectory("__user-data-dir__");
-			final Path targetProfileDirectory = targetUserDataDir.resolve(profileDirectoryName.getName());
+			// copy the "Local State" file
+			Path localStateSource = userDataDir.resolve(LocalState.LOCAL_STATE_FILENAME);
+			Path localStateTarget = targetUserDataDir.resolve(LocalState.LOCAL_STATE_FILENAME);
+			Files.copy(localStateSource, localStateTarget);
+
+			// copy the profile directory recursively
+			final Path targetProfileDirectory = targetUserDataDir.resolve(cacheDirectoryName.getName());
 			PathUtils.copyDirectoryRecursively(sourceProfileDirectory, targetProfileDirectory);
+			//
 			logger_.info(String.format("copied %d files from %s into %s",
 					PathUtils.listDirectoryRecursively(targetProfileDirectory).size(),
 					sourceProfileDirectory, targetProfileDirectory));
@@ -240,8 +260,8 @@ public class ChromeDriverFactoryImpl extends ChromeDriverFactory {
 
 		// use the specified UserProfile with which Chrome browser is launched
 		this.addChromeOptionsModifier(
-				ChromeOptionsModifiers.withProfileDirectoryName(
-						targetUserDataDir, profileDirectoryName)
+				ChromeOptionsModifiers.withCacheDirectoryName(
+						targetUserDataDir, cacheDirectoryName)
 		);
 
 		// launch the Chrome driver
@@ -250,8 +270,10 @@ public class ChromeDriverFactoryImpl extends ChromeDriverFactory {
 			ChromeOptions options = buildOptions(this.chromePreferencesModifiers, this.chromeOptionsModifiers);
 			driver = new ChromeDriver(options);
 			setPageLoadTimeout(driver, this.pageLoadTimeoutSeconds);
+			ChromeUserProfile chromeUserProfile =
+					new ChromeUserProfile(targetUserDataDir, cacheDirectoryName);
 			return new LaunchedChromeDriver(driver)
-					.setChromeUserProfile(new ChromeUserProfile(targetUserDataDir, profileDirectoryName))
+					.setChromeUserProfile(chromeUserProfile)
 					.setInstruction(instruction).setEmployedOptions(options);
 		} catch (InvalidArgumentException iae) {
 			if (driver != null) {
@@ -260,13 +282,12 @@ public class ChromeDriverFactoryImpl extends ChromeDriverFactory {
 			}
 			StringBuilder sb = new StringBuilder();
 			sb.append(String.format("targetUserDataDir=\"%s\"\n", targetUserDataDir));
-			sb.append(String.format("profileDirectoryName=\"%s\"\n", profileDirectoryName));
+			sb.append(String.format("cacheDirectoryName=\"%s\"\n", cacheDirectoryName));
 			sb.append("org.openqa.selenium.InvalidArgumentException was thrown.\n");
 			sb.append("Exception message:\n\n");
 			sb.append(iae.getMessage());
 			throw new WebDriverFactoryException(sb.toString());
 		}
-
 	}
 
 	/**
@@ -275,7 +296,7 @@ public class ChromeDriverFactoryImpl extends ChromeDriverFactory {
 	 * Chrome Preferences => Chrome Options
 	 * while modifying each containers with specified Modifiers
 	 */
-	private ChromeOptions buildOptions(Set<ChromePreferencesModifier> chromePreferencesModifiers,
+	public static ChromeOptions buildOptions(Set<ChromePreferencesModifier> chromePreferencesModifiers,
 									   Set<ChromeOptionsModifier> chromeOptionsModifiers) {
 		// create a Chrome Preferences object as the seed
 		Map<String, Object> preferences = new HashMap<>();

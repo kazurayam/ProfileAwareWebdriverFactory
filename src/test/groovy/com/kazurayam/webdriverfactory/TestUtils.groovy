@@ -2,6 +2,7 @@ package com.kazurayam.webdriverfactory
 
 import com.kazurayam.subprocessj.Subprocess
 import com.kazurayam.subprocessj.Subprocess.CompletedProcess
+import org.junit.Ignore
 
 import java.nio.file.Files
 import java.nio.file.Path
@@ -54,6 +55,7 @@ class TestUtils {
         }
     }
 
+    @Ignore
     @Test
     void test_getGitHubPersonalAccessToken() {
         String pat = TestUtils.getGitHubPersonalAccessToken()

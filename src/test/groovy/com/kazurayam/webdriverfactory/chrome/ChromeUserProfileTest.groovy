@@ -1,6 +1,6 @@
 package com.kazurayam.webdriverfactory.chrome
 
-import com.kazurayam.webdriverfactory.ProfileDirectoryName
+import com.kazurayam.webdriverfactory.CacheDirectoryName
 import groovy.json.JsonSlurper
 
 import static org.junit.Assert.*
@@ -24,7 +24,7 @@ class ChromeUserProfileTest {
 		Path userDataDir = ChromeProfileUtils.getDefaultUserDataDir()
         ChromeUserProfile defaultProfile =
 				new ChromeUserProfile(userDataDir,
-						new ProfileDirectoryName('Default'))
+						new CacheDirectoryName('Default'))
 		// then:
 		assertNotNull(defaultProfile)
 		assertNotNull(defaultProfile.getUserProfile())
@@ -37,9 +37,9 @@ class ChromeUserProfileTest {
 		Path userDataDir = ChromeProfileUtils.getDefaultUserDataDir()
 		ChromeUserProfile defaultProfile =
 				new ChromeUserProfile(userDataDir,
-						new ProfileDirectoryName('Default')
+						new CacheDirectoryName('Default')
 				)
-		Path userProfileDirectory = defaultProfile.getProfileDirectory()
+		Path userProfileDirectory = defaultProfile.getCacheDirectory()
 		assertNotNull(userProfileDirectory)
 		assertEquals('Default',
 				userProfileDirectory.getFileName().toString())
@@ -50,11 +50,23 @@ class ChromeUserProfileTest {
 		Path userDataDir = ChromeProfileUtils.getDefaultUserDataDir()
 		ChromeUserProfile defaultProfile =
 				new ChromeUserProfile(userDataDir,
-						new ProfileDirectoryName('Default')
+						new CacheDirectoryName('Default')
 				)
 		println defaultProfile.toString()
+		assertTrue("defaultProfile.toString() should start with {",
+				defaultProfile.toString().startsWith("{"));
 		JsonSlurper slurper = new JsonSlurper()
 		def obj = slurper.parseText(defaultProfile.toString())
 		assert obj != null
+	}
+
+	@Test
+	void test_getPreferences() {
+		Path userDataDir = ChromeProfileUtils.getDefaultUserDataDir()
+		LocalState localState = new LocalState(userDataDir, LocalState.LOCAL_STATE_FILENAME);
+		String cacheName = localState.lookupCacheNameOf("Picasso")
+		ChromeUserProfile cupPicasso =
+				new ChromeUserProfile(userDataDir, new CacheDirectoryName(cacheName))
+
 	}
 }

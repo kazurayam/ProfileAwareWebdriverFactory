@@ -43,31 +43,26 @@ import java.util.stream.Collectors;
  *
  */
 public class CookieServer {
-
     static final String URL_ENCODING = "UTF-8";
     static final String RESPONSE_ENCODING = "UTF-8";
-
     @Parameter(
             names = {"-p", "--port"},
             description = "port number. default : 80.",
             arity = 1)
     Integer port = 80;
-
     @Parameter(
             names = {"-b", "--base-dir"},
             description = "base directory path. default : current directory.",
             arity = 1)
     Path baseDir = Paths.get(".");
-
     @Parameter(
             names = {"-h", "--help"},
             help = true)
     boolean help;
-
     @Parameter(names = { "--print-request"},
-            description = "display HTTP Request. default : true"
+            description = "display HTTP Request. default : false"
     )
-    boolean isPrintingRequested = true;
+    boolean isPrintRequestRequired = false;
 
     @Parameter(names = { "--debug"},
             description = "run with debug mode. default : false"
@@ -83,6 +78,8 @@ public class CookieServer {
     private ExecutorService httpThreadPool;
     private static final int NUM_OF_THREADS = 4;
 
+    private static RequestPrinter requestPrinter = new DefaultRequestPrinter();
+
     CookieServer() {}
 
     public CookieServer setPort(Integer port) {
@@ -95,12 +92,12 @@ public class CookieServer {
         return this;
     }
 
-    public CookieServer isPrintingRequested(boolean isPrintingRequested) {
-        this.isPrintingRequested = isPrintingRequested;
+    public CookieServer setPrintRequestRequired(boolean required) {
+        this.isPrintRequestRequired = required;
         return this;
     }
 
-    public CookieServer isDebugMode(boolean isDebugMode) {
+    public CookieServer setDebugMode(boolean isDebugMode) {
         this.isDebugMode = isDebugMode;
         return this;
     }
@@ -110,13 +107,21 @@ public class CookieServer {
         return this;
     }
 
+    /*
+     * for unit testing only
+     */
+    public CookieServer setRequestPrinter(RequestPrinter printer) {
+        requestPrinter = printer;
+        return this;
+    }
+
     public void startup() throws IOException {
         httpServer = HttpServer.create(
                 new InetSocketAddress(port), 0);
         httpServer.createContext("/",
                 new Handler(this.baseDir,
                         this.isDebugMode,
-                        this.isPrintingRequested,
+                        this.isPrintRequestRequired,
                         this.cookieMaxAge));
         httpThreadPool = Executors.newFixedThreadPool(NUM_OF_THREADS);
         httpServer.setExecutor(httpThreadPool);
@@ -207,10 +212,46 @@ public class CookieServer {
             StringBuilder sb = new StringBuilder();
             sb.append("\n\n");
             sb.append("<<<< Request received\n");
-            sb.append(String.format("method = %s\n", exchange.getRequestMethod()));
-            sb.append(String.format("uri = %s\n", exchange.getRequestURI().toString()));
-            sb.append(String.format("body = %s\n", stringifyInputStream(exchange.getRequestBody())));
-            System.out.println(sb);
+            sb.append("{\n");
+            sb.append(String.format("\"method\": \"%s\",\n", exchange.getRequestMethod()));
+            sb.append(String.format("\"uri\": \"%s\",\n", exchange.getRequestURI().toString()));
+            sb.append("\"headers\": [\n");
+            Headers headers = exchange.getRequestHeaders();
+            String sep1 = "";
+            for (String key : headers.keySet()) {
+                List<String> values = headers.get(key);
+                sb.append("    ");
+                sb.append(String.format("{\"%s\": [", key));
+                String sep2 = "";
+                for (String value : values) {
+                    sb.append(String.format("\"%s\"", escapeJson(value)));
+                    sb.append(sep2);
+                    sep2 = ", ";
+                }
+                sb.append("]}");
+                sb.append(sep1);
+                sb.append("\n");
+                sep1 = ",";
+            }
+            sb.append("],\n");
+            sb.append(String.format("\"body\": \"\"\"%s\"\"\"\n", stringifyInputStream(exchange.getRequestBody())));
+            sb.append("}");
+            // will print into the STDOUT as default, but you can change it by
+            // calling CookieServer#setRequestPrinter(RequestPrinter printer)
+            requestPrinter.printRequest(sb.toString());
+        }
+
+        private String escapeJson(String str) {
+            StringBuilder sb = new StringBuilder();
+            for (char ch : str.toCharArray()) {
+                String chs = String.valueOf(ch);
+                if (chs.equals("\"")) {
+                    sb.append("\\\"");
+                } else {
+                    sb.append(ch);
+                }
+            }
+            return sb.toString();
         }
 
         private String stringifyInputStream(InputStream inputStream) {
@@ -357,4 +398,14 @@ public class CookieServer {
     }
 
 
+    static interface RequestPrinter {
+        public void printRequest(String str);
+    }
+
+    static class DefaultRequestPrinter implements RequestPrinter {
+        @Override
+        public void printRequest(String str) {
+            System.out.println(str);
+        }
+    }
 }

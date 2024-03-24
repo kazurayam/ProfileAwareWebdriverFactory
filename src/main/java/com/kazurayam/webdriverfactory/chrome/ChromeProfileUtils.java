@@ -1,6 +1,6 @@
 package com.kazurayam.webdriverfactory.chrome;
 
-import com.kazurayam.webdriverfactory.ProfileDirectoryName;
+import com.kazurayam.webdriverfactory.CacheDirectoryName;
 import com.kazurayam.webdriverfactory.UserProfile;
 import com.kazurayam.webdriverfactory.utils.OSIdentifier;
 import org.slf4j.Logger;
@@ -12,27 +12,35 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 public final class ChromeProfileUtils {
 
-    private static Logger logger_ = LoggerFactory.getLogger(ChromeProfileUtils.class);
+    private static final Logger logger_ = LoggerFactory.getLogger(ChromeProfileUtils.class);
 
     public static Path getDefaultUserDataDir() {
         if (OSIdentifier.isWindows()) {
-            // It is important that this chromeProfilesPath ends with User Data and not with the profile folder
-            // %HOME%\AppData\Local\Google\Chrome\User Data
-            return Paths.get("C:", "Users", System.getProperty("user.name"), "AppData", "Local", "Google", "Chrome", "User Data");
+            // It is important that this chromeProfilesPath ends with User Data
+            // and not with the profile folder.
+            // e.g., "%HOME%\AppData\Local\Google\Chrome\User Data"
+            return Paths.get("C:", "Users",
+                    System.getProperty("user.name"), "AppData", "Local", "Google", "Chrome",
+                    "User Data");
         } else if (OSIdentifier.isMac()) {
             // ~/Library/Application Support/Google/Chrome
-            return Paths.get(System.getProperty("user.home")).resolve("Library").resolve("Application Support").resolve("Google").resolve("Chrome");
+            return Paths.get(System.getProperty("user.home")).resolve("Library")
+                    .resolve("Application Support")
+                    .resolve("Google")
+                    .resolve("Chrome");
         } else if (OSIdentifier.isUnix()) {
             // ~/.config/google-chrome
-            return Paths.get(System.getProperty("user.home")).resolve(".config").resolve("google-chrome");
+            return Paths.get(System.getProperty("user.home")).resolve(".config")
+                    .resolve("google-chrome");
         } else {
-            throw new IllegalStateException("Windows, Mac, Linux are supported. Other platforms are not supported.");
+            throw new IllegalStateException(
+                    "Windows, Mac, Linux are supported. Other platforms are not supported.");
         }
 
     }
@@ -50,16 +58,40 @@ public final class ChromeProfileUtils {
         if (!Files.exists(userDataDir)) {
             throw new IllegalArgumentException(String.format("%s is not present", userDataDir));
         }
-        List<ChromeUserProfile> userProfiles = new ArrayList<>();
-        List<Path> dirs = Files.list(userDataDir).collect(Collectors.toList());
-        for (Path dir : dirs) {
-            if (Files.exists(dir.resolve("Preferences"))) {
-                ChromeUserProfile cp = new ChromeUserProfile(userDataDir, new ProfileDirectoryName(dir.getFileName().toString()));
-                userProfiles.add(cp);
-            }
+        List<ChromeUserProfile> cupList = new ArrayList<>();
+        //
+        Path localStateFile = userDataDir.resolve(LocalState.LOCAL_STATE_FILENAME);
+        LocalState localState = new LocalState(localStateFile);
+        LocalCacheProfilePairs pairs = localState.getCacheProfilePairs();
+        logger_.debug("[getChromeUserProfileList] pairs: " + pairs.toString());
+        Iterator<LocalCacheProfilePair> iter = pairs.iterator();
+        while (iter.hasNext()) {
+            LocalCacheProfilePair cpp = iter.next();
+            CacheDirectoryName cdn = new CacheDirectoryName(cpp.getCacheName());
+            UserProfile up = new UserProfile(cpp.getProfileName());
+            ChromeUserProfile cup = new ChromeUserProfile(userDataDir, cdn, up);
+            logger_.debug(String.format("cdn: %s, cup: %s", cdn.toString(), cup.toString()));
+            cupList.add(cup);
         }
-        return userProfiles;
+        return cupList;
     }
+
+    public static String stringifyListOfChromeUserProfile(List<ChromeUserProfile> list) {
+        Collections.sort(list);
+        StringBuilder sb = new StringBuilder();
+        sb.append("[\n");
+        for (int i = 0; i < list.size(); i++) {
+            if (i > 0) {
+                sb.append(",\n");
+            }
+            sb.append("\t");
+            ChromeUserProfile cup = list.get(i);
+            sb.append(cup.toString());
+        }
+        sb.append("\n]");
+        return sb.toString();
+    }
+
 
     public static ChromeUserProfile findChromeUserProfile(UserProfile userProfile)
             throws IOException
@@ -96,52 +128,46 @@ public final class ChromeProfileUtils {
         return findChromeUserProfile(userDataDir, userProfile) != null;
     }
 
-    public static ChromeUserProfile findChromeUserProfileByProfileDirectoryName(ProfileDirectoryName profileDirectoryName) throws IOException {
-        return findChromeUserProfileByProfileDirectoryName(getDefaultUserDataDir(), profileDirectoryName);
+    public static ChromeUserProfile findChromeUserProfileByCacheDirectoryName(
+            CacheDirectoryName cacheDirectoryName) throws IOException {
+        return findChromeUserProfileByCacheDirectoryName(
+                getDefaultUserDataDir(),
+                cacheDirectoryName);
     }
 
-    public static ChromeUserProfile findChromeUserProfileByProfileDirectoryName(Path userDataDir, ProfileDirectoryName profileDirectoryName) throws IOException {
+    public static ChromeUserProfile findChromeUserProfileByCacheDirectoryName(
+            Path userDataDir,
+            CacheDirectoryName cacheDirectoryName) throws IOException {
         List<ChromeUserProfile> chromeUserProfiles = getChromeUserProfileList(userDataDir);
         for (ChromeUserProfile chromeUserProfile : chromeUserProfiles) {
-            if (chromeUserProfile.getProfileDirectoryName().equals(profileDirectoryName)) {
+            if (chromeUserProfile.getCacheDirectoryName().equals(cacheDirectoryName)) {
                 return chromeUserProfile;
             }
 
         }
-
         return null;
     }
 
-    public static UserProfile findUserProfileByProfileDirectoryName(ProfileDirectoryName profileDirectoryName)
+    public static UserProfile findUserProfileByCacheDirectoryName(CacheDirectoryName cacheDirectoryName)
             throws IOException {
-        return findUserProfileByProfileDirectoryName(getDefaultUserDataDir(), profileDirectoryName);
+        return findUserProfileByCacheDirectoryName(getDefaultUserDataDir(), cacheDirectoryName);
     }
 
-    public static UserProfile findUserProfileByProfileDirectoryName(Path userDataDir, ProfileDirectoryName profileDirectoryName)
+    public static UserProfile findUserProfileByCacheDirectoryName(
+            Path userDataDir,
+            CacheDirectoryName cacheDirectoryName)
             throws IOException {
-        return findChromeUserProfileByProfileDirectoryName(userDataDir, profileDirectoryName).getUserProfile();
+        return findChromeUserProfileByCacheDirectoryName(
+                userDataDir, cacheDirectoryName).getUserProfile();
     }
 
     /**
-     * @return String representaion in JSON of all ChromeUserProfiles found
+     * @return String representation in JSON of all ChromeUserProfiles found
      * @throws IOException TODO
      */
     public static String allChromeUserProfilesAsString() throws IOException {
         List<ChromeUserProfile> userProfiles = getChromeUserProfileList();
-        Collections.sort(userProfiles);
-        StringBuilder sb = new StringBuilder();
-        sb.append("[");
-        int count = 0;
-        for (ChromeUserProfile up : userProfiles) {
-            if (count > 0) {
-                sb.append(",");
-            }
-            sb.append(up.toString());
-            count += 1;
-        }
-
-        sb.append("]");
-        return sb.toString();
+        return stringifyListOfChromeUserProfile(userProfiles);
     }
 
     private ChromeProfileUtils() {

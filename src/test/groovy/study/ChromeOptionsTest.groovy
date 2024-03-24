@@ -83,7 +83,8 @@ class ChromeOptionsTest {
     @Before
     void setup() {
         driver = null
-        gson = new GsonBuilder().setPrettyPrinting().create()
+        //gson = new GsonBuilder().setPrettyPrinting().create()
+        gson = new GsonBuilder().setPrettyPrinting().excludeFieldsWithoutExposeAnnotation().create()
     }
 
     @After

@@ -1,6 +1,6 @@
 package com.kazurayam.webdriverfactory.chrome;
 
-import com.kazurayam.webdriverfactory.ProfileDirectoryName;
+import com.kazurayam.webdriverfactory.CacheDirectoryName;
 import org.openqa.selenium.chrome.ChromeOptions;
 
 import java.nio.file.Path;
@@ -22,7 +22,7 @@ public class ChromeOptionsModifiers {
         noSandbox,
         singleProcess,
         windowSize,
-        withProfileDirectoryName,
+        withCacheDirectoryName,
     }
 
     public static ChromeOptionsModifier disableDevShmUsage() {
@@ -126,24 +126,24 @@ public class ChromeOptionsModifiers {
         return new Base(Type.windowSize, modifier, arguments);
     }
 
-    public static ChromeOptionsModifier withProfileDirectoryName(
+    public static ChromeOptionsModifier withCacheDirectoryName(
             final Path userDataDir,
-            final ProfileDirectoryName profileDirectoryName)
+            final CacheDirectoryName cacheDirectoryName)
     {
         Objects.requireNonNull(userDataDir);
-        Objects.requireNonNull(profileDirectoryName);
-        List<Object> arguments = Arrays.asList(userDataDir, profileDirectoryName);
+        Objects.requireNonNull(cacheDirectoryName);
+        List<Object> arguments = Arrays.asList(userDataDir, cacheDirectoryName);
         BiFunction<ChromeOptions, List<Object>, ChromeOptions> modifier = (opts, args) -> {
             assert args.size() >= 2;
             assert args.get(0) instanceof Path;
-            assert args.get(1) instanceof ProfileDirectoryName;
+            assert args.get(1) instanceof CacheDirectoryName;
             Path udd = (Path)args.get(0);
-            ProfileDirectoryName pdn = (ProfileDirectoryName)args.get(1);
+            CacheDirectoryName pdn = (CacheDirectoryName)args.get(1);
             opts.addArguments("user-data-dir=" + udd);
             opts.addArguments("profile-directory=" + pdn.getName());
             return opts;
         };
-        return new Base(Type.withProfileDirectoryName, modifier, arguments);
+        return new Base(Type.withCacheDirectoryName, modifier, arguments);
     }
 
 

@@ -8,12 +8,14 @@ plugins {
 }
 
 group 'com.kazurayam'
-version '0.6.6'
+version '0.7.0'
 
 ext.isReleaseVersion = ! version.endsWith("SNAPSHOT")
 
-sourceCompatibility = '1.8'
-targetCompatibility = '1.8'
+java {
+    sourceCompatibility = '11'
+    targetCompatibility = '11'
+}
 
 def defaultEncoding = 'UTF-8'
 tasks.withType(AbstractCompile).each {
@@ -22,12 +24,13 @@ tasks.withType(AbstractCompile).each {
 
 ext {
     groovyVersion = '2.4.21'
-    slf4jVersion = '1.7.25'
+    slf4jVersion = '2.0.12'
     selenium3Version = '3.141.59'
-    webdrivermanagerVersion = '5.0.3'
+    webdrivermanagerVersion = '5.7.0'
     junitVersion = '4.12'
     subprocessjVersion = '0.3.3'
-    gsonVersion = '2.8.2'
+    gsonVersion = '2.10.1'
+    jacksonVersion = '2.14.0'
     jcommanderVersion = '1.82'
 }
 
@@ -38,17 +41,19 @@ repositories {
 
 dependencies {
     implementation "org.slf4j:slf4j-api:${slf4jVersion}"
-    implementation group: 'org.slf4j', name: 'slf4j-simple', version: "${slf4jVersion}"
     implementation group: 'org.seleniumhq.selenium', name: 'selenium-java', version: "${selenium3Version}"
     implementation group: 'com.google.code.gson', name: 'gson', version: "${gsonVersion}"
+    implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: "${jacksonVersion}"
     implementation group: 'com.beust', name: 'jcommander', version: "${jcommanderVersion}"
 
+    testImplementation group: 'org.slf4j', name: 'slf4j-simple', version: "${slf4jVersion}"
     testImplementation "org.codehaus.groovy:groovy-all:${groovyVersion}"
     testImplementation group: 'org.seleniumhq.selenium', name: 'selenium-java', version: "${selenium3Version}"
     testImplementation group: 'io.github.bonigarcia', name: 'webdrivermanager', version: "${webdrivermanagerVersion}"
     testImplementation group: 'junit', name: 'junit', version: "${junitVersion}"
     testImplementation group: 'com.kazurayam', name: 'subprocessj', version: "${subprocessjVersion}"
     testImplementation group: 'com.kazurayam', name: 'timekeeper', version: '0.3.3'
+    testImplementation group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.5.1'
 }
 
 tasks.withType(JavaCompile) {
@@ -57,6 +62,17 @@ tasks.withType(JavaCompile) {
 
 test {
     finalizedBy jacocoTestReport
+}
+
+task testSelected(type: Test) {
+    //include '**/CarryingCookieOverSessionsViaChromeProfileTest*'
+    //include '**/ChromeDriverFactoryImplTest*'
+    include '**/ChromeDriverFactoryTest*'
+    //include '**/ChromeProfileUtilsTest*'
+    //include '**/LaunchedChromeDriverTest*'
+    include '**/LaunchChromeWithProfileDirectory*'
+    //include '**/LaunchChromeWithUserProfile*'
+    //include '**/PrintEmployedOptions*'
 }
 
 application {

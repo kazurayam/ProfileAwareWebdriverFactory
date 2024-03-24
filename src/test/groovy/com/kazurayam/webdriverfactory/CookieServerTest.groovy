@@ -2,15 +2,13 @@ package com.kazurayam.webdriverfactory
 
 import com.beust.jcommander.JCommander
 import com.kazurayam.webdriverfactory.chrome.ChromeDriverFactory
-import com.kazurayam.webdriverfactory.chrome.ChromeDriverFactoryImpl
 import com.kazurayam.webdriverfactory.chrome.ChromePreferencesModifiers
 import com.kazurayam.webdriverfactory.chrome.LaunchedChromeDriver
 import io.github.bonigarcia.wdm.WebDriverManager
 import org.junit.Before
 import org.junit.BeforeClass
 import org.junit.Test
-import org.slf4j.Logger
-import org.slf4j.LoggerFactory
+import static org.junit.Assert.*
 
 import java.nio.file.Files
 import java.nio.file.Path
@@ -20,13 +18,12 @@ class CookieServerTest {
 
     CookieServer cookieServer
     JCommander jc
-
     Path outputDir
 
     @BeforeClass
     static void beforeClass() {
         // setup the ChromeDriver binary
-        WebDriverManager.chromedriver().setup()
+        WebDriverManager.chromedriver().clearDriverCache().setup()
     }
 
     @Before
@@ -42,8 +39,8 @@ class CookieServerTest {
     void test_startup_shutdown() {
         cookieServer.setPort(8080)
         cookieServer.setBaseDir(Paths.get("./src/web"))
-        cookieServer.isPrintingRequested(true)
-        cookieServer.isDebugMode(true)
+        cookieServer.setPrintRequestRequired(true)
+        cookieServer.setDebugMode(true)
         cookieServer.setCookieMaxAge(35)
         cookieServer.startup()
         ChromeDriverFactory factory = ChromeDriverFactory.newChromeDriverFactory()
@@ -117,17 +114,45 @@ class CookieServerTest {
     }
 
     @Test
-    void test_cli_print_request_negative() {
+    void test_cli_print_request_positive() {
+        BufferingRequestPrinter printer = new BufferingRequestPrinter()
+        cookieServer.setRequestPrinter(printer)
         String[] argv = [ "--print-request" ]
         jc.parse(argv)
-        assert ! cookieServer.isPrintingRequested
+        assert cookieServer.isPrintRequestRequired
+        cookieServer.setBaseDir(Paths.get("./src/web"))
+        cookieServer.startup()
+        //
+        ChromeDriverFactory factory = ChromeDriverFactory.newChromeDriverFactory()
+        LaunchedChromeDriver launched = factory.newChromeDriver()
+        launched.getDriver().navigate().to("http://127.0.0.1:80/")
+        Thread.sleep(3000)
+        launched.getDriver().quit()
+        String msg = printer.getMessage();
+        println "msg: ${msg}"
+        assertTrue(msg.contains("Accept-encoding"))
+        //
+        cookieServer.shutdown()
     }
 
+
+    static class BufferingRequestPrinter implements CookieServer.RequestPrinter {
+        StringBuilder sb = new StringBuilder();
+        @Override
+        void printRequest(String str) {
+            sb.append(str)
+        }
+        String getMessage() {
+            return sb.toString()
+        }
+    }
+
+
     @Test
-    void test_cli_print_request_positive() {
-        String[] argv = [ "--debug" ]
+    void test_cli_print_request_negative() {
+        String[] argv = []
         jc.parse(argv)
-        assert cookieServer.isPrintingRequested
+        assert ! cookieServer.isPrintRequestRequired
     }
 
     @Test
@@ -139,7 +164,7 @@ class CookieServerTest {
 
     @Test
     void test_cli_debug_negative() {
-        String[] argv = [ "--print-request" ]
+        String[] argv = []
         jc.parse(argv)
         assert ! cookieServer.isDebugMode
     }

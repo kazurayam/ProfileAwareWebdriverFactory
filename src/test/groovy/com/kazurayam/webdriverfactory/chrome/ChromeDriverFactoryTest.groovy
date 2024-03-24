@@ -5,7 +5,7 @@ import com.kazurayam.timekeeper.Record
 import com.kazurayam.timekeeper.Table
 import com.kazurayam.timekeeper.Timekeeper
 import com.kazurayam.webdriverfactory.CookieServer
-import com.kazurayam.webdriverfactory.ProfileDirectoryName
+import com.kazurayam.webdriverfactory.CacheDirectoryName
 import com.kazurayam.webdriverfactory.UserProfile
 import com.kazurayam.webdriverfactory.chrome.ChromeDriverFactory.UserDataAccess
 import org.junit.After
@@ -42,15 +42,17 @@ class ChromeDriverFactoryTest {
 
 	@BeforeClass
 	static void beforeClass() {
-		WebDriverManager.chromedriver().setup()
+		WebDriverManager.chromedriver()
+				.clearDriverCache()
+				.clearResolutionCache().setup()
 		outputFolder = Paths.get(".").resolve("build/tmp/testOutput")
 				.resolve(ChromeDriverFactoryTest.class.getSimpleName())
 		Files.createDirectories(outputFolder)
 		//
 		cookieServer = new CookieServer()
 		cookieServer.setBaseDir(Paths.get("./src/web"))
-		cookieServer.isPrintingRequested(true)
-		cookieServer.isDebugMode(true)
+		cookieServer.setPrintRequestRequired(true)
+		cookieServer.setDebugMode(true)
 		cookieServer.startup()
 	}
 
@@ -81,6 +83,7 @@ class ChromeDriverFactoryTest {
 		//
 		launched = cdFactory.newChromeDriver()
 		assertNotNull(launched)
+		//println "raw: " + launched.getEmployedOptionsAsJSON()
 		launched.getEmployedOptionsAsJSON().ifPresent({ json ->
 			println("options is\n${json}")
 		})
@@ -141,21 +144,22 @@ class ChromeDriverFactoryTest {
   }
 }
 			 */
-			assertTrue(json.contains("--incognito"))
+			assertTrue("json does not contain --incognito", json.contains("--incognito"))
 		})
 	}
 
 	@Test
-	void test_ChromeDriver_metadata() {
+	void test_ChromeDriver_metadata_FOR_HERE() {
 		ChromeDriverFactory cdFactory = ChromeDriverFactory.newChromeDriverFactory()
-		launched = cdFactory.newChromeDriver(new ProfileDirectoryName('Default'))
+		launched = cdFactory.newChromeDriver(new CacheDirectoryName('Default'),
+				UserDataAccess.FOR_HERE)
 		assertNotNull(launched)
 		assertTrue(launched.getChromeUserProfile().isPresent())
 		assertTrue(launched.getInstruction().isPresent())
 		launched.getChromeUserProfile().ifPresent({ ChromeUserProfile up ->
 			println up
 			assertEquals(new UserProfile("Kazuaki"), up.getUserProfile())
-			assertEquals(new ProfileDirectoryName("Default"), up.getProfileDirectoryName())
+			assertEquals(new CacheDirectoryName("Default"), up.getCacheDirectoryName())
 			assertTrue(Files.exists(up.getUserDataDir()))
 			// e.g, "/Users/kazurayam/Library/Application Support/Google/Chrome"
 		})
@@ -180,6 +184,7 @@ class ChromeDriverFactoryTest {
 		assertTrue(logFile.size() > 0)
 	}
 
+
 	/**
 	 * Instantiate a ChromeDriver to open a Chrome browser specifying a user profile "Picasso"
 	 * while cloning the User Data directory to a temporary folder
@@ -196,9 +201,9 @@ class ChromeDriverFactoryTest {
 		// from the genuine one into the temporary directory
 		launched.getChromeUserProfile().ifPresent({ ChromeUserProfile chromeUserProfile ->
 			Path originalCookieFile = ChromeProfileUtils.getDefaultUserDataDir()
-					.resolve(chromeUserProfile.getProfileDirectoryName().toString())
+					.resolve(chromeUserProfile.getCacheDirectoryName().toString())
 					.resolve("Cookies")
-			Path clonedCookieFile = chromeUserProfile.getProfileDirectory().resolve("Cookies")
+			Path clonedCookieFile = chromeUserProfile.getCacheDirectory().resolve("Cookies")
 			assert clonedCookieFile != null
 			//assert originalCookieFile.size() == clonedCookieFile.size()
 			//
@@ -250,10 +255,10 @@ class ChromeDriverFactoryTest {
 	// I ignore this as it tends to fail easily when a Chrome process is already in action
 	@Ignore
 	@Test
-	void test_newChromeDriver_byProfileDirectoryName_FOR_HERE() {
+	void test_newChromeDriver_byCacheDirectoryName_FOR_HERE() {
 		ChromeDriverFactory cdFactory = ChromeDriverFactory.newChromeDriverFactory()
 		launched = cdFactory.newChromeDriver(
-				new ProfileDirectoryName('Profile 1'),
+				new CacheDirectoryName('Profile 17'),
 				UserDataAccess.FOR_HERE)
 		assertNotNull(launched)
 
@@ -262,10 +267,10 @@ class ChromeDriverFactoryTest {
 	}
 
 	@Test
-	void test_newChromeDriver_byProfileDirectoryName_TO_GO() {
+	void test_newChromeDriver_byCacheDirectoryName_TO_GO() {
 		ChromeDriverFactory cdFactory = ChromeDriverFactory.newChromeDriverFactory()
 		launched = cdFactory.newChromeDriver(
-				new ProfileDirectoryName('Profile 1'),
+				new CacheDirectoryName('Profile 17'),
 				UserDataAccess.TO_GO)  // or 'Default'
 		assertNotNull(launched)
 
@@ -401,12 +406,12 @@ class ChromeDriverFactoryTest {
 		m1.recordDuration(["Case": "no specialization"], before, after)
 		launched.getDriver().quit()
 
-		// open Chrome with ProfileDirectoryName
+		// open Chrome with CacheDirectoryName
 		before = LocalDateTime.now()
 		cdFactory = ChromeDriverFactory.newChromeDriverFactory()
-		launched = cdFactory.newChromeDriver(new ProfileDirectoryName('Profile 1'))
+		launched = cdFactory.newChromeDriver(new CacheDirectoryName('Profile 17'))
 		after = LocalDateTime.now()
-		m1.recordDuration(["Case": "with ProfileDirectoryName"], before, after)
+		m1.recordDuration(["Case": "with CacheDirectoryName"], before, after)
 		// report
 		Path md = outputFolder.resolve("test_speed.md")
 		tk.report(md)
