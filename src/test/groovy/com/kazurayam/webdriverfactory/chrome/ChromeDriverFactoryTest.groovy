@@ -4,31 +4,23 @@ import com.kazurayam.timekeeper.Measurement
 import com.kazurayam.timekeeper.Record
 import com.kazurayam.timekeeper.Table
 import com.kazurayam.timekeeper.Timekeeper
-import com.kazurayam.webdriverfactory.CookieServer
 import com.kazurayam.webdriverfactory.CacheDirectoryName
+import com.kazurayam.webdriverfactory.CookieServer
+import com.kazurayam.webdriverfactory.TestUtils
 import com.kazurayam.webdriverfactory.UserProfile
 import com.kazurayam.webdriverfactory.chrome.ChromeDriverFactory.UserDataAccess
-import org.junit.After
-import org.junit.AfterClass
-import org.junit.BeforeClass
-
-import java.time.LocalDateTime
-
-import static org.junit.Assert.*
-
-import org.junit.Before
-import org.junit.Ignore
-import org.junit.Test
+import io.github.bonigarcia.wdm.WebDriverManager
+import org.junit.*
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
 import org.openqa.selenium.Cookie
 
-import io.github.bonigarcia.wdm.WebDriverManager
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
+import java.time.LocalDateTime
 
-import com.kazurayam.webdriverfactory.TestUtils
+import static org.junit.Assert.*
 
 /**
  * @author kazurayam
@@ -386,10 +378,21 @@ class ChromeDriverFactoryTest {
 				new UserProfile('Picasso'),
 				UserDataAccess.FOR_HERE)
 		assertNotNull(launched)
-
 		launched.getDriver().navigate().to('http://example.com/')
+		launched.getDriver().quit()
 	}
 
+	@Test
+	void test_newChromeDriver_HEADLESS() {
+		ChromeDriverFactory cdf = ChromeDriverFactory.newChromeDriverFactory()
+		cdf.addChromeOptionsModifier(ChromeOptionsModifiers.headless())
+		launched = cdf.newChromeDriver(
+				new UserProfile('Picasso'),
+				UserDataAccess.TO_GO)
+		assertNotNull(launched)
+		launched.getDriver().navigate().to('http://example.com/')
+		launched.getDriver().quit()
+	}
 
 	@Test
 	void test_speed() {
