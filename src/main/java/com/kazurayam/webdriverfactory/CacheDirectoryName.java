@@ -1,6 +1,7 @@
 package com.kazurayam.webdriverfactory;
 
 public class CacheDirectoryName implements Comparable<CacheDirectoryName> {
+
     public CacheDirectoryName(String name) {
         this.name = name;
     }

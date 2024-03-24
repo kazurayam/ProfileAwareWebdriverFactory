@@ -2,7 +2,7 @@ package com.kazurayam.webdriverfactory.chrome;
 
 import java.util.Objects;
 
-public class CacheProfilePair {
+public class LocalCacheProfilePair {
     private final String cacheName;
     private final String profileName;
 
@@ -11,7 +11,7 @@ public class CacheProfilePair {
      * @param cn e.g, "Profile 17"
      * @param pn e.g, "Picasso"
      */
-    public CacheProfilePair(String cn, String pn) {
+    public LocalCacheProfilePair(String cn, String pn) {
         Objects.requireNonNull(cn);
         if (!cn.equals("Default") && !cn.startsWith("Profile")) {
             throw new IllegalArgumentException("cacheName must be Default or Profile N");
@@ -20,26 +20,31 @@ public class CacheProfilePair {
         if (pn.isEmpty()) {
             throw new IllegalArgumentException("profileName must not be empty string");
         }
-        this.cacheName = cn;
-        this.profileName = pn;
+        this.cacheName = cn.trim();
+        this.profileName = pn.trim();
     }
+
     public final String getCacheName() {
         return cacheName;
     }
+
+    public final boolean hasCacheName(String cn) { return cn.trim().equals(this.cacheName); };
+
     public final String getProfileName() {
         return profileName;
     }
+
     public final boolean hasProfileName(String pn) {
-        return pn.equals(this.profileName);
+        return pn.trim().equals(this.profileName);
     }
 
     @Override
     public final boolean equals(Object o) {
         if (o == this)
             return true;
-        if (!(o instanceof CacheProfilePair))
+        if (!(o instanceof LocalCacheProfilePair))
             return false;
-        CacheProfilePair other = (CacheProfilePair)o;
+        LocalCacheProfilePair other = (LocalCacheProfilePair)o;
         boolean cacheNameEquals = this.cacheName.equals(other.cacheName);
         return this.profileName.equals(other.profileName) && cacheNameEquals;
     }

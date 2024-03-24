@@ -13,6 +13,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 
 /**
  * A representation of a Chrome Profile instance.
@@ -23,38 +24,59 @@ public class ChromeUserProfile implements Comparable<ChromeUserProfile> {
 
     private static Logger logger_ = LoggerFactory.getLogger(ChromeUserProfile.class);
 
+    private Path userDataDir;
+    private CacheDirectoryName cacheDirectoryName;
+    private UserProfile userProfile;
+    private String preferences;
+    private static final String PREFERENCES_FILE_NAME = "Preferences";
+
     /**
      * @param userDataDir "~/Library/Application Support/Google/Chrome/"
      * @param cacheDirectoryName "Default", "Profile 1", "Profile 2", "Profile 3", ...
      * @throws IOException TOOD
      */
-    public ChromeUserProfile(final Path userDataDir, CacheDirectoryName cacheDirectoryName)
+    public ChromeUserProfile(final Path userDataDir,
+                             CacheDirectoryName cacheDirectoryName)
             throws IOException {
+        Path localStateFile = userDataDir.resolve(LocalState.LOCAL_STATE_FILENAME);
+        LocalState localState = new LocalState(localStateFile);
+        Optional<UserProfile> userProfile =
+                localState.lookupUserProfileOf(cacheDirectoryName);
+        if (userProfile.isPresent()) {
+            initialize(userDataDir, cacheDirectoryName, userProfile.get());
+        } else {
+            throw new IllegalStateException("unable to find UserProfile that relates to " +
+                    cacheDirectoryName);
+        }
+    }
+
+    public ChromeUserProfile(final Path userDataDir,
+                             CacheDirectoryName cacheDirectoryName,
+                             UserProfile userProfile)
+            throws IOException {
+        initialize(userDataDir, cacheDirectoryName, userProfile);
+    }
+
+    void initialize(final Path userDataDir,
+                    CacheDirectoryName cacheDirectoryName,
+                    UserProfile userProfile) throws IOException {
         Objects.requireNonNull(userDataDir);
         Objects.requireNonNull(cacheDirectoryName);
+        Objects.requireNonNull(userProfile);
         if (!Files.exists(userDataDir)) {
             throw new IllegalArgumentException(
                     String.format("%s is not found", userDataDir));
         }
-
+        //
         Path profilePath = userDataDir.resolve(cacheDirectoryName.toString());
         if (!Files.exists(profilePath)) {
             throw new IllegalArgumentException(
                     String.format("%s is not found", profilePath));
         }
-
+        //
         this.userDataDir = userDataDir;
         this.cacheDirectoryName = cacheDirectoryName;
-
-        logger_.debug("getPreferences(): " + getPreferences());
-
-        Gson gson = new Gson();
-        Map m = gson.fromJson(getPreferences(), Map.class);
-        Map prof = (Map)m.get("profile");
-        assert prof != null;
-        String name = (String)prof.get("name");
-        assert name != null;
-        this.userProfile = new UserProfile(name);
+        this.userProfile = userProfile;
     }
 
     public Path getUserDataDir() {
@@ -135,9 +157,4 @@ public class ChromeUserProfile implements Comparable<ChromeUserProfile> {
         return sb.toString();
     }
 
-    private final Path userDataDir;
-    private final CacheDirectoryName cacheDirectoryName;
-    private final UserProfile userProfile;
-    private String preferences;
-    private static final String PREFERENCES_FILE_NAME = "Preferences";
 }

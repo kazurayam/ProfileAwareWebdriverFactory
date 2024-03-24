@@ -59,4 +59,14 @@ class ChromeUserProfileTest {
 		def obj = slurper.parseText(defaultProfile.toString())
 		assert obj != null
 	}
+
+	@Test
+	void test_getPreferences() {
+		Path userDataDir = ChromeProfileUtils.getDefaultUserDataDir()
+		LocalState localState = new LocalState(userDataDir, LocalState.LOCAL_STATE_FILENAME);
+		String cacheName = localState.lookupCacheNameOf("Picasso")
+		ChromeUserProfile cupPicasso =
+				new ChromeUserProfile(userDataDir, new CacheDirectoryName(cacheName))
+
+	}
 }

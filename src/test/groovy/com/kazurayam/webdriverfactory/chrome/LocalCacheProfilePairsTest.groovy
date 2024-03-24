@@ -4,15 +4,15 @@ import org.junit.Before
 import org.junit.Test
 import static org.junit.Assert.assertEquals
 
-class CacheProfilePairsTest {
+class LocalCacheProfilePairsTest {
 
-    private CacheProfilePair instance0
-    private CacheProfilePairs pairs
+    private LocalCacheProfilePair instance0
+    private LocalCacheProfilePairs pairs
 
     @Before
     void setup() {
-        instance0 = new CacheProfilePair("Profile 17", "Picasso")
-        pairs = new CacheProfilePairs()
+        instance0 = new LocalCacheProfilePair("Profile 17", "Picasso")
+        pairs = new LocalCacheProfilePairs()
         pairs.add(instance0)
     }
 
@@ -23,7 +23,7 @@ class CacheProfilePairsTest {
 
     @Test
     void test_get() {
-        CacheProfilePair cpp = pairs.get(0)
+        LocalCacheProfilePair cpp = pairs.get(0)
         assertEquals(instance0, cpp);
     }
 

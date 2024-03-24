@@ -12,13 +12,13 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
 public final class ChromeProfileUtils {
 
-    private static Logger logger_ = LoggerFactory.getLogger(ChromeProfileUtils.class);
+    private static final Logger logger_ = LoggerFactory.getLogger(ChromeProfileUtils.class);
 
     public static Path getDefaultUserDataDir() {
         if (OSIdentifier.isWindows()) {
@@ -58,15 +58,38 @@ public final class ChromeProfileUtils {
         if (!Files.exists(userDataDir)) {
             throw new IllegalArgumentException(String.format("%s is not present", userDataDir));
         }
-        List<ChromeUserProfile> userProfiles = new ArrayList<>();
-        List<Path> dirs = Files.list(userDataDir).collect(Collectors.toList());
-        for (Path dir : dirs) {
-            if (Files.exists(dir.resolve("Preferences"))) {
-                ChromeUserProfile cp = new ChromeUserProfile(userDataDir, new CacheDirectoryName(dir.getFileName().toString()));
-                userProfiles.add(cp);
-            }
+        List<ChromeUserProfile> cupList = new ArrayList<>();
+        //
+        Path localStateFile = userDataDir.resolve(LocalState.LOCAL_STATE_FILENAME);
+        LocalState localState = new LocalState(localStateFile);
+        LocalCacheProfilePairs pairs = localState.getCacheProfilePairs();
+        logger_.debug("[getChromeUserProfileList] pairs: " + pairs.toString());
+        Iterator<LocalCacheProfilePair> iter = pairs.iterator();
+        while (iter.hasNext()) {
+            LocalCacheProfilePair cpp = iter.next();
+            CacheDirectoryName cdn = new CacheDirectoryName(cpp.getCacheName());
+            UserProfile up = new UserProfile(cpp.getProfileName());
+            ChromeUserProfile cup = new ChromeUserProfile(userDataDir, cdn, up);
+            logger_.debug(String.format("cdn: %s, cup: %s", cdn.toString(), cup.toString()));
+            cupList.add(cup);
         }
-        return userProfiles;
+        return cupList;
+    }
+
+    public static String stringifyListOfChromeUserProfile(List<ChromeUserProfile> list) {
+        Collections.sort(list);
+        StringBuilder sb = new StringBuilder();
+        sb.append("[\n");
+        for (int i = 0; i < list.size(); i++) {
+            if (i > 0) {
+                sb.append(",\n");
+            }
+            sb.append("\t");
+            ChromeUserProfile cup = list.get(i);
+            sb.append(cup.toString());
+        }
+        sb.append("\n]");
+        return sb.toString();
     }
 
 
@@ -139,26 +162,12 @@ public final class ChromeProfileUtils {
     }
 
     /**
-     * @return String representaion in JSON of all ChromeUserProfiles found
+     * @return String representation in JSON of all ChromeUserProfiles found
      * @throws IOException TODO
      */
     public static String allChromeUserProfilesAsString() throws IOException {
         List<ChromeUserProfile> userProfiles = getChromeUserProfileList();
-        Collections.sort(userProfiles);
-        StringBuilder sb = new StringBuilder();
-        sb.append("[\n");
-        int count = 0;
-        for (ChromeUserProfile up : userProfiles) {
-            if (count > 0) {
-                sb.append(",\n");
-            }
-            sb.append("\t");
-            sb.append(up.toString());
-            count += 1;
-        }
-
-        sb.append("\n]");
-        return sb.toString();
+        return stringifyListOfChromeUserProfile(userProfiles);
     }
 
     private ChromeProfileUtils() {

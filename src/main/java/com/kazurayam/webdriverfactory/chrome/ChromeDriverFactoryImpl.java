@@ -170,7 +170,6 @@ public class ChromeDriverFactoryImpl extends ChromeDriverFactory {
 					)
 			);
 		}
-
 		Path userDataDir = ChromeProfileUtils.getDefaultUserDataDir();
 		CacheDirectoryName cacheDirectoryName = chromeUserProfile.getCacheDirectoryName();
 		return launchChrome(userDataDir, cacheDirectoryName, instruction);
@@ -230,17 +229,28 @@ public class ChromeDriverFactoryImpl extends ChromeDriverFactory {
 		Objects.requireNonNull(userDataDir);
 		Objects.requireNonNull(cacheDirectoryName);
 		Objects.requireNonNull(instruction);
+		logger_.debug("[launchChrome] userDataDir: " + userDataDir);
+		logger_.debug("[launchChrome] cacheDirectoryName: " + cacheDirectoryName);
+		logger_.debug("[launchChrome] instruction: " + instruction);
 		if (!Files.exists(userDataDir)) {
 			throw new IllegalArgumentException(String.format("%s is not present", userDataDir));
 		}
 
 		final Path sourceProfileDirectory = userDataDir.resolve(cacheDirectoryName.toString());
-		assert Files.exists(sourceProfileDirectory);
+		assert Files.exists(sourceProfileDirectory) : sourceProfileDirectory + " is not found";
 		Path targetUserDataDir = userDataDir;
 		if (instruction.equals(UserDataAccess.TO_GO)) {
+			// copy the profile-related files to a temp dir
 			targetUserDataDir = Files.createTempDirectory("__user-data-dir__");
+			// copy the "Local State" file
+			Path localStateSource = userDataDir.resolve(LocalState.LOCAL_STATE_FILENAME);
+			Path localStateTarget = targetUserDataDir.resolve(LocalState.LOCAL_STATE_FILENAME);
+			Files.copy(localStateSource, localStateTarget);
+
+			// copy the profile directory recursively
 			final Path targetProfileDirectory = targetUserDataDir.resolve(cacheDirectoryName.getName());
 			PathUtils.copyDirectoryRecursively(sourceProfileDirectory, targetProfileDirectory);
+			//
 			logger_.info(String.format("copied %d files from %s into %s",
 					PathUtils.listDirectoryRecursively(targetProfileDirectory).size(),
 					sourceProfileDirectory, targetProfileDirectory));
@@ -260,8 +270,10 @@ public class ChromeDriverFactoryImpl extends ChromeDriverFactory {
 			ChromeOptions options = buildOptions(this.chromePreferencesModifiers, this.chromeOptionsModifiers);
 			driver = new ChromeDriver(options);
 			setPageLoadTimeout(driver, this.pageLoadTimeoutSeconds);
+			ChromeUserProfile chromeUserProfile =
+					new ChromeUserProfile(targetUserDataDir, cacheDirectoryName);
 			return new LaunchedChromeDriver(driver)
-					.setChromeUserProfile(new ChromeUserProfile(targetUserDataDir, cacheDirectoryName))
+					.setChromeUserProfile(chromeUserProfile)
 					.setInstruction(instruction).setEmployedOptions(options);
 		} catch (InvalidArgumentException iae) {
 			if (driver != null) {

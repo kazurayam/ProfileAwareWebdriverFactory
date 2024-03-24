@@ -6,15 +6,15 @@ import org.junit.Test
 import static org.junit.Assert.assertEquals
 import static org.junit.Assert.fail
 
-class CacheProfilePairTest {
+class LocalCacheProfilePairTest {
 
     private final String cacheName = "Profile 17"
     private final String profileName = "Picasso"
-    CacheProfilePair cpp
+    LocalCacheProfilePair cpp
 
     @Before
     void setup() {
-        cpp = new CacheProfilePair(cacheName, profileName)
+        cpp = new LocalCacheProfilePair(cacheName, profileName)
     }
 
     @Test
@@ -29,13 +29,13 @@ class CacheProfilePairTest {
 
     @Test
     void testEquals() {
-        CacheProfilePair other = new CacheProfilePair(cacheName, profileName)
+        LocalCacheProfilePair other = new LocalCacheProfilePair(cacheName, profileName)
         assertEquals(other, cpp)
     }
 
     @Test
     void testHashCode() {
-        CacheProfilePair other = new CacheProfilePair(cacheName, profileName)
+        LocalCacheProfilePair other = new LocalCacheProfilePair(cacheName, profileName)
         assertEquals(other.hashCode(), cpp.hashCode())
     }
 
@@ -51,7 +51,7 @@ class CacheProfilePairTest {
     @Test
     public void testInvalidCacheName() {
         try {
-            cpp = new CacheProfilePair("Foo", "Bar")
+            cpp = new LocalCacheProfilePair("Foo", "Bar")
             fail("should fail with cacheName Foo, but actually passed")
         } catch (IllegalArgumentException e) {
             // as expected

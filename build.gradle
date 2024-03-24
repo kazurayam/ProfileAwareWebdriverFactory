@@ -12,8 +12,10 @@ version '0.7.0-SNAPSHOT'
 
 ext.isReleaseVersion = ! version.endsWith("SNAPSHOT")
 
-sourceCompatibility = '17'
-targetCompatibility = '17'
+java {
+    sourceCompatibility = '11'
+    targetCompatibility = '11'
+}
 
 def defaultEncoding = 'UTF-8'
 tasks.withType(AbstractCompile).each {
@@ -62,15 +64,15 @@ test {
     finalizedBy jacocoTestReport
 }
 
-task runFailedTests(type: Test) {
-    include '**/CarryingCookieOverSessionsViaChromeProfileTest*'
-    include '**/ChromeDriverFactoryImplTest*'
+task testSelected(type: Test) {
+    //include '**/CarryingCookieOverSessionsViaChromeProfileTest*'
+    //include '**/ChromeDriverFactoryImplTest*'
     include '**/ChromeDriverFactoryTest*'
-    include '**/ChromeProfileUtilsTest*'
-    include '**/LaunchedChromeDriverTest*'
+    //include '**/ChromeProfileUtilsTest*'
+    //include '**/LaunchedChromeDriverTest*'
     include '**/LaunchChromeWithProfileDirectory*'
-    include '**/LaunchChromeWithUserProfile*'
-    include '**/PrintEmployedOptions*'
+    //include '**/LaunchChromeWithUserProfile*'
+    //include '**/PrintEmployedOptions*'
 }
 
 application {

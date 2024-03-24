@@ -4,7 +4,7 @@ import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import org.junit.BeforeClass
 import org.junit.Test
-import static org.junit.Assert.fail
+import static org.junit.Assert.assertNotNull
 import org.openqa.selenium.chrome.ChromeOptions
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -24,9 +24,9 @@ class ChromeDriverFactoryImplTest {
     @Test
     void test_applyChromePreferencesModifiers() {
         // prepare
-        Set<ChromePreferencesModifier> modifiers = new HashSet<>();
+        Set<ChromePreferencesModifier> modifiers = new HashSet<>()
         modifiers.add(ChromePreferencesModifiers.downloadWithoutPrompt())
-        Map<String, Object> preference = new HashMap<>();
+        Map<String, Object> preference = new HashMap<>()
         preference.put("plugins.plugins_disabled",
                 Arrays.asList("Adobe Flash Player", "Chrome PDF Viewer"))
         // when
@@ -65,7 +65,17 @@ class ChromeDriverFactoryImplTest {
 
     @Test
     void test_buildOptions() {
-        fail("TODO");
+        Set<ChromePreferencesModifier> chromePreferencesModifiers = new HashSet<>()
+        chromePreferencesModifiers.add(ChromePreferencesModifiers.downloadWithoutPrompt())
+        //
+        Set<ChromeOptionsModifier> chromeOptionsModifiers = new HashSet<>()
+        chromeOptionsModifiers.add(ChromeOptionsModifiers.disableDevShmUsage())
+        //
+        ChromeOptions chromeOptions =
+                ChromeDriverFactoryImpl.buildOptions(
+                        chromePreferencesModifiers,
+                        chromeOptionsModifiers);
+        assertNotNull(chromeOptions);
     }
 
 }
