@@ -17,6 +17,7 @@ public class ChromeOptionsModifiers {
         disableExtensions,
         disableGpu,
         disableInfobars,
+        enableAutomation,
         headless,
         incognito,
         noSandbox,
@@ -59,6 +60,16 @@ public class ChromeOptionsModifiers {
             return opts;
         };
         return new Base(Type.disableInfobars, modifier, arguments);
+    }
+
+    public static ChromeOptionsModifier enableAutomation() {
+        List<Object> arguments = Collections.emptyList();
+        BiFunction<ChromeOptions, List<Object>, ChromeOptions> modifier = (opts, args) -> {
+            opts.setExperimentalOption("excludeSwitches",
+                    new String[]{"enable-automation"});
+            return opts;
+        };
+        return new Base(Type.enableAutomation, modifier, arguments);
     }
 
     public static ChromeOptionsModifier headless() {
