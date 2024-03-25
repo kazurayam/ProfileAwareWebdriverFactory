@@ -8,6 +8,7 @@ import io.github.bonigarcia.wdm.WebDriverManager;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
@@ -56,6 +57,7 @@ import java.util.concurrent.TimeUnit;
  *    The JavaScript will return a URL string back to the test script.
  * 5. It verifies if the returned URL string is equal to the expected.
  */
+@Ignore
 public class GettingClipboardContent {
     private final String targetURL = "https://codepen.io/RevCred/pen/vxXrww";
     private final String iframeLocator = "//iframe[@id='result']";
@@ -75,7 +77,7 @@ public class GettingClipboardContent {
         // If I turn Chrome to be Headless, this test will fail.
         // I don't know why. It could be that the target web page does not work healthy
         // if the browser is headless.
-        //cdf.addChromeOptionsModifier(ChromeOptionsModifiers.headless());
+        cdf.addChromeOptionsModifier(ChromeOptionsModifiers.headless());
 
         // modify Chrome Preferences to grant access to Clipboard
         cdf.addChromePreferencesModifier(

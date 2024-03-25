@@ -1,7 +1,8 @@
 package com.kazurayam.webdriverfactory.chrome;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.slf4j.Logger;
@@ -59,9 +60,14 @@ public class LaunchedChromeDriver {
     public Optional<String> getEmployedOptionsAsJSON() {
         Optional<ChromeOptions> options = getEmployedOptions();
         if (options.isPresent()) {
-            Gson gson = new GsonBuilder().setPrettyPrinting()
-                    .excludeFieldsWithoutExposeAnnotation().create();
-            return Optional.of(gson.toJson(options.get().asMap()));
+            ChromeOptions opts = options.get();
+            ObjectMapper mapper = new ObjectMapper();
+            JsonNode root = mapper.convertValue(opts.asMap(), JsonNode.class);
+            try {
+                return Optional.of(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(root));
+            } catch (JsonProcessingException e) {
+                throw new RuntimeException("unable to convert a ChromeOptions instance into json", e);
+            }
         } else {
             return Optional.empty();
         }

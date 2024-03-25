@@ -21,11 +21,12 @@ class JacksonTest {
 }
 '''
 
+    private ObjectMapper mapper;
     private JsonNode root;
 
     @Before
     public void setup() {
-        ObjectMapper mapper = new ObjectMapper();
+        mapper = new ObjectMapper();
         root = mapper.readTree(str);
     }
 
@@ -49,6 +50,11 @@ class JacksonTest {
         assertEquals(2, root.get("hoge").get("piyo").asInt())
         println root.get("hoge").get("piyo").asDouble()   // 2.0
         assertEquals(true, root.get("hoge").get("piyo").asBoolean())
+    }
 
+    @Test
+    void test_pretty_print() {
+        String pp = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(root)
+        println pp
     }
 }

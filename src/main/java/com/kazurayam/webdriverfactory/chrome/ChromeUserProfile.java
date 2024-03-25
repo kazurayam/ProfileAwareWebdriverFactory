@@ -1,17 +1,15 @@
 package com.kazurayam.webdriverfactory.chrome;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.kazurayam.webdriverfactory.CacheDirectoryName;
 import com.kazurayam.webdriverfactory.UserProfile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.io.Reader;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -102,10 +100,9 @@ public class ChromeUserProfile implements Comparable<ChromeUserProfile> {
             throw new IOException(
                     String.format("%s is not found", preferencesPath));
         }
-        Gson gson = new GsonBuilder().setPrettyPrinting().create();
-        Reader reader = Files.newBufferedReader(preferencesPath);
-        Map m = gson.fromJson(reader, Map.class);
-        return gson.toJson(m);
+        ObjectMapper mapper = new ObjectMapper();
+        JsonNode root = mapper.readTree(Files.newBufferedReader(preferencesPath));
+        return mapper.writerWithDefaultPrettyPrinter().writeValueAsString(root);
     }
 
     /**
@@ -151,9 +148,6 @@ public class ChromeUserProfile implements Comparable<ChromeUserProfile> {
         sb.append(this.getCacheDirectoryName());
         sb.append("\"");
         sb.append("}");
-        //
-        //Gson gson = new GsonBuilder().setPrettyPrinting().create();
-        //return gson.toJson(sb.toString());
         return sb.toString();
     }
 

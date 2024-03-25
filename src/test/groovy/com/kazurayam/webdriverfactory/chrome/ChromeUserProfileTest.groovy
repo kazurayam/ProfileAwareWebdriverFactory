@@ -6,6 +6,8 @@ import groovy.json.JsonSlurper
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 
 import java.nio.file.Path
 
@@ -17,6 +19,8 @@ import static org.junit.Assert.*
  */
 @RunWith(JUnit4.class)
 class ChromeUserProfileTest {
+
+	Logger logger = LoggerFactory.getLogger(ChromeUserProfileTest.class)
 
 	@Test
 	void test_ChromeProfile() {
@@ -70,6 +74,7 @@ class ChromeUserProfileTest {
 				new ChromeUserProfile(userDataDir,
 						new CacheDirectoryName(cacheName.get()),
 						new UserProfile("Picasso"))
+		logger.info("[test_getPreferences] cupPicasso.getPreferences(): " + cupPicasso.getPreferences())
 		assertNotNull(cupPicasso.getPreferences())
 	}
 }
