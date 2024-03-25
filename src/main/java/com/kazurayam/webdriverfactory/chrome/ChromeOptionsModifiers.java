@@ -75,7 +75,7 @@ public class ChromeOptionsModifiers {
     public static ChromeOptionsModifier headless() {
         List<Object> arguments = Collections.emptyList();
         BiFunction<ChromeOptions, List<Object>, ChromeOptions> modifier = (opts, args) -> {
-            opts.addArguments("--headless");
+            opts.addArguments("--headless=new");
             return opts;
         };
         return new Base(Type.headless, modifier, arguments);
