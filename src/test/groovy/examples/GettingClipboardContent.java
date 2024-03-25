@@ -11,10 +11,15 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.NoSuchElementException;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.FluentWait;
+import org.openqa.selenium.support.ui.Wait;
 
 import java.io.IOException;
+import java.time.Duration;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -66,7 +71,11 @@ public class GettingClipboardContent {
     @Before
     public void setup() throws IOException {
         ChromeDriverFactory cdf = ChromeDriverFactory.newChromeDriverFactory();
-        cdf.addChromeOptionsModifier(ChromeOptionsModifiers.headless());
+
+        // If I turn Chrome to be Headless, this test will fail.
+        // I don't know why. It could be that the target web page does not work healthy
+        // if the browser is headless.
+        //cdf.addChromeOptionsModifier(ChromeOptionsModifiers.headless());
 
         // modify Chrome Preferences to grant access to Clipboard
         cdf.addChromePreferencesModifier(
@@ -74,15 +83,20 @@ public class GettingClipboardContent {
 
         LaunchedChromeDriver launched = cdf.newChromeDriver();
         driver = launched.getDriver();
-        driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS);
     }
 
     @Test
     public void testReadingClipboard() throws InterruptedException {
         driver.navigate().to(targetURL);
-        WebElement iframe = driver.findElement(By.xpath(iframeLocator));
+        Wait<WebDriver> wait = new FluentWait<>(driver)
+                .withTimeout(Duration.ofSeconds(10))
+                .pollingEvery(Duration.ofSeconds(1))
+                .ignoring(NoSuchElementException.class);
+        WebElement iframe = wait.until(ExpectedConditions
+                .presenceOfElementLocated(By.id("result")));
         driver.switchTo().frame(iframe);
-        WebElement button = driver.findElement(By.xpath(buttonLocator));
+        WebElement button = wait.until(ExpectedConditions
+                .presenceOfElementLocated(By.id("copy")));
         button.click();
         Thread.sleep(1 * 1000);
         if (driver instanceof JavascriptExecutor) {
