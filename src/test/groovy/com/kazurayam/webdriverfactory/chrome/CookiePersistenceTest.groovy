@@ -41,9 +41,11 @@ class CookiePersistenceTest {
      */
     @Test
     void test_FORHERE_takes_over_persisted_cookie() {
-        ChromeDriverFactory cdFactory = ChromeDriverFactory.newChromeDriverFactory()
+        ChromeDriverFactory cdf = ChromeDriverFactory.newChromeDriverFactory()
+        cdf.addChromeOptionsModifier(ChromeOptionsModifiers.headless())
+
         // 1st session
-        driver = cdFactory.newChromeDriver(new UserProfile(profileName),
+        driver = cdf.newChromeDriver(new UserProfile(profileName),
                 ChromeDriverFactory.UserDataAccess.FOR_HERE)
         driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS)
         driver.navigate().to(url)
@@ -57,11 +59,11 @@ class CookiePersistenceTest {
         driver.quit()
 
         // 2nd session
-        driver = cdFactory.newChromeDriver(new UserProfile(profileName),
-                ChromeDriverFactory.UserDataAccess.FOR_HERE)   // notice it! we use FOR_HERE
-        driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS)
-        driver.navigate().to(url)
-        assertNotNull(driver)
+        LaunchedChromeDriver launched =
+                cdf.newChromeDriver(new UserProfile(profileName),
+                        ChromeDriverFactory.UserDataAccess.FOR_HERE)   // notice it! we use FOR_HERE
+        launched.getDriver().manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS)
+        launched.getDriver().navigate().to(url)
         Cookie cookie2 = driver.manage().getCookieNamed(cookieName)
         String value2 = cookie2.getValue()
 
@@ -74,6 +76,7 @@ class CookiePersistenceTest {
             println "cookie1 DOES NOT equal cookie2"
         }
         assert value1 == value2
+        launched.getDriver().quit()
     }
 
     /**
@@ -82,29 +85,30 @@ class CookiePersistenceTest {
      */
     @Test
     void test_TOGO_doesnt_take_over_persisted_cookie() {
-        ChromeDriverFactory cdFactory = ChromeDriverFactory.newChromeDriverFactory()
+        ChromeDriverFactory cdf = ChromeDriverFactory.newChromeDriverFactory()
         // 1st session
-        driver = cdFactory.newChromeDriver(new UserProfile(profileName),
-                ChromeDriverFactory.UserDataAccess.TO_GO)   // notice it; we use TO_GO!
-        driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS)
-        driver.navigate().to(url)
-        assertNotNull(driver)
-        Cookie cookie1 = driver.manage().getCookieNamed(cookieName)
+        LaunchedChromeDriver launched =
+                cdf.newChromeDriver(new UserProfile(profileName),
+                        ChromeDriverFactory.UserDataAccess.TO_GO)   // notice it; we use TO_GO!
+        launched.getDriver().manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS)
+        launched.getDriver().navigate().to(url)
+        Cookie cookie1 = launched.getDriver().manage().getCookieNamed(cookieName)
         String value1 = cookie1.getValue()
         String s = cookie1.toString()
         assertNotNull(s)
 
         // stop the 1st session
-        driver.quit()
+        launched.getDriver().quit()
 
         // 2nd session
-        driver = cdFactory.newChromeDriver(new UserProfile(profileName),
-                ChromeDriverFactory.UserDataAccess.FOR_HERE)
-        driver.manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS)
-        driver.navigate().to(url)
-        assertNotNull(driver)
+        LaunchedChromeDriver launched2 =
+                cdf.newChromeDriver(new UserProfile(profileName),
+                        ChromeDriverFactory.UserDataAccess.FOR_HERE)
+        launched2.getDriver().manage().timeouts().implicitlyWait(10, TimeUnit.SECONDS)
+        launched2.getDriver().navigate().to(url)
         Cookie cookie2 = driver.manage().getCookieNamed(cookieName)
         String value2 = cookie2.getValue()
+        launched2.getDriver().quit()
 
         // make sure that the cookie value was taken over via the profile
         println "cookie1 timestamp=${value1}"

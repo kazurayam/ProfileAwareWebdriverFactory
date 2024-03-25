@@ -8,7 +8,7 @@ plugins {
 }
 
 group 'com.kazurayam'
-version '0.7.0'
+version '0.7.3'
 
 ext.isReleaseVersion = ! version.endsWith("SNAPSHOT")
 
@@ -29,7 +29,6 @@ ext {
     webdrivermanagerVersion = '5.7.0'
     junitVersion = '4.12'
     subprocessjVersion = '0.3.3'
-    gsonVersion = '2.10.1'
     jacksonVersion = '2.14.0'
     jcommanderVersion = '1.82'
 }
@@ -42,7 +41,6 @@ repositories {
 dependencies {
     implementation "org.slf4j:slf4j-api:${slf4jVersion}"
     implementation group: 'org.seleniumhq.selenium', name: 'selenium-java', version: "${selenium3Version}"
-    implementation group: 'com.google.code.gson', name: 'gson', version: "${gsonVersion}"
     implementation group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: "${jacksonVersion}"
     implementation group: 'com.beust', name: 'jcommander', version: "${jcommanderVersion}"
 

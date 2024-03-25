@@ -1,6 +1,6 @@
 package study
 
-import com.google.gson.GsonBuilder
+import com.kazurayam.webdriverfactory.chrome.ChromeOptionsUtil
 import io.github.bonigarcia.wdm.WebDriverManager
 import org.junit.After;
 import org.junit.Before
@@ -9,7 +9,6 @@ import org.junit.Test;
 import org.openqa.selenium.chrome.ChromeDriver
 import org.openqa.selenium.chrome.ChromeOptions
 import org.openqa.selenium.Proxy
-import com.google.gson.Gson
 
 /**
  * Study the following article by the ChromeDriver project
@@ -19,13 +18,16 @@ import com.google.gson.Gson
  */
 class ChromeOptionsTest {
 
+    private String toJson(ChromeOptions options) {
+        return ChromeOptionsUtil.toJson(options)
+    }
 
     @Test(expected = IllegalArgumentException.class)
     void test_ChromeOptions_addExtensions() {
         ChromeOptions options = new ChromeOptions()
         options.addExtensions(new File("/path/to/extensions.crx"))
         driver = new ChromeDriver(options)
-        println "test_ChromeOptions_assExtensions: " + gson.toJson(options)
+        println "test_ChromeOptions_assExtensions: " + toJson(options)
         driver.navigate().to("http://www.google.com")
         Thread.sleep(1000)
     }
@@ -34,10 +36,12 @@ class ChromeOptionsTest {
     void test_ChromeOptions_addArguments_windowSize() {
         ChromeOptions options = new ChromeOptions()
         options.addArguments("window-size=" + 800 + "," + 600)
+        options.addArguments("--headless")
         driver = new ChromeDriver(options)
-        println "test_ChromeOptions_addArguments_windowSize: " + gson.toJson(options)
+        println "test_ChromeOptions_addArguments_windowSize: " + toJson(options)
         driver.navigate().to("http://example.com")
         Thread.sleep(3000)
+        driver.quit()
     };
 
     /**
@@ -49,12 +53,14 @@ class ChromeOptionsTest {
     @Test
     void test_ChromeOptions_setCapability() {
         ChromeOptions options = new ChromeOptions();
+        options.addArguments("--headless")
         // Add the WebDriver proxy capability.
         Proxy proxy = new Proxy()
         proxy.setHttpProxy("myhttpproxy:3337")
         options.setCapability("proxy", proxy)
-        println "test_ChromeOptions_setCapability: " + gson.toJson(options)
+        println "test_ChromeOptions_setCapability: " + toJson(options)
         driver = new ChromeDriver(options);
+        driver.quit()
     }
 
     /**
@@ -68,11 +74,7 @@ class ChromeOptionsTest {
      * to tell Chrome which profile to use:
      */
 
-
-
-
     private ChromeDriver driver;
-    private Gson gson
 
     @BeforeClass
     static void beforeClass() {
@@ -83,8 +85,6 @@ class ChromeOptionsTest {
     @Before
     void setup() {
         driver = null
-        //gson = new GsonBuilder().setPrettyPrinting().create()
-        gson = new GsonBuilder().setPrettyPrinting().excludeFieldsWithoutExposeAnnotation().create()
     }
 
     @After

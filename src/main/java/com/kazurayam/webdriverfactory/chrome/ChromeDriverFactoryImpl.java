@@ -54,6 +54,7 @@ public class ChromeDriverFactoryImpl extends ChromeDriverFactory {
 		this.addChromeOptionsModifier(ChromeOptionsModifiers.disableExtensions());
 		this.addChromeOptionsModifier(ChromeOptionsModifiers.disableGpu());
 		this.addChromeOptionsModifier(ChromeOptionsModifiers.disableDevShmUsage());
+		//this.addChromeOptionsModifier(ChromeOptionsModifiers.enableAutomation());
 	}
 
 	@Override
@@ -114,9 +115,9 @@ public class ChromeDriverFactoryImpl extends ChromeDriverFactory {
 		ChromeOptions options = buildOptions(
 				this.chromePreferencesModifiers,
 				this.chromeOptionsModifiers);
-		logger_.info("[newChromeDriver] this.chromePreferencesModifiers: " + this.chromePreferencesModifiers);
-		logger_.info("[newChromeDriver] this.chromeOptionsModifiers: " + this.chromeOptionsModifiers);
-		logger_.info("[newChromeDriver] options: " + options);
+		logger_.debug("[newChromeDriver] this.chromePreferencesModifiers: " + this.chromePreferencesModifiers);
+		logger_.debug("[newChromeDriver] this.chromeOptionsModifiers: " + this.chromeOptionsModifiers);
+		logger_.debug("[newChromeDriver] options: " + options);
 		ChromeDriver driver = new ChromeDriver(options);
 		setPageLoadTimeout(driver, this.pageLoadTimeoutSeconds);
 		return new LaunchedChromeDriver(driver).setEmployedOptions(options);

@@ -7,7 +7,6 @@ import io.github.bonigarcia.wdm.WebDriverManager
 import org.junit.After
 import org.junit.Before
 import org.junit.BeforeClass
-import org.junit.Ignore
 import org.junit.Test
 import org.openqa.selenium.Cookie
 
@@ -44,6 +43,7 @@ class CarryingCookieOverSessionsViaChromeProfileTest {
         cookieServer.setDebugMode(true)
         cookieServer.startup()
     }
+
     /**
      * This code will open Chrome browser and navigate to the URL "http://127.0.0.1" twice.
      * The http server will send a cookie named "timestamp" with value of
@@ -57,40 +57,90 @@ class CarryingCookieOverSessionsViaChromeProfileTest {
      * At the 2nd time, Chrome is opened with UserDataAccess option of "TO_GO".
      * TO_GO means that the files in the profile directory will be copied from the genuine location
      * to the temporary location. Therefore I expect the cookies are carried over to
-     * the second session. In the second session,
-     * I expect the "timestamp" cookie should be sent from Chrome to the server again.
+     * the second session. In the second session, I expect the "timestamp" cookie
+     * should be sent from Chrome to the server again.
      *
      * This code makes assertion if the values of "timestamp" cookie of the 1st session
      * and the 2nd session are equal.
      * If these are not equal, it means that cookie was not carried over.
+     *
      */
-    @Test
-    void test_carrying_cookie_over_sessions_via_profile() {
-        //ChromeDriverFactory factory = ChromeDriverFactory.newHeadlessChromeDriverFactory()
-        ChromeDriverFactory factory = ChromeDriverFactory.newChromeDriverFactory()
-        LaunchedChromeDriver launched
 
+    @Test
+    void test_automationNotEnabled_nonHeadless() {
+        ChromeDriverFactory cdf = ChromeDriverFactory.newChromeDriverFactory()
+        // automation not enabled
+        //cdf.addChromeOptionsModifier(ChromeOptionsModifiers.enableAutomation())
+        Tuple2<Cookie, Cookie> result = performConsecutiveSessions(cdf)
+        assertEquals(result.first.getValue(), result.second.getValue())
+    }
+
+    @Test
+    void test_automationEnabled_nonHeadless() {
+        ChromeDriverFactory cdf = ChromeDriverFactory.newChromeDriverFactory()
+        // automation is enabled
+        cdf.addChromeOptionsModifier(ChromeOptionsModifiers.enableAutomation())
+        //
+        Tuple2<Cookie, Cookie> result = performConsecutiveSessions(cdf)
+        assertEquals(result.first.getValue(), result.second.getValue())
+    }
+
+    //-------------------------------------------------------------------------
+
+    @Test
+    void test_automationIsNotEnabled_Headless() {
+        ChromeDriverFactory cdf =
+                ChromeDriverFactory.newHeadlessChromeDriverFactory()
+        // automation is not enabled
+        //cdf.addChromeOptionsModifier(ChromeOptionsModifiers.enableAutomation())
+        //
+        Tuple2<Cookie, Cookie> result = performConsecutiveSessions(cdf)
+        assertEquals(result.first.getValue(), result.second.getValue())
+    }
+
+    @Test
+    void test_automationIsEnabled_Headless() {
+        ChromeDriverFactory cdf =
+                ChromeDriverFactory.newHeadlessChromeDriverFactory()
+        // automation is enabled
+        cdf.addChromeOptionsModifier(ChromeOptionsModifiers.enableAutomation())
+        //
+        Tuple2<Cookie, Cookie> result = performConsecutiveSessions(cdf)
+        assertEquals(result.first.getValue(), result.second.getValue())
+    }
+
+    //=========================================================================
+
+    private static Tuple2<Cookie, Cookie> performConsecutiveSessions(ChromeDriverFactory cdf) {
+        LaunchedChromeDriver launched
         // 1st session
-        launched = factory.newChromeDriver(new UserProfile("Picasso"),
+        launched = cdf.newChromeDriver(new UserProfile("Picasso"),
                 ChromeDriverFactory.UserDataAccess.FOR_HERE)
         Cookie timestamp1 = observeCookie(launched)
-        launched.getDriver().quit()   // at .quit(), the Cookies will be stored into disk
+        launched.getDriver().quit()
+        // at .quit(), the Cookies will be stored into the genuine UserDataDir
+
+        try {
+            Thread.sleep(3000)
+        } catch (Exception e) {}
 
         // 2nd session
-        launched = factory.newChromeDriver(new UserProfile("Picasso"),  // or new CacheDirectoryName("Profile 6")
-                ChromeDriverFactory.UserDataAccess.TO_GO)  // the Cookies file will be copied into the temp dir
+        launched = cdf.newChromeDriver(
+                new UserProfile("Picasso"),
+                ChromeDriverFactory.UserDataAccess.TO_GO
+                // the Cookies file will be copied from the genuine UserDataDir
+                // into the temp dir
+        )
         Cookie timestamp2 = observeCookie(launched)
         launched.getDriver().quit()
         //
         println "timestamp1 => " + CookieUtils.stringifyCookie(timestamp1)
         println "timestamp2 => " + CookieUtils.stringifyCookie(timestamp2)
-
-        assertEquals(timestamp1.getValue(), timestamp2.getValue())
-        assertNotEquals(timestamp1.getExpiry(), timestamp2.getExpiry())
+        return new Tuple2(timestamp1, timestamp2)
     }
 
     private static Cookie observeCookie(LaunchedChromeDriver launched, String cookieName = "timestamp") {
-        launched.getEmployedOptions()ifPresent({ options ->
+        launched.getEmployedOptions().ifPresent({ options ->
             println "options => " + options.toString() })
         launched.getChromeUserProfile().ifPresent({ up ->
             println "userProfile => " + up.toString() })

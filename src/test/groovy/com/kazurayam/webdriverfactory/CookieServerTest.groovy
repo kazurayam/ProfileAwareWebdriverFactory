@@ -2,6 +2,7 @@ package com.kazurayam.webdriverfactory
 
 import com.beust.jcommander.JCommander
 import com.kazurayam.webdriverfactory.chrome.ChromeDriverFactory
+import com.kazurayam.webdriverfactory.chrome.ChromeOptionsModifiers
 import com.kazurayam.webdriverfactory.chrome.ChromePreferencesModifiers
 import com.kazurayam.webdriverfactory.chrome.LaunchedChromeDriver
 import io.github.bonigarcia.wdm.WebDriverManager
@@ -43,8 +44,9 @@ class CookieServerTest {
         cookieServer.setDebugMode(true)
         cookieServer.setCookieMaxAge(35)
         cookieServer.startup()
-        ChromeDriverFactory factory = ChromeDriverFactory.newChromeDriverFactory()
-        LaunchedChromeDriver launched = factory.newChromeDriver()
+        ChromeDriverFactory cdf = ChromeDriverFactory.newChromeDriverFactory()
+        cdf.addChromeOptionsModifier(ChromeOptionsModifiers.headless())
+        LaunchedChromeDriver launched = cdf.newChromeDriver()
         launched.getDriver().navigate().to("http://127.0.0.1:8080/")
         Thread.sleep(3000)
         launched.getDriver().quit()
@@ -64,13 +66,12 @@ class CookieServerTest {
             dir.toFile().deleteDir()
         }
         Files.createDirectories(dir)
-        ChromeDriverFactory factory =
+        ChromeDriverFactory cdf =
                 ChromeDriverFactory.newChromeDriverFactory()
-                .addChromePreferencesModifier(
-                        ChromePreferencesModifiers.downloadWithoutPrompt())
-                .addChromePreferencesModifier(
-                        ChromePreferencesModifiers.downloadIntoDirectory(dir))
-        LaunchedChromeDriver launched = factory.newChromeDriver()
+                        .addChromeOptionsModifier(ChromeOptionsModifiers.headless())
+                        .addChromePreferencesModifier(ChromePreferencesModifiers.downloadWithoutPrompt())
+                        .addChromePreferencesModifier(ChromePreferencesModifiers.downloadIntoDirectory(dir))
+        LaunchedChromeDriver launched = cdf.newChromeDriver()
         launched.getDriver().navigate().to("http://127.0.0.1/SDG_DSD_MATRIX.1.7.xlsm")
         Thread.sleep(3000)   // expect the downloading to finish in 3 seconds
         launched.getDriver().quit()
@@ -123,8 +124,9 @@ class CookieServerTest {
         cookieServer.setBaseDir(Paths.get("./src/web"))
         cookieServer.startup()
         //
-        ChromeDriverFactory factory = ChromeDriverFactory.newChromeDriverFactory()
-        LaunchedChromeDriver launched = factory.newChromeDriver()
+        ChromeDriverFactory cdf = ChromeDriverFactory.newChromeDriverFactory()
+        cdf.addChromeOptionsModifier(ChromeOptionsModifiers.headless())
+        LaunchedChromeDriver launched = cdf.newChromeDriver()
         launched.getDriver().navigate().to("http://127.0.0.1:80/")
         Thread.sleep(3000)
         launched.getDriver().quit()

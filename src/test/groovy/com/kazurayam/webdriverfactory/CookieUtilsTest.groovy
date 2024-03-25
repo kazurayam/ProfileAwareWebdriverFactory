@@ -5,7 +5,6 @@ import org.openqa.selenium.Cookie
 
 class CookieUtilsTest {
 
-
     /**
      * public Cookie(java.lang.String name,
      java.lang.String value,

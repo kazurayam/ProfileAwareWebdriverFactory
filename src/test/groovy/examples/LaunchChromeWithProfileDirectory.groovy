@@ -1,6 +1,7 @@
 package examples
 
 import com.kazurayam.webdriverfactory.chrome.ChromeDriverFactory
+import com.kazurayam.webdriverfactory.chrome.ChromeOptionsModifiers
 import com.kazurayam.webdriverfactory.chrome.LaunchedChromeDriver
 import com.kazurayam.webdriverfactory.CacheDirectoryName
 import io.github.bonigarcia.wdm.WebDriverManager
@@ -16,16 +17,18 @@ class LaunchChromeWithProfileDirectory {
 
     @Test
     void test_launch_browser_with_profile_directory() {
-        ChromeDriverFactory factory = ChromeDriverFactory.newChromeDriverFactory()
-        launched = factory.newChromeDriver(new CacheDirectoryName("Profile 17"))
+        ChromeDriverFactory cdf = ChromeDriverFactory.newChromeDriverFactory()
+        cdf.addChromeOptionsModifier(ChromeOptionsModifiers.headless())
+        launched = cdf.newChromeDriver(new CacheDirectoryName("Profile 17"))
         launched.getDriver().navigate().to("http://example.com")
         Thread.sleep(1000)
     }
 
     @Test
     void test_launch_browser_with_profile_TO_GO() {
-        ChromeDriverFactory factory = ChromeDriverFactory.newChromeDriverFactory()
-        launched = factory.newChromeDriver(
+        ChromeDriverFactory cdf = ChromeDriverFactory.newChromeDriverFactory()
+        cdf.addChromeOptionsModifier(ChromeOptionsModifiers.headless())
+        launched = cdf.newChromeDriver(
                 new CacheDirectoryName("Profile 17"),
                 ChromeDriverFactory.UserDataAccess.TO_GO)
         launched.getDriver().navigate().to("http://example.com")
@@ -35,8 +38,9 @@ class LaunchChromeWithProfileDirectory {
     @Ignore
     @Test
     void test_launch_browser_with_profile_FOR_HERE() {
-        ChromeDriverFactory factory = ChromeDriverFactory.newChromeDriverFactory()
-        launched = factory.newChromeDriver(
+        ChromeDriverFactory cdf = ChromeDriverFactory.newChromeDriverFactory()
+        cdf.addChromeOptionsModifier(ChromeOptionsModifiers.headless())
+        launched = cdf.newChromeDriver(
                 new CacheDirectoryName("Profile 17"),
                 ChromeDriverFactory.UserDataAccess.FOR_HERE)
         launched.getDriver().navigate().to("http://example.com")

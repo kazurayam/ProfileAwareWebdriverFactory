@@ -4,31 +4,23 @@ import com.kazurayam.timekeeper.Measurement
 import com.kazurayam.timekeeper.Record
 import com.kazurayam.timekeeper.Table
 import com.kazurayam.timekeeper.Timekeeper
-import com.kazurayam.webdriverfactory.CookieServer
 import com.kazurayam.webdriverfactory.CacheDirectoryName
+import com.kazurayam.webdriverfactory.CookieServer
+import com.kazurayam.webdriverfactory.TestUtils
 import com.kazurayam.webdriverfactory.UserProfile
 import com.kazurayam.webdriverfactory.chrome.ChromeDriverFactory.UserDataAccess
-import org.junit.After
-import org.junit.AfterClass
-import org.junit.BeforeClass
-
-import java.time.LocalDateTime
-
-import static org.junit.Assert.*
-
-import org.junit.Before
-import org.junit.Ignore
-import org.junit.Test
+import io.github.bonigarcia.wdm.WebDriverManager
+import org.junit.*
 import org.junit.runner.RunWith
 import org.junit.runners.JUnit4
 import org.openqa.selenium.Cookie
 
-import io.github.bonigarcia.wdm.WebDriverManager
 import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
+import java.time.LocalDateTime
 
-import com.kazurayam.webdriverfactory.TestUtils
+import static org.junit.Assert.*
 
 /**
  * @author kazurayam
@@ -77,11 +69,12 @@ class ChromeDriverFactoryTest {
 
 	@Test
 	void test_addChromeOptionsModifier_incognito() {
-		ChromeDriverFactory cdFactory = ChromeDriverFactory.newChromeDriverFactory()
+		ChromeDriverFactory cdf = ChromeDriverFactory.newChromeDriverFactory()
+		cdf.addChromeOptionsModifier(ChromeOptionsModifiers.headless())
 		//
-		cdFactory.addChromeOptionsModifier(ChromeOptionsModifiers.incognito())
+		cdf.addChromeOptionsModifier(ChromeOptionsModifiers.incognito())
 		//
-		launched = cdFactory.newChromeDriver()
+		launched = cdf.newChromeDriver()
 		assertNotNull(launched)
 		//println "raw: " + launched.getEmployedOptionsAsJSON()
 		launched.getEmployedOptionsAsJSON().ifPresent({ json ->
@@ -146,12 +139,19 @@ class ChromeDriverFactoryTest {
 			 */
 			assertTrue("json does not contain --incognito", json.contains("--incognito"))
 		})
+		launched.getDriver().quit()
 	}
 
+	/**
+	 * I would put @Ignore because this test will certainly fail.
+	 * FOR_HERE causes failure.
+	 */
+	@Ignore
 	@Test
 	void test_ChromeDriver_metadata_FOR_HERE() {
-		ChromeDriverFactory cdFactory = ChromeDriverFactory.newChromeDriverFactory()
-		launched = cdFactory.newChromeDriver(new CacheDirectoryName('Default'),
+		ChromeDriverFactory cdf = ChromeDriverFactory.newChromeDriverFactory()
+		cdf.addChromeOptionsModifier(ChromeOptionsModifiers.headless())
+		launched = cdf.newChromeDriver(new CacheDirectoryName('Default'),
 				UserDataAccess.FOR_HERE)
 		assertNotNull(launched)
 		assertTrue(launched.getChromeUserProfile().isPresent())
@@ -163,25 +163,30 @@ class ChromeDriverFactoryTest {
 			assertTrue(Files.exists(up.getUserDataDir()))
 			// e.g, "/Users/kazurayam/Library/Application Support/Google/Chrome"
 		})
+		launched.getDriver().quit()
 	}
 
 	@Test
 	void test_ChromeDriver_metadata_empty() {
-		ChromeDriverFactory cdFactory = ChromeDriverFactory.newChromeDriverFactory()
-		launched = cdFactory.newChromeDriver()
+		ChromeDriverFactory cdf = ChromeDriverFactory.newChromeDriverFactory()
+		cdf.addChromeOptionsModifier(ChromeOptionsModifiers.headless())
+		launched = cdf.newChromeDriver()
 		assertEquals(Optional.empty(), launched.getChromeUserProfile())
 		assertEquals(Optional.empty(), launched.getInstruction())
+		launched.getDriver().quit()
 	}
 
 	@Test
 	void test_enableChromeDriverLog() {
-		ChromeDriverFactory cdFactory = ChromeDriverFactory.newChromeDriverFactory()
-		cdFactory.enableChromeDriverLog(outputFolder)
-		launched = cdFactory.newChromeDriver()
+		ChromeDriverFactory cdf = ChromeDriverFactory.newChromeDriverFactory()
+		cdf.addChromeOptionsModifier(ChromeOptionsModifiers.headless())
+		cdf.enableChromeDriverLog(outputFolder)
+		launched = cdf.newChromeDriver()
 		assertNotNull(launched)
 		Path logFile = outputFolder.resolve(ChromeDriverUtils.LOG_FILE_NAME)
 		assertTrue(Files.exists(logFile))
 		assertTrue(logFile.size() > 0)
+		launched.getDriver().quit()
 	}
 
 
@@ -191,8 +196,9 @@ class ChromeDriverFactoryTest {
 	 */
 	@Test
 	void test_if_cookie_file_is_cloned_TO_GO() {
-		ChromeDriverFactory cdFactory = ChromeDriverFactory.newChromeDriverFactory()
-		launched = cdFactory.newChromeDriver(
+		ChromeDriverFactory cdf = ChromeDriverFactory.newChromeDriverFactory()
+		cdf.addChromeOptionsModifier(ChromeOptionsModifiers.headless())
+		launched = cdf.newChromeDriver(
 				new UserProfile('Picasso'),
 				UserDataAccess.TO_GO)
 		assertNotNull(launched)
@@ -216,6 +222,7 @@ class ChromeDriverFactoryTest {
 
 		//println("ChromeDriver has been instantiated with profile Picasso")
 		launched.getDriver().navigate().to('http://example.com/')
+		launched.getDriver().quit()
 	}
 
 	/**
@@ -229,25 +236,27 @@ class ChromeDriverFactoryTest {
 	@Test
 	void test_if_cookie_is_retained_in_profile_accross_2_sessions() {
 		// we want Headless
-		ChromeDriverFactory cdFactory = ChromeDriverFactory.newChromeDriverFactory()
+		ChromeDriverFactory cdf = ChromeDriverFactory.newChromeDriverFactory()
+		cdf.addChromeOptionsModifier(ChromeOptionsModifiers.headless())
 		//ChromeOptionsModifier com = new ChromeOptionsModifierHeadless()
-		//cdFactory.addChromeOptionsModifier(com)
+		//cdf.addChromeOptionsModifier(com)
 		//
 		String url = 'http://localhost/'
 		// 1st session
-		launched = cdFactory.newChromeDriver(new UserProfile('Picasso'))
+		launched = cdf.newChromeDriver(new UserProfile('Picasso'))
 		launched.getDriver().navigate().to(url)
 		Set<Cookie> cookies = launched.getDriver().manage().getCookies()
 		println "1st session: " + cookies
 		String phpsessid1st = launched.getDriver().manage().getCookieNamed('timestamp')
-		launched.quit()
+		launched.getDriver().quit()
 
 		// 2nd session
-		launched = cdFactory.newChromeDriver(new UserProfile('Picasso'))
+		launched = cdf.newChromeDriver(new UserProfile('Picasso'))
 		launched.getDriver().navigate().to(url)
 		cookies = launched.getDriver().manage().getCookies()
 		println "2nd session: " + cookies
 		String phpsessid2nd = launched.getDriver().manage().getCookieNamed('timestamp')
+		launched.getDriver().quit()
 		//
 		assert phpsessid1st == phpsessid2nd
 	}
@@ -256,35 +265,50 @@ class ChromeDriverFactoryTest {
 	@Ignore
 	@Test
 	void test_newChromeDriver_byCacheDirectoryName_FOR_HERE() {
-		ChromeDriverFactory cdFactory = ChromeDriverFactory.newChromeDriverFactory()
-		launched = cdFactory.newChromeDriver(
+		ChromeDriverFactory cdf = ChromeDriverFactory.newChromeDriverFactory()
+		cdf.addChromeOptionsModifier(ChromeOptionsModifiers.headless())
+		launched = cdf.newChromeDriver(
 				new CacheDirectoryName('Profile 17'),
 				UserDataAccess.FOR_HERE)
 		assertNotNull(launched)
 
 		//println("ChromeDriver has been instantiated with profile directory Default")
 		launched.getDriver().navigate().to('http://example.com/')
+		launched.getDriver().quit()
 	}
 
 	@Test
 	void test_newChromeDriver_byCacheDirectoryName_TO_GO() {
-		ChromeDriverFactory cdFactory = ChromeDriverFactory.newChromeDriverFactory()
-		launched = cdFactory.newChromeDriver(
+		ChromeDriverFactory cdf = ChromeDriverFactory.newChromeDriverFactory()
+		cdf.addChromeOptionsModifier(ChromeOptionsModifiers.headless())
+		launched = cdf.newChromeDriver(
 				new CacheDirectoryName('Profile 17'),
 				UserDataAccess.TO_GO)  // or 'Default'
 		assertNotNull(launched)
 
 		//println("ChromeDriver has been instantiated with profile directory Default")
 		launched.getDriver().navigate().to('http://example.com/')
+		launched.getDriver().quit()
 	}
 
 	@Test
 	void test_newChromeDriver_disableViewersOfFlashAndPdf() {
-		ChromeDriverFactory factory = ChromeDriverFactory.newChromeDriverFactory()
-		factory.addChromePreferencesModifier(ChromePreferencesModifiers.disableViewersOfFlashAndPdf())
-		launched = factory.newChromeDriver()
+		Path dir = outputFolder.resolve("test_newChromeDriver_disableViewersOfFlashAndPdf")
+		Files.createDirectories(dir)
+		String fileName = "SDG_DSD_MATRIX.1.7.xlsm"
+		Path xlsm = dir.resolve(fileName)
+		if (Files.exists(xlsm)) {
+			Files.delete(xlsm)
+		}
+		ChromeDriverFactory cdf =
+				ChromeDriverFactory.newChromeDriverFactory()
+						.addChromeOptionsModifier(ChromeOptionsModifiers.headless())
+						.addChromePreferencesModifier(ChromePreferencesModifiers.downloadIntoDirectory(dir))
+						.addChromePreferencesModifier(ChromePreferencesModifiers.disableViewersOfFlashAndPdf())
+		launched = cdf.newChromeDriver()
 		launched.getDriver().navigate().to("http://127.0.0.1/SDG_Guidlines_AUG_2019_Final.pdf");
 		Thread.sleep(3000)
+		launched.getDriver().quit()
 	}
 
 	@Test
@@ -296,37 +320,44 @@ class ChromeDriverFactoryTest {
 		if (Files.exists(xlsm)) {
 			Files.delete(xlsm)
 		}
-		ChromeDriverFactory factory = ChromeDriverFactory
+		ChromeDriverFactory cdf = ChromeDriverFactory
 				.newChromeDriverFactory()
 				.addChromePreferencesModifier(ChromePreferencesModifiers.downloadIntoDirectory(dir))
-		launched = factory.newChromeDriver()
+		cdf.addChromeOptionsModifier(ChromeOptionsModifiers.headless())
+		launched = cdf.newChromeDriver()
 		System.out.println("test_newChromeDriver_downloadIntoDirectory: " + launched.getEmployedOptionsAsJSON().get())
 		launched.getDriver().navigate().to("http://127.0.0.1/" + fileName)
 		Thread.sleep(3000)
 		assert Files.exists(xlsm)
+		launched.getDriver().quit()
 	}
 
 	@Test
 	void test_newChromeDriver_downloadWithoutPrompt() {
+		Path dir = outputFolder.resolve("test_newChromeDriver_downloadWithoutPrompt")
+		Files.createDirectories(dir)
 		String fileName = "SDG_DSD_MATRIX.1.7.xlsm"
-		Path xlsm = Paths.get(System.getProperty("user.home"))
-				.resolve("Downloads").resolve(fileName)
+		Path xlsm = dir.resolve(fileName)
 		if (Files.exists(xlsm)) {
 			Files.delete(xlsm)
 		}
-		ChromeDriverFactory factory = ChromeDriverFactory
+		ChromeDriverFactory cdf = ChromeDriverFactory
 				.newChromeDriverFactory()
+				.addChromePreferencesModifier(ChromePreferencesModifiers.downloadIntoDirectory(dir))
 				.addChromePreferencesModifier(ChromePreferencesModifiers.downloadWithoutPrompt())
-		launched = factory.newChromeDriver()
+		cdf.addChromeOptionsModifier(ChromeOptionsModifiers.headless())
+		launched = cdf.newChromeDriver()
 		launched.getDriver().navigate().to("http://127.0.0.1/" + fileName)
 		Thread.sleep(3000)
 		assert Files.exists(xlsm)
+		launched.getDriver().quit()
 	}
 
 	@Test
 	void test_newChromeDriver_no_default_settings() {
-		ChromeDriverFactory cdFactory = ChromeDriverFactory.newChromeDriverFactory(false)
-		launched = cdFactory.newChromeDriver()
+		ChromeDriverFactory cdf = ChromeDriverFactory.newChromeDriverFactory(false)
+		cdf.addChromeOptionsModifier(ChromeOptionsModifiers.headless())
+		launched = cdf.newChromeDriver()
 		assertNotNull(launched)
 		launched.getEmployedOptionsAsJSON().ifPresent({ json ->
 			println("options is\n${json}")
@@ -347,6 +378,7 @@ class ChromeDriverFactoryTest {
 			assertFalse("window-size option should not be there when no default setting",
 					json.contains("window-size=1024,768")
 			)
+			launched.getDriver().quit()
 		})
 	}
 
@@ -358,14 +390,16 @@ class ChromeDriverFactoryTest {
 	 */
 	@Test
 	void test_newChromeDriver_noUserProfileSpecified() {
-		ChromeDriverFactory cdFactory = ChromeDriverFactory.newChromeDriverFactory()
-		launched = cdFactory.newChromeDriver()
+		ChromeDriverFactory cdf = ChromeDriverFactory.newChromeDriverFactory()
+		cdf.addChromeOptionsModifier(ChromeOptionsModifiers.headless())
+		launched = cdf.newChromeDriver()
 		assertNotNull(launched)
 		launched.getEmployedOptionsAsJSON().ifPresent({ json ->
 			println("options is\n${json}")
 		})
 		//
 		launched.getDriver().navigate().to('http://example.com/')
+		launched.getDriver().quit()
 	}
 
 
@@ -381,15 +415,27 @@ class ChromeDriverFactoryTest {
 	// when you have Chrome opened when you execute this test, it will certainly fail
 	@Test
 	void test_newChromeDriver_withUserProfile_FOR_HERE() {
-		ChromeDriverFactory cdFactory = ChromeDriverFactory.newChromeDriverFactory()
-		launched = cdFactory.newChromeDriver(
+		ChromeDriverFactory cdf = ChromeDriverFactory.newChromeDriverFactory()
+		cdf.addChromeOptionsModifier(ChromeOptionsModifiers.headless())
+		launched = cdf.newChromeDriver(
 				new UserProfile('Picasso'),
 				UserDataAccess.FOR_HERE)
 		assertNotNull(launched)
-
 		launched.getDriver().navigate().to('http://example.com/')
+		launched.getDriver().quit()
 	}
 
+	@Test
+	void test_newChromeDriver_HEADLESS() {
+		ChromeDriverFactory cdf = ChromeDriverFactory.newChromeDriverFactory()
+		cdf.addChromeOptionsModifier(ChromeOptionsModifiers.headless())
+		launched = cdf.newChromeDriver(
+				new UserProfile('Picasso'),
+				UserDataAccess.TO_GO)
+		assertNotNull(launched)
+		launched.getDriver().navigate().to('http://example.com/')
+		launched.getDriver().quit()
+	}
 
 	@Test
 	void test_speed() {
@@ -398,19 +444,20 @@ class ChromeDriverFactoryTest {
 				"How long it took to open a Chrome browser",
 				["Case"]).build()
 		tk.add(new Table.Builder(m1).build())
+		ChromeDriverFactory cdf = ChromeDriverFactory.newChromeDriverFactory()
+		cdf.addChromeOptionsModifier(ChromeOptionsModifiers.headless())
 		// open Chrome as default
 		LocalDateTime before = LocalDateTime.now()
-		ChromeDriverFactory cdFactory = ChromeDriverFactory.newChromeDriverFactory()
-		launched = cdFactory.newChromeDriver()
+		launched = cdf.newChromeDriver()
 		LocalDateTime after = LocalDateTime.now()
 		m1.recordDuration(["Case": "no specialization"], before, after)
 		launched.getDriver().quit()
 
 		// open Chrome with CacheDirectoryName
 		before = LocalDateTime.now()
-		cdFactory = ChromeDriverFactory.newChromeDriverFactory()
-		launched = cdFactory.newChromeDriver(new CacheDirectoryName('Profile 17'))
+		launched = cdf.newChromeDriver(new CacheDirectoryName('Profile 17'))
 		after = LocalDateTime.now()
+		launched.getDriver().quit()
 		m1.recordDuration(["Case": "with CacheDirectoryName"], before, after)
 		// report
 		Path md = outputFolder.resolve("test_speed.md")
@@ -425,10 +472,12 @@ class ChromeDriverFactoryTest {
 
 	@Test
 	void test_waitForPageLoad_works() {
-		ChromeDriverFactory cdFactory = ChromeDriverFactory.newChromeDriverFactory()
-		cdFactory.pageLoadTimeout(10)
-		launched = cdFactory.newChromeDriver()
+		ChromeDriverFactory cdf = ChromeDriverFactory.newChromeDriverFactory()
+		cdf.addChromeOptionsModifier(ChromeOptionsModifiers.headless())
+		cdf.pageLoadTimeout(10)
+		launched = cdf.newChromeDriver()
 		assertNotNull(launched)
 		launched.getDriver().navigate().to("http://example.com")
+		launched.getDriver().quit()
 	}
 }

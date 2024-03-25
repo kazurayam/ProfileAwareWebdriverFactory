@@ -12,7 +12,7 @@ import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
 
-import static org.junit.Assert.*
+import static org.junit.Assert.assertNotNull
 
 class LaunchedChromeDriverTest {
 
@@ -37,7 +37,9 @@ class LaunchedChromeDriverTest {
 
     @Test
     void test_smoke() {
-        driver = new ChromeDriver()
+        ChromeOptions opts = new ChromeOptions()
+        opts.addArguments("--headless")
+        driver = new ChromeDriver(opts)
         LaunchedChromeDriver launched =
                 new LaunchedChromeDriver(driver)
         assertNotNull(launched)

@@ -2,6 +2,7 @@ package examples
 
 import com.kazurayam.webdriverfactory.UserProfile
 import com.kazurayam.webdriverfactory.chrome.ChromeDriverFactory
+import com.kazurayam.webdriverfactory.chrome.ChromeOptionsModifiers
 import com.kazurayam.webdriverfactory.chrome.LaunchedChromeDriver
 import com.kazurayam.webdriverfactory.CacheDirectoryName
 import io.github.bonigarcia.wdm.WebDriverManager
@@ -16,22 +17,26 @@ class HowCookiesAreDigested {
 
     @Test
     void test_launch_browser_with_profile_TO_GO() {
-        ChromeDriverFactory factory = ChromeDriverFactory.newChromeDriverFactory()
-        launched = factory.newChromeDriver(
+        ChromeDriverFactory cdf = ChromeDriverFactory.newChromeDriverFactory()
+        cdf.addChromeOptionsModifier(ChromeOptionsModifiers.headless())
+        launched = cdf.newChromeDriver(
                 new UserProfile("Kazuaki"),
                 ChromeDriverFactory.UserDataAccess.TO_GO)
         launched.getDriver().navigate().to("https://mail.google.com/mail/u/0/#inbox")
         Thread.sleep(1000)
+        launched.getDriver().quit()
     }
 
     @Test
     void test_launch_browser_withCacheDirectoryName_TO_GO() {
-        ChromeDriverFactory factory = ChromeDriverFactory.newChromeDriverFactory()
-        launched = factory.newChromeDriver(
+        ChromeDriverFactory cdf = ChromeDriverFactory.newChromeDriverFactory()
+        cdf.addChromeOptionsModifier(ChromeOptionsModifiers.headless())
+        launched = cdf.newChromeDriver(
                 new CacheDirectoryName("Default"),
                 ChromeDriverFactory.UserDataAccess.TO_GO)
         launched.getDriver().navigate().to("https://mail.google.com/mail/u/0/#inbox")
         Thread.sleep(1000)
+        launched.getDriver().quit()
     }
 
     @BeforeClass

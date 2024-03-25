@@ -1,7 +1,8 @@
 package com.kazurayam.webdriverfactory.chrome
 
-import com.google.gson.Gson
-import com.google.gson.GsonBuilder
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import org.junit.BeforeClass
 import org.junit.Test
 import static org.junit.Assert.assertNotNull
@@ -14,11 +15,11 @@ import static org.junit.Assert.assertTrue
 class ChromeDriverFactoryImplTest {
 
     static Logger logger = LoggerFactory.getLogger(ChromeDriverFactoryImplTest.class);
-    private static Gson gson;
+    private static ObjectMapper mapper;
 
     @BeforeClass
     static void beforeClass() {
-        gson = new GsonBuilder().setPrettyPrinting().excludeFieldsWithoutExposeAnnotation().create();
+        mapper = new ObjectMapper();
     }
 
     @Test
@@ -46,21 +47,27 @@ class ChromeDriverFactoryImplTest {
 
         ChromeOptions options = new ChromeOptions();
         options.addArguments("--incognito");
-        logger.info("[test_applyChromeOptionsModifiers] options: " +
-                gson.toJson(options.asMap()));
+        logger.info("[test_applyChromeOptionsModifiers] options: " + toJson(options));
         assertTrue("options should contain --incognito, but actually not",
-                gson.toJson(options.asMap()).contains("--incognito"));
+                toJson(options).contains("--incognito"));
 
         // when
         ChromeOptions result =
                 ChromeDriverFactoryImpl.applyChromeOptionsModifiers(options, modifiers);
-        logger.info("[test_applyChromeOptionsModifiers] result: " +
-                gson.toJson(result.asMap()));
+        logger.info("[test_applyChromeOptionsModifiers] result: " + toJson(result));
         // then
         assertTrue("disable-dev-shm-usage option is missing",
-                gson.toJson(result.asMap()).contains("disable-dev-shm-usage"))
-        assertTrue("--incognito option is missing",
-                gson.toJson(result.asMap()).contains("--incognito"))
+                toJson(result).contains("disable-dev-shm-usage"))
+        assertTrue("--incognito option is missing", toJson(result).contains("--incognito"))
+    }
+
+    /**
+     *
+     * @param options
+     * @return
+     */
+    String toJson(ChromeOptions options) {
+        return ChromeOptionsUtil.toJson(options);
     }
 
     @Test

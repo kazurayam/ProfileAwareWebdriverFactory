@@ -1,7 +1,5 @@
 package com.kazurayam.webdriverfactory.firefox;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.firefox.FirefoxOptions;
 
@@ -43,10 +41,9 @@ public class LaunchedFirefoxDriver {
     public Optional<String> getEmployedOptionsAsJSON() {
         String json = "";
         this.getEmployedOptions().ifPresent(options -> {
-            Gson gson = new GsonBuilder().setPrettyPrinting().create();
-            gson.toJson(options);
+            Optional.of(FirefoxOptionsUtil.toJson(options));
         });
-        return Optional.of(json);
+        return Optional.empty();
     }
 
     private final FirefoxDriver driver;
