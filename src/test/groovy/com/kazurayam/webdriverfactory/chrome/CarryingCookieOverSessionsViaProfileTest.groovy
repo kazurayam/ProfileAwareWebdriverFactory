@@ -44,6 +44,7 @@ class CarryingCookieOverSessionsViaChromeProfileTest {
         cookieServer.setDebugMode(true)
         cookieServer.startup()
     }
+
     /**
      * This code will open Chrome browser and navigate to the URL "http://127.0.0.1" twice.
      * The http server will send a cookie named "timestamp" with value of
@@ -57,29 +58,34 @@ class CarryingCookieOverSessionsViaChromeProfileTest {
      * At the 2nd time, Chrome is opened with UserDataAccess option of "TO_GO".
      * TO_GO means that the files in the profile directory will be copied from the genuine location
      * to the temporary location. Therefore I expect the cookies are carried over to
-     * the second session. In the second session,
-     * I expect the "timestamp" cookie should be sent from Chrome to the server again.
+     * the second session. In the second session, I expect the "timestamp" cookie
+     * should be sent from Chrome to the server again.
      *
      * This code makes assertion if the values of "timestamp" cookie of the 1st session
      * and the 2nd session are equal.
      * If these are not equal, it means that cookie was not carried over.
+     *
      */
     @Test
     void test_carrying_cookie_over_sessions_via_profile() {
-        //ChromeDriverFactory factory = ChromeDriverFactory.newHeadlessChromeDriverFactory()
-        ChromeDriverFactory cdf = ChromeDriverFactory.newChromeDriverFactory()
-        cdf.addChromeOptionsModifier(ChromeOptionsModifiers.headless())
+        ChromeDriverFactory cdf = ChromeDriverFactory.newHeadlessChromeDriverFactory()
+        //ChromeDriverFactory cdf = ChromeDriverFactory.newChromeDriverFactory()
         LaunchedChromeDriver launched
 
         // 1st session
         launched = cdf.newChromeDriver(new UserProfile("Picasso"),
                 ChromeDriverFactory.UserDataAccess.FOR_HERE)
         Cookie timestamp1 = observeCookie(launched)
-        launched.getDriver().quit()   // at .quit(), the Cookies will be stored into disk
+        launched.getDriver().quit()
+        // at .quit(), the Cookies will be stored into the genuine UserDataDir
 
         // 2nd session
-        launched = cdf.newChromeDriver(new UserProfile("Picasso"),  // or new CacheDirectoryName("Profile 6")
-                ChromeDriverFactory.UserDataAccess.TO_GO)  // the Cookies file will be copied into the temp dir
+        launched = cdf.newChromeDriver(
+                new UserProfile("Picasso"),
+                ChromeDriverFactory.UserDataAccess.TO_GO
+                // the Cookies file will be copied from the genuine UserDataDir
+                // into the temp dir
+        )
         Cookie timestamp2 = observeCookie(launched)
         launched.getDriver().quit()
         //
@@ -91,7 +97,7 @@ class CarryingCookieOverSessionsViaChromeProfileTest {
     }
 
     private static Cookie observeCookie(LaunchedChromeDriver launched, String cookieName = "timestamp") {
-        launched.getEmployedOptions()ifPresent({ options ->
+        launched.getEmployedOptions().ifPresent({ options ->
             println "options => " + options.toString() })
         launched.getChromeUserProfile().ifPresent({ up ->
             println "userProfile => " + up.toString() })

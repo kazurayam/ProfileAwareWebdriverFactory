@@ -251,7 +251,7 @@ public class ChromeDriverFactoryImpl extends ChromeDriverFactory {
 			final Path targetProfileDirectory = targetUserDataDir.resolve(cacheDirectoryName.getName());
 			PathUtils.copyDirectoryRecursively(sourceProfileDirectory, targetProfileDirectory);
 			//
-			logger_.debug(String.format("copied %d files from %s into %s",
+			logger_.info(String.format("copied %d files from %s into %s",
 					PathUtils.listDirectoryRecursively(targetProfileDirectory).size(),
 					sourceProfileDirectory, targetProfileDirectory));
 		} else {
