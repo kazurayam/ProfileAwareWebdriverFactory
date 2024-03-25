@@ -68,7 +68,7 @@ class CarryingCookieOverSessionsViaChromeProfileTest {
     void test_carrying_cookie_over_sessions_via_profile() {
         //ChromeDriverFactory factory = ChromeDriverFactory.newHeadlessChromeDriverFactory()
         ChromeDriverFactory cdf = ChromeDriverFactory.newChromeDriverFactory()
-        cdf.addChromeOptionsModifier(ChromeOptionsModifiers.headless())
+        //cdf.addChromeOptionsModifier(ChromeOptionsModifiers.headless())
         LaunchedChromeDriver launched
 
         // 1st session
