@@ -54,7 +54,7 @@ public class ChromeDriverFactoryImpl extends ChromeDriverFactory {
 		this.addChromeOptionsModifier(ChromeOptionsModifiers.disableExtensions());
 		this.addChromeOptionsModifier(ChromeOptionsModifiers.disableGpu());
 		this.addChromeOptionsModifier(ChromeOptionsModifiers.disableDevShmUsage());
-		this.addChromeOptionsModifier(ChromeOptionsModifiers.enableAutomation());
+		//this.addChromeOptionsModifier(ChromeOptionsModifiers.enableAutomation());
 	}
 
 	@Override
