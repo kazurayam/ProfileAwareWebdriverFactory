@@ -25,8 +25,11 @@ public class ChromeUserProfile implements Comparable<ChromeUserProfile> {
     private Path userDataDir;
     private CacheDirectoryName cacheDirectoryName;
     private UserProfile userProfile;
+    private boolean present;
     private String preferences;
     private static final String PREFERENCES_FILE_NAME = "Preferences";
+
+    private static final String PSEUDO_USER_PROFILE = "";
 
     /**
      * @param userDataDir "~/Library/Application Support/Google/Chrome/"
@@ -43,8 +46,10 @@ public class ChromeUserProfile implements Comparable<ChromeUserProfile> {
         if (userProfile.isPresent()) {
             initialize(userDataDir, cacheDirectoryName, userProfile.get());
         } else {
-            throw new IllegalStateException("unable to find UserProfile that relates to " +
-                    cacheDirectoryName);
+            logger_.warn(String.format(
+                    "unable to find a user profile that corresponds to the cache directory '%s'." +
+                            " '%s' is assumed", cacheDirectoryName, PSEUDO_USER_PROFILE));
+            initialize(userDataDir, cacheDirectoryName, new UserProfile(PSEUDO_USER_PROFILE));
         }
     }
 
@@ -63,13 +68,12 @@ public class ChromeUserProfile implements Comparable<ChromeUserProfile> {
         Objects.requireNonNull(userProfile);
         if (!Files.exists(userDataDir)) {
             throw new IllegalArgumentException(
-                    String.format("userDataDir %s is not found", userDataDir ));
+                    String.format("userDataDir '%s' is not found", userDataDir ));
         }
         //
         Path cacheDir = userDataDir.resolve(cacheDirectoryName.toString());
         if (!Files.exists(cacheDir)) {
-            throw new IllegalArgumentException(
-                    String.format("cacheDir %s is not found. ", cacheDir));
+            logger_.warn(String.format("cache directory '%s' is not found. ", cacheDir));
         }
         //
         this.userDataDir = userDataDir;
@@ -105,6 +109,11 @@ public class ChromeUserProfile implements Comparable<ChromeUserProfile> {
         return mapper.writerWithDefaultPrettyPrinter().writeValueAsString(root);
     }
 
+    public boolean isPresent() {
+        Path cacheDir = userDataDir.resolve(cacheDirectoryName.toString());
+        return Files.exists(cacheDir);
+    }
+
     /**
      * order by UserProfileName
      */
@@ -135,18 +144,24 @@ public class ChromeUserProfile implements Comparable<ChromeUserProfile> {
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append("{");
-        sb.append("\"userProfile\":\"");
-        sb.append(this.getUserProfile().toString());
-        sb.append("\"");
-        sb.append(",");
         //
         sb.append("\"userDataDir\":\"");
         sb.append(this.getUserDataDir().toString());
         sb.append("\"");
         sb.append(",");
+        //
         sb.append("\"cacheDirectoryName\":\"");
         sb.append(this.getCacheDirectoryName());
         sb.append("\"");
+        sb.append(",");
+        //
+        sb.append("\"userProfile\":\"");
+        sb.append(this.getUserProfile().toString());
+        sb.append("\"");
+        sb.append(",");
+        //
+        sb.append("\"isPresent\":");
+        sb.append(this.isPresent());
         sb.append("}");
         return sb.toString();
     }

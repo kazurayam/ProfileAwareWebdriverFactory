@@ -42,7 +42,7 @@ class ChromeProfileUtilsTest {
 	@Test
 	void test_allChromeUserProfileAsString() {
 		String text = ChromeProfileUtils.allChromeUserProfilesAsString()
-		logger.debug("[test_allChromeUserProfileAsString] text: " + text)
+		logger.info("[test_allChromeUserProfileAsString] text: " + text)
 		assertTrue( text.length() > 0)
 	}
 

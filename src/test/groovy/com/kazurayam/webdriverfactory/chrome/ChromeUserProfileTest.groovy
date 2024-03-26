@@ -50,18 +50,45 @@ class ChromeUserProfileTest {
 	}
 
 	@Test
+	void test_isPresent_positive() {
+		Path userDataDir = ChromeProfileUtils.getDefaultUserDataDir()
+		ChromeUserProfile defaultProfile =
+				new ChromeUserProfile(userDataDir, new CacheDirectoryName('Default')
+				)
+		assertTrue(defaultProfile.isPresent());
+	}
+
+	@Test
+	void test_isPresent_negative() {
+		Path userDataDir = ChromeProfileUtils.getDefaultUserDataDir()
+		ChromeUserProfile defaultProfile =
+				new ChromeUserProfile(userDataDir, new CacheDirectoryName('Profile 999'))
+		assertFalse(defaultProfile.isPresent());
+	}
+
+
+	@Test
 	void test_toString() {
 		Path userDataDir = ChromeProfileUtils.getDefaultUserDataDir()
 		ChromeUserProfile defaultProfile =
-				new ChromeUserProfile(userDataDir,
-						new CacheDirectoryName('Default')
-				)
-		println defaultProfile.toString()
+				new ChromeUserProfile(userDataDir, new CacheDirectoryName('Default'))
+		logger.info("[test_toString] " + defaultProfile.toString());
 		assertTrue("defaultProfile.toString() should start with {",
 				defaultProfile.toString().startsWith("{"));
+		// make sure it is a parseable JSON text
 		JsonSlurper slurper = new JsonSlurper()
 		def obj = slurper.parseText(defaultProfile.toString())
-		assert obj != null
+		assertNotNull(obj);
+	}
+
+	@Test
+	void test_toString_isNotPresent() {
+		Path userDataDir = ChromeProfileUtils.getDefaultUserDataDir()
+		ChromeUserProfile dummyProfile =
+				new ChromeUserProfile(userDataDir, new CacheDirectoryName('dummy'))
+		String json = dummyProfile.toString()
+		logger.info("[test_toString_isNotPresent] " + json);
+		assertTrue(json.contains("\"isPresent\":false"))
 	}
 
 	@Test
