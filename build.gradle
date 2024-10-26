@@ -26,7 +26,7 @@ ext {
     groovyVersion = '2.4.21'
     slf4jVersion = '2.0.12'
     selenium3Version = '3.141.59'
-    webdrivermanagerVersion = '5.7.0'
+    webdrivermanagerVersion = '5.9.2'
     junitVersion = '4.12'
     subprocessjVersion = '0.3.3'
     jacksonVersion = '2.14.0'

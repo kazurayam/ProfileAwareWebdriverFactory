@@ -7,6 +7,7 @@ import io.github.bonigarcia.wdm.WebDriverManager
 import org.junit.After
 import org.junit.Before
 import org.junit.BeforeClass
+import org.junit.Ignore
 import org.junit.Test
 import org.openqa.selenium.Cookie
 
@@ -17,14 +18,14 @@ import static org.junit.Assert.*
 /**
  * I marked this test as @Ignore.
  * Why?
- * Because this test fails when I run it while a Chrome browser is already opened.
+ * Because I know that this test fails when I run it while a Chrome browser is already opened.
  * The test fails because the FOR_HERE option.
  *
  * However this test is valuable. It demonstrates how the ChromeDriverFactory class
  * can help you carry over cookie info over HTTP sessions via Chrome profile.
  *
  */
-//@Ignore
+@Ignore
 class CarryingCookieOverSessionsViaChromeProfileTest {
 
     private CookieServer cookieServer
